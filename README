@@ -1,0 +1,210 @@
+
+
+Thoth - Android RSS Reader
+==========================
+
+Concept
+-------
+Simple, elegant RSS reader. That's it. 
+
+
+Explanation
+-----------
+We all need something to replace the "Google Reader" android app that will be end-of-lived on July 1, 2013.
+Most of the alternatives in the market now rely on Google's reader service that is also being discontiued and/or have really poor outdated UI.
+also ads.. blech. not even google reader had those!
+
+
+Functional Requirements
+-----------------------
+    - alternative to google reader app for android (closing july 1st)
+    - free to use, all features open.
+    - name-your-own-price in-app billing (shareware nag dialog)
+    - elegant simple UI
+    - share intent from android chrome (in chrome, share a page to send it to app so app can scrape it for rss/atom definition)
+    - rss2 / atom support
+    - no discovery/search.
+    - 4.x+ 
+
+
+Competing apps
+--------------
+    - rssdemon (6k)
+        - starts up populated with random list of feeds.
+        - ads
+        - extra podcast stuff
+        - local search
+        - excessive notifications
+        - clumsy menu-driven ui
+        - import did not preserve folder structure
+    - feedly (63k)
+        - requires website account
+        - requires whole feedly ecosystem
+        - "innovative" view/interface is just distracting
+    - greader (39k)
+        - requires google reader or some other backend service
+        - like the sidebar nav ui
+        - confusing bottom-nav ui, (check and O?)
+        - feed dissapeared when i accidently clicked mark all as read
+    - google currents (38k)
+        - good "standard" drawer+cards ui
+        - no rss folder hierarchy
+        - cards are a little confusing because the layout/image switches
+        - paging through an article with horizontal swipe is strange
+    - pulse news (89k)
+        - magazine view
+        - slow
+        - tablet oriented
+    - newsrob (17k)
+        - clunky list view
+        - google reader required  
+
+
+
+
+UI Concept
+----------
+
+h3. Navigation Drawer
+    ref: http://developer.android.com/design/patterns/navigation-drawer.html
+
+    - "introduce to user"
+        - start with drawer open until the user opens it themself.
+    - swipe from the left edge to bring in.
+        - overlays the content. doesnt move it.
+    - List of collapsable tag "folders". aggregate unread counters
+        - tag folders contain feeds, with unread counters
+    - back button never shows the drawer.
+
+h3. Action Bar
+    - logo with navigation drawer
+    - title of feed
+
+    Only on ArticleListView
+        - sync button
+        - add button
+        - menu
+            - show unread checkbox
+            - mark all as read
+            - rename
+            - unsubscribe
+            - change folders
+
+    Only on SummaryView
+        - share button
+        - goto button
+
+
+h3. App Navigation
+    referencing: http://developer.android.com/design/patterns/navigation.html
+
+
+      +--------------------------> ArticleListView
+      |                                  |       
+      |                                  |      
+      |                                  +     
+      |  SummaryView  <----<swipe>  SummaryView  <swipe>----> SummaryView
+      |       |                      /   |    \                    |  
+      |     <back>             <click> <back> <share>            <back>
+      |       |                   |      |                         | 
+      |       |       Intent:"http://"   |                         |
+      |       |                          |                         |
+      +-------+--------------------------+-------------------------+
+
+
+
+Components
+-----
+
+h3. ArticleListView
+    - ListView of article  titles
+    - bold for unread
+
+h3. SummaryDetailView
+    - WebView of description.
+
+h3. AddFeedView
+    - name 
+    - url
+    - tags
+
+h3. ImportView
+    - handle .opml
+    - handle a .zip from google reader?
+
+h3. ThothDatabaseHelper
+    - feed table
+    - tag table
+    - tag_feeds join table
+    - article table
+
+
+h3. NagShop
+    - Shown after every 10 app starts until at least one product is purchased.
+    - 4 products:
+        - Free.    "Just stop bugging me."
+        - $1.00    "Thanks."
+        - $3.00    "This is pretty good."
+        - $5.00    "Awesome app!"
+
+
+
+Wishes
+------
+
+h3. Better image viewing than reader.
+
+h3. FeedCachingService
+    - IntentService that deals with fetching and caching description tags and images to disk.
+
+h3. PollingAlarm
+    - of type RTC so as to not wake device.
+
+
+
+
+
+
+
+
+
+Workflows
+----
+    Action Bar
+        Logo - slides nav drawer in from left
+        Sync 
+        Add - add new feed
+        Menu 
+            - import
+            - settings
+            - about
+            - purchase
+    Drawer
+        - feeds organized by tag, slide up/down tags by clicking on header (ala currents)
+        - can select a tag, or one particular feed
+
+    Article List
+        - card view or list view
+        - actionbar dropdown (view all or unread, card or listview)
+        left swipe: show drawer
+        right swipe: either next tag, or next feed
+        tap item: -> Summary View
+
+    Summary View
+        - webview of html from feed.
+        - overview nav bar:
+            - go to url (http intent)
+            - share (share intent)
+        - clicking an image brings up an panning/zooming imageviewer
+        swipe left/right: prev/next article (at end/start of list prev/next feed)
+
+    Nag Dialog
+        - modal dialog:
+            - message preamble
+            - products list
+            - okay/dismiss button bar
+
+
+
+
+
