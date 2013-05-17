@@ -71,10 +71,10 @@ public class ThothMainActivity extends Activity {
         boolean is_open = mDrawerLayout.isDrawerOpen(mDrawerList);
 
         //hide other actionbar items when drawer is visible
-//        menu.findItem(R.id.action_sync).setVisible(!is_open);
-//        menu.findItem(R.id.action_add).setVisible(!is_open);
-//        menu.findItem(R.id.action_share).setVisible(!is_open);
-//        menu.findItem(R.id.action_goto).setVisible(!is_open);
+        menu.findItem(R.id.action_subscribe).setVisible(!is_open);
+        menu.findItem(R.id.action_refresh).setVisible(!is_open);
+        menu.findItem(R.id.action_share).setVisible(!is_open);
+        menu.findItem(R.id.action_visitpage).setVisible(!is_open);
         return super.onPrepareOptionsMenu(menu);
     }
 
