@@ -134,9 +134,22 @@ h3. ImportView
 
 h3. ThothDatabaseHelper
     - feed table
+        - title
+        - link
+        - description
+        - timestamp
+        - unread_count
     - tag table
+        - name 
+        - unread_count
     - tag_feeds join table
     - article table
+        - feed_id
+        - guid
+        - title
+        - link
+        - description
+        - timestamp
 
 
 h3. NagShop
