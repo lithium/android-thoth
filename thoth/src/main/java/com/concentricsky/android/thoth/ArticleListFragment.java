@@ -2,10 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.ListFragment;
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -24,7 +21,25 @@ public class ArticleListFragment extends ListFragment implements ThothFragmentIn
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        menu.findItem(R.id.action_share).setVisible(!drawer_open);
-        menu.findItem(R.id.action_visitpage).setVisible(!drawer_open);
+        menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
+        menu.findItem(R.id.action_refresh).setVisible(!drawer_open);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+       switch (item.getItemId()) {
+           case R.id.action_subscribe:
+               ThothMainActivity act = (ThothMainActivity)getActivity();
+               act.showSubscribe();
+               return true;
+       }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().invalidateOptionsMenu();
     }
 }

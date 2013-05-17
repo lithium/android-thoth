@@ -16,14 +16,12 @@
           android:orderInCategory="10"
           android:icon="@drawable/navigation_forward"
           android:title="Visit Page"
-          android:visible="false"
           android:showAsAction="ifRoom" />
 
     <item android:id="@+id/action_share"
           android:orderInCategory="20"
           android:icon="@drawable/social_share"
           android:title="Share"
-          android:visible="false"
           android:showAsAction="ifRoom" />
 
 

@@ -22,8 +22,9 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
-        menu.findItem(R.id.action_refresh).setVisible(!drawer_open);
+
+//        menu.findItem(R.id.action_share).setVisible(!drawer_open);
+//        menu.findItem(R.id.action_visitpage).setVisible(!drawer_open);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

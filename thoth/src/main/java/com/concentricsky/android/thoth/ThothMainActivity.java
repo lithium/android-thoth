@@ -1,11 +1,8 @@
 package com.concentricsky.android.thoth;
 
-import android.app.ActionBar;
-import android.app.Fragment;
-import android.app.FragmentManager;
+import android.app.*;
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.app.Activity;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -25,7 +22,6 @@ public class ThothMainActivity extends Activity {
     private FragmentManager mFragmentManager;
     private ArticleListFragment mArticleListFragment;
     private SubscribeFragment mSubscribeFragment;
-    private ThothFragmentInterface mCurrentFragment;
 
 
 //    private RequestQueue mRequestQueue;
@@ -76,19 +72,25 @@ public class ThothMainActivity extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.thoth_main, menu);
+        menu.findItem(R.id.action_refresh).setVisible(false);
+        menu.findItem(R.id.action_subscribe).setVisible(false);
+        menu.findItem(R.id.action_share).setVisible(false);
+        menu.findItem(R.id.action_visitpage).setVisible(false);
         return true;
     }
 
+    private ThothFragmentInterface getCurrentFragment()
+    {
+        return (ThothFragmentInterface)mFragmentManager.findFragmentByTag("current_fragment");
+    }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean is_open = mDrawerLayout.isDrawerOpen(mDrawerList);
 
-        //hide other actionbar items when drawer is visible
-
-
-        if (mCurrentFragment != null) {
-            mCurrentFragment.onPrepareOptionsMenu(menu, is_open);
+        ThothFragmentInterface frag = getCurrentFragment();
+        if (frag != null) {
+            frag.onPrepareOptionsMenu(menu, is_open);
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -100,7 +102,8 @@ public class ThothMainActivity extends Activity {
             return true;
         }
 
-        if (mCurrentFragment != null && mCurrentFragment.onOptionsItemSelected(item)) {
+        ThothFragmentInterface frag = getCurrentFragment();
+        if (frag != null && frag.onOptionsItemSelected(item)) {
             return true;
         }
 
@@ -146,7 +149,6 @@ public class ThothMainActivity extends Activity {
 
         @Override
         public void onDrawerOpened(View drawerView) {
-//            mActionBar.setTitle(mDrawerTitle)
             invalidateOptionsMenu();
         }
     }
@@ -156,20 +158,21 @@ public class ThothMainActivity extends Activity {
      * Private Methods
      */
 
-    private void showArticleList()
+    public void showArticleList()
     {
-        mFragmentManager.beginTransaction().replace(R.id.content_frame, mArticleListFragment).commit();
-        mCurrentFragment = mArticleListFragment;
+        mFragmentManager.beginTransaction().replace(R.id.content_frame, mArticleListFragment, "current_fragment").commit();
+        invalidateOptionsMenu();
     }
 
-    private void showSubscribe()
+    public void showSubscribe()
     {
         if (mSubscribeFragment == null) {
             mSubscribeFragment = new SubscribeFragment();
         }
-        mFragmentManager.beginTransaction().replace(R.id.content_frame, mSubscribeFragment).commit();
-
-        mCurrentFragment = mSubscribeFragment;
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack(null);
+        trans.commit();
+        invalidateOptionsMenu();
     }
 
 }
