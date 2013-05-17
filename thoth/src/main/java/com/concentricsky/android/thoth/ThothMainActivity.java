@@ -1,6 +1,8 @@
 package com.concentricsky.android.thoth;
 
 import android.app.ActionBar;
+import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.app.Activity;
@@ -20,6 +22,10 @@ public class ThothMainActivity extends Activity {
     private DrawerLayout mDrawerLayout;
     private ListView mDrawerList;
     private ThothActionBarDrawerToggle mDrawerToggle;
+    private FragmentManager mFragmentManager;
+    private ArticleListFragment mArticleListFragment;
+    private SubscribeFragment mSubscribeFragment;
+    private ThothFragmentInterface mCurrentFragment;
 
 
 //    private RequestQueue mRequestQueue;
@@ -45,8 +51,16 @@ public class ThothMainActivity extends Activity {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
 
+        //set up fragments
+        mFragmentManager = getFragmentManager();
+        mArticleListFragment = new ArticleListFragment();
+        mSubscribeFragment = null; //create on demand
+
+
+
        if (savedInstanceState == null) {
            //initial startup
+           showArticleList();
        }
 
 
@@ -71,10 +85,12 @@ public class ThothMainActivity extends Activity {
         boolean is_open = mDrawerLayout.isDrawerOpen(mDrawerList);
 
         //hide other actionbar items when drawer is visible
-        menu.findItem(R.id.action_subscribe).setVisible(!is_open);
-        menu.findItem(R.id.action_refresh).setVisible(!is_open);
-        menu.findItem(R.id.action_share).setVisible(!is_open);
-        menu.findItem(R.id.action_visitpage).setVisible(!is_open);
+
+
+        if (mCurrentFragment != null) {
+            mCurrentFragment.onPrepareOptionsMenu(menu, is_open);
+        }
+
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -84,11 +100,11 @@ public class ThothMainActivity extends Activity {
             return true;
         }
 
-        switch (item.getItemId()) {
-        //case R.id.action_sync:
-        default:
-            return super.onOptionsItemSelected(item);
+        if (mCurrentFragment != null && mCurrentFragment.onOptionsItemSelected(item)) {
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
 
@@ -107,6 +123,7 @@ public class ThothMainActivity extends Activity {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
 
     /*
      * Private Classes
@@ -134,5 +151,25 @@ public class ThothMainActivity extends Activity {
         }
     }
 
+
+    /*
+     * Private Methods
+     */
+
+    private void showArticleList()
+    {
+        mFragmentManager.beginTransaction().replace(R.id.content_frame, mArticleListFragment).commit();
+        mCurrentFragment = mArticleListFragment;
+    }
+
+    private void showSubscribe()
+    {
+        if (mSubscribeFragment == null) {
+            mSubscribeFragment = new SubscribeFragment();
+        }
+        mFragmentManager.beginTransaction().replace(R.id.content_frame, mSubscribeFragment).commit();
+
+        mCurrentFragment = mSubscribeFragment;
+    }
 
 }
