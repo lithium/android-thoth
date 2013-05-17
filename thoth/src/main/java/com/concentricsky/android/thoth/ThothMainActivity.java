@@ -15,6 +15,7 @@ public class ThothMainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        //http://www.youtube.com/watch?v=yhv8l9F44qo#t=14m36
         mRequestQueue = Volley.newRequestQueue(this);
     }
 
