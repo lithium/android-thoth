@@ -12,8 +12,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.Volley;
+//import com.android.volley.RequestQueue;
+//import com.android.volley.toolbox.Volley;
 
 public class ThothMainActivity extends Activity {
     private ActionBar mActionBar;
@@ -22,7 +22,7 @@ public class ThothMainActivity extends Activity {
     private ThothActionBarDrawerToggle mDrawerToggle;
 
 
-    private RequestQueue mRequestQueue;
+//    private RequestQueue mRequestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
