@@ -3,13 +3,19 @@ package com.concentricsky.android.thoth;
 import android.os.Bundle;
 import android.app.Activity;
 import android.view.Menu;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
 
 public class ThothMainActivity extends Activity {
+
+    private RequestQueue mRequestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mRequestQueue = Volley.newRequestQueue(this);
     }
 
 
