@@ -68,7 +68,9 @@
           <root url="jar://$MODULE_DIR$/thoth/libs/volley-c6b2aaa.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/thoth/libs/volley-c6b2aaa.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
