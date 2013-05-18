@@ -27,9 +27,7 @@ public class ThothMainActivity extends Activity
     private FragmentManager mFragmentManager;
     private ArticleListFragment mArticleListFragment;
     private SubscribeFragment mSubscribeFragment;
-//    private ThothDatabaseHelper mDbHelper;
     private ThothDrawerAdapter mDrawerAdapter;
-
 
 //    private RequestQueue mRequestQueue;
 
@@ -38,7 +36,10 @@ public class ThothMainActivity extends Activity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        mDbHelper = new ThothDatabaseHelper((Context)this);
+        //set up action bar
+        mActionBar = getActionBar();
+        mActionBar.setDisplayHomeAsUpEnabled(true);
+        mActionBar.setHomeButtonEnabled(true);
 
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -49,14 +50,12 @@ public class ThothMainActivity extends Activity
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
-        getLoaderManager().initLoader(0, null, this);
-
-        mActionBar = getActionBar();
-        mActionBar.setDisplayHomeAsUpEnabled(true);
-        mActionBar.setHomeButtonEnabled(true);
-
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
+
+
+        //start loaders
+        getLoaderManager().initLoader(0, null, this);
 
 
         //set up fragments
@@ -210,11 +209,6 @@ public class ThothMainActivity extends Activity
             return ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
         }
 
-//        @Override
-//        protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-//            super.bindChildView(view, context, cursor, isLastChild);
-////            Button b = (Button)view.findViewById(android.R.id.button1);
-//        }
     }
 
     /*

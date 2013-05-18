@@ -166,6 +166,9 @@ public class ThothDatabaseHelper
     public Cursor getFeedCursor(int tag_id)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        return db.rawQuery("SELECT _id,title FROM "+FEED_TABLE_NAME+" JOIN "+FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=?", new String[] {String.valueOf(tag_id)});
+        Cursor c = db.rawQuery("SELECT _id,title FROM "+FEED_TABLE_NAME+" JOIN "+FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=?", new String[] {String.valueOf(tag_id)});
+        if (!c.moveToFirst())
+            return null;
+        return c;
     }
 }

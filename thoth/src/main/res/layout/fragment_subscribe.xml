@@ -3,10 +3,26 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="match_parent"
+              android:padding="8dp"
+              >
 
     <TextView
-            android:text="subscribe..."
+            android:text="@string/subscribe_link_prompt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+    <EditText android:id="@+id/subscribe_link"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="wrap_content"
+            />
+
+    <Button android:id="@+id/subscribe_submit"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="@string/subscribe"
+            />
+
 </LinearLayout>
