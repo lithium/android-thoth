@@ -14,8 +14,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
-//import com.android.volley.RequestQueue;
-//import com.android.volley.toolbox.Volley;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.Volley;
+
 
 public class ThothMainActivity extends Activity
                                implements LoaderManager.LoaderCallbacks<Cursor>
@@ -29,7 +30,7 @@ public class ThothMainActivity extends Activity
     private SubscribeFragment mSubscribeFragment;
     private ThothDrawerAdapter mDrawerAdapter;
 
-//    private RequestQueue mRequestQueue;
+    private RequestQueue mRequestQueue;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,8 +80,7 @@ public class ThothMainActivity extends Activity
 
 
         //http://www.youtube.com/watch?v=yhv8l9F44qo#t=14m36
-//        mRequestQueue = Volley.newRequestQueue(this);
-
+        mRequestQueue = Volley.newRequestQueue(this);
 
     }
 
