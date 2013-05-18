@@ -9,8 +9,26 @@ import android.database.sqlite.SQLiteStatement;
 /**
  * Created by wiggins on 5/17/13.
  */
-public class ThothDatabaseHelper extends SQLiteOpenHelper
+public class ThothDatabaseHelper
 {
+    private static ThothDatabaseHelper instance = null;
+    private ThothOpenHelper mOpenHelper;
+
+    public ThothDatabaseHelper() {  }
+
+    public static ThothDatabaseHelper getInstance() {
+        if (instance == null) {
+            instance = new ThothDatabaseHelper();
+        }
+        return instance;
+    }
+
+    public void init(Context context) {
+       mOpenHelper = new ThothOpenHelper(context);
+    }
+
+
+
     private static final String TAG = "ThothDatabaseHelper";
 
 
@@ -66,32 +84,35 @@ public class ThothDatabaseHelper extends SQLiteOpenHelper
 
 
 
-    public ThothDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, DATABASE_VERSION);
-    }
+    private class ThothOpenHelper extends SQLiteOpenHelper {
 
+        public ThothOpenHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
 
-    @Override
-    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL(FEED_TABLE_CREATE);
-        sqLiteDatabase.execSQL(TAG_TABLE_CREATE);
-        sqLiteDatabase.execSQL(FEEDTAG_TABLE_CREATE);
-        sqLiteDatabase.execSQL(ARTICLE_TABLE_CREATE);
+        @Override
+        public void onCreate(SQLiteDatabase sqLiteDatabase) {
+            sqLiteDatabase.execSQL(FEED_TABLE_CREATE);
+            sqLiteDatabase.execSQL(TAG_TABLE_CREATE);
+            sqLiteDatabase.execSQL(FEEDTAG_TABLE_CREATE);
+            sqLiteDatabase.execSQL(ARTICLE_TABLE_CREATE);
 
-    }
+        }
 
-    @Override
-    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-        sqLiteDatabase.execSQL(FEED_TABLE_DROP);
-        sqLiteDatabase.execSQL(TAG_TABLE_DROP);
-        sqLiteDatabase.execSQL(FEEDTAG_TABLE_DROP);
-        sqLiteDatabase.execSQL(ARTICLE_TABLE_DROP);
-        onCreate(sqLiteDatabase);
+        @Override
+        public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
+            sqLiteDatabase.execSQL(FEED_TABLE_DROP);
+            sqLiteDatabase.execSQL(TAG_TABLE_DROP);
+            sqLiteDatabase.execSQL(FEEDTAG_TABLE_DROP);
+            sqLiteDatabase.execSQL(ARTICLE_TABLE_DROP);
+            onCreate(sqLiteDatabase);
+        }
+
     }
 
     public long addTag(String title)
     {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         SQLiteStatement stmt = db.compileStatement(TAG_TABLE_INSERT);
         stmt.bindString(1, title);
         return stmt.executeInsert();
@@ -99,7 +120,7 @@ public class ThothDatabaseHelper extends SQLiteOpenHelper
 
     public long addFeed(String link, String title, long[] tags)
     {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         SQLiteStatement feed_insert = db.compileStatement(FEED_TABLE_INSERT);
         feed_insert.bindString(1, link);
         feed_insert.bindString(2, title);
@@ -111,7 +132,7 @@ public class ThothDatabaseHelper extends SQLiteOpenHelper
 
     public int renameFeed(long feed_id, String title)
     {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
         SQLiteStatement feed_update = db.compileStatement("UPDATE " + FEED_TABLE_NAME + " SET title=? WHERE feed_id=?");
         feed_update.bindString(1, title);
         feed_update.bindLong(2, feed_id);
@@ -120,7 +141,7 @@ public class ThothDatabaseHelper extends SQLiteOpenHelper
 
     public void updateFeedTags(long feed_id, long[] tags)
     {
-        SQLiteDatabase db = getWritableDatabase();
+        SQLiteDatabase db = mOpenHelper.getWritableDatabase();
 
         db.execSQL("DELETE FROM " + FEEDTAG_TABLE_NAME + " WHERE feed_id=?;", new String[] {String.valueOf(feed_id)});
 
@@ -135,17 +156,16 @@ public class ThothDatabaseHelper extends SQLiteOpenHelper
 
     public Cursor getTagCursor()
     {
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT _id,title FROM " + TAG_TABLE_NAME + " ORDER BY title", null);
-        if (!c.moveToFirst()) {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM " + TAG_TABLE_NAME + " ORDER BY title", null);
+        if (!c.moveToFirst())
             return null;
-        }
         return c;
     }
 
     public Cursor getFeedCursor(int tag_id)
     {
-        SQLiteDatabase db = getReadableDatabase();
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         return db.rawQuery("SELECT _id,title FROM "+FEED_TABLE_NAME+" JOIN "+FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=?", new String[] {String.valueOf(tag_id)});
     }
 }

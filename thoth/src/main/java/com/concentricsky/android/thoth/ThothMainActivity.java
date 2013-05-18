@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.*;
 import android.content.Context;
+import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -16,7 +17,9 @@ import android.widget.*;
 //import com.android.volley.RequestQueue;
 //import com.android.volley.toolbox.Volley;
 
-public class ThothMainActivity extends Activity {
+public class ThothMainActivity extends Activity
+                               implements LoaderManager.LoaderCallbacks<Cursor>
+{
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
@@ -24,7 +27,7 @@ public class ThothMainActivity extends Activity {
     private FragmentManager mFragmentManager;
     private ArticleListFragment mArticleListFragment;
     private SubscribeFragment mSubscribeFragment;
-    private ThothDatabaseHelper mDbHelper;
+//    private ThothDatabaseHelper mDbHelper;
     private ThothDrawerAdapter mDrawerAdapter;
 
 
@@ -35,7 +38,7 @@ public class ThothMainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mDbHelper = new ThothDatabaseHelper(this);
+//        mDbHelper = new ThothDatabaseHelper((Context)this);
 
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -45,6 +48,8 @@ public class ThothMainActivity extends Activity {
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+
+        getLoaderManager().initLoader(0, null, this);
 
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -66,6 +71,7 @@ public class ThothMainActivity extends Activity {
            showArticleList();
 
            //debug tables
+//           ThothDatabaseHelper mDbHelper = ThothDatabaseHelper.getInstance();
 //           long[] tags = {mDbHelper.addTag("hobby")};
 //           mDbHelper.addFeed("http://diydrones.com/profiles/blog/feed?user=3m9btzxk9mkpg&amp;xn_auth=no", "Joshua Ott's Posts - DIY Drones", tags);
 //           mDbHelper.addFeed("http://www.fleshpilot.com/?feed=rss2", "Flesh Pilot", tags);
@@ -141,6 +147,25 @@ public class ThothMainActivity extends Activity {
 
 
     /*
+     * LoaderManager Methods
+     */
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new ThothNavigationLoader(this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mDrawerAdapter.changeCursor(cursor);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+        mDrawerAdapter.changeCursor(null);
+    }
+
+
+    /*
      * Private Classes
      */
     private class DrawerItemClickListener implements ListView.OnItemClickListener {
@@ -170,19 +195,19 @@ public class ThothMainActivity extends Activity {
 
         public ThothDrawerAdapter() {
             super(ThothMainActivity.this,
-                    mDbHelper.getTagCursor(),
-                    android.R.layout.simple_list_item_2,
-                    new String[] {"_id", "title"}, // groupFrom,
-                    new int[] {android.R.id.text1, android.R.id.text2}, // groupTo,
-                    android.R.layout.simple_list_item_2,
-                    new String[] {"_id", "title"}, // childFrom,
-                    new int[] {android.R.id.text1, android.R.id.text2}); // childTo);
+                    null,
+                    android.R.layout.simple_expandable_list_item_2,
+                    new String[]{"_id", "title"}, // groupFrom,
+                    new int[]{android.R.id.text1, android.R.id.text2}, // groupTo,
+                    android.R.layout.simple_expandable_list_item_2,
+                    new String[]{"_id", "title"}, // childFrom,
+                    new int[]{android.R.id.text1, android.R.id.text2}); // childTo);
         }
 
         @Override
         protected Cursor getChildrenCursor(Cursor cursor) {
             int tag_id = cursor.getInt(cursor.getColumnIndex("_id"));
-            return mDbHelper.getFeedCursor(tag_id);
+            return ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
         }
 
 //        @Override
