@@ -1,7 +1,9 @@
 package com.concentricsky.android.thoth;
 
 import android.app.*;
+import android.content.Context;
 import android.content.res.Configuration;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -9,19 +11,21 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
+import android.view.ViewGroup;
+import android.widget.*;
 //import com.android.volley.RequestQueue;
 //import com.android.volley.toolbox.Volley;
 
 public class ThothMainActivity extends Activity {
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
-    private ListView mDrawerList;
+    private ExpandableListView mDrawerList;
     private ThothActionBarDrawerToggle mDrawerToggle;
     private FragmentManager mFragmentManager;
     private ArticleListFragment mArticleListFragment;
     private SubscribeFragment mSubscribeFragment;
+    private ThothDatabaseHelper mDbHelper;
+    private ThothDrawerAdapter mDrawerAdapter;
 
 
 //    private RequestQueue mRequestQueue;
@@ -31,12 +35,15 @@ public class ThothMainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        mDbHelper = new ThothDatabaseHelper(this);
+
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
-        mDrawerList = (ListView)findViewById(R.id.navigation_drawer);
-
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
-//        mDrawerList.setAdapter();
+
+        mDrawerAdapter = new ThothDrawerAdapter();
+        mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
+        mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
 
         mActionBar = getActionBar();
@@ -57,6 +64,11 @@ public class ThothMainActivity extends Activity {
        if (savedInstanceState == null) {
            //initial startup
            showArticleList();
+
+           //debug tables
+//           long[] tags = {mDbHelper.addTag("hobby")};
+//           mDbHelper.addFeed("http://diydrones.com/profiles/blog/feed?user=3m9btzxk9mkpg&amp;xn_auth=no", "Joshua Ott's Posts - DIY Drones", tags);
+//           mDbHelper.addFeed("http://www.fleshpilot.com/?feed=rss2", "Flesh Pilot", tags);
        }
 
 
@@ -153,6 +165,32 @@ public class ThothMainActivity extends Activity {
         }
     }
 
+
+    private class ThothDrawerAdapter extends SimpleCursorTreeAdapter {
+
+        public ThothDrawerAdapter() {
+            super(ThothMainActivity.this,
+                    mDbHelper.getTagCursor(),
+                    android.R.layout.simple_list_item_2,
+                    new String[] {"_id", "title"}, // groupFrom,
+                    new int[] {android.R.id.text1, android.R.id.text2}, // groupTo,
+                    android.R.layout.simple_list_item_2,
+                    new String[] {"_id", "title"}, // childFrom,
+                    new int[] {android.R.id.text1, android.R.id.text2}); // childTo);
+        }
+
+        @Override
+        protected Cursor getChildrenCursor(Cursor cursor) {
+            int tag_id = cursor.getInt(cursor.getColumnIndex("_id"));
+            return mDbHelper.getFeedCursor(tag_id);
+        }
+
+//        @Override
+//        protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
+//            super.bindChildView(view, context, cursor, isLastChild);
+////            Button b = (Button)view.findViewById(android.R.id.button1);
+//        }
+    }
 
     /*
      * Private Methods
