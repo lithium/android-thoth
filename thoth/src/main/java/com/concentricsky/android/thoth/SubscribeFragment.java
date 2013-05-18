@@ -8,9 +8,13 @@ import android.view.*;
 import android.widget.Button;
 import android.widget.EditText;
 import com.android.volley.*;
+import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -50,7 +54,12 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
                 String link = mLinkText.getText().toString();
 //                ThothDatabaseHelper.getInstance().addFeed(link,title,tags);
 
-                mRequestQueue.add(new SubscribeFeedRequest(link));
+                mRequestQueue.add(new SubscribeFeedRequest(link, new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.d(TAG, "volley error! "+error);
+                    }
+                }));
             }
 
         });
@@ -71,27 +80,47 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
     }
 
 
-    private class SubscribeFeedRequest extends StringRequest {
+    private class SubscribeFeedRequest extends Request<Feed> {
+        private Response.ErrorListener mErrorListener;
 
-        private SubscribeFeedRequest(String url) {
-            super(Request.Method.GET, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        Log.d(TAG, "got subscribe response");
+        public SubscribeFeedRequest(String url, Response.ErrorListener errorListener)
+        {
+            super(Request.Method.GET, url, errorListener);
+            mErrorListener = errorListener;
+        }
 
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "volley error! "+error);
+        @Override
+        protected Response<Feed> parseNetworkResponse(NetworkResponse response) {
+            String parsed;
+            try {
+                parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+            } catch (UnsupportedEncodingException e) {
+                parsed = new String(response.data);
+            }
+            Feed feed = null;
 
-                    }
-                });
+            if (response.headers.get("Content-Type").startsWith("text/xml")) {
+                feed = FeedHelper.attemptToParseFeed(parsed);
+                if (feed != null) {
+                    return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
+                }
+            }
+            else {
+                String feed_url = FeedHelper.scanHtmlForFeedUrl(parsed);
+                if (feed_url != null) {
+                    mRequestQueue.add(new SubscribeFeedRequest(feed_url, mErrorListener));
+                }
+            }
 
+            //TODO: do we need to report subscribe error to user here?
+            return null;
+        }
+
+        @Override
+        protected void deliverResponse(Feed response) {
 
         }
 
     }
+    
 }
