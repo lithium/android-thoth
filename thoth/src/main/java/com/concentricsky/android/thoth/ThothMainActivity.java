@@ -227,7 +227,7 @@ public class ThothMainActivity extends Activity
             mSubscribeFragment = new SubscribeFragment();
         }
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack(null);
+        trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack("Subscribe");
         trans.commit();
         invalidateOptionsMenu();
     }

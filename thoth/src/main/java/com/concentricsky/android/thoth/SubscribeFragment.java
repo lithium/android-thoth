@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -48,12 +49,20 @@ public class SubscribeFragment extends  Fragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mRequestQueue = Volley.newRequestQueue(activity);
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mRequestQueue.stop();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        mLinkText.setText("");
+        mFeedTags.setText("");
     }
 
     @Override
@@ -104,14 +113,21 @@ public class SubscribeFragment extends  Fragment
 //                Log.d(TAG, "create new feed with tags: "+tags);
                 String[] tags = mFeedTags.getText().toString().split(",");
                 for (String tag_name : tags) {
-                    Tag tag = mDbHelper.getOrCreateTag(tag_name);
+                    Tag tag = mDbHelper.getOrCreateTag(tag_name.trim());
                 }
 
+                // TODO: move this off main thread
                 mFeed.save(mDbHelper.getWritableDatabase());
+                popBackStack();
             }
         });
 
         return root;
+    }
+
+    private void popBackStack()
+    {
+        getActivity().getFragmentManager().popBackStack("Subscribe", FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     @Override
