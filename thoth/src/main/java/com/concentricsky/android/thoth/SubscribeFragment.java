@@ -81,12 +81,14 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
 
 
     private class SubscribeFeedRequest extends Request<Feed> {
+        private String mLink;
         private Response.ErrorListener mErrorListener;
 
         public SubscribeFeedRequest(String url, Response.ErrorListener errorListener)
         {
             super(Request.Method.GET, url, errorListener);
             mErrorListener = errorListener;
+            mLink = url;
         }
 
         @Override
@@ -106,21 +108,29 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
                 }
             }
             else {
-                String feed_url = FeedHelper.scanHtmlForFeedUrl(parsed);
+                String feed_url = FeedHelper.scanHtmlForFeedUrl(mLink, parsed);
                 if (feed_url != null) {
-                    mRequestQueue.add(new SubscribeFeedRequest(feed_url, mErrorListener));
+                    feed = new Feed();
+                    feed.link = feed_url;
+                    feed.title = null; // indicate this still needs to be scraped
+                    return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
                 }
             }
 
-            //TODO: do we need to report subscribe error to user here?
-            return null;
+            return Response.error(new ParseError());
         }
 
         @Override
         protected void deliverResponse(Feed response) {
+            if (response.title == null) {
+                mRequestQueue.add(new SubscribeFeedRequest(response.link, mErrorListener));
+            }
+            else {
+                //we found a new feed!
+            }
 
         }
 
     }
-    
+
 }
