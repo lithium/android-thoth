@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteStatement;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -15,6 +16,18 @@ public class ThothDatabaseHelper
     private ThothOpenHelper mOpenHelper;
 
     public ThothDatabaseHelper() {  }
+
+
+    public SQLiteDatabase getWritableDatabase() {
+        if (mOpenHelper != null)
+            return mOpenHelper.getWritableDatabase();
+        return null;
+    }
+    public SQLiteDatabase getReadableDatabase() {
+        if (mOpenHelper != null)
+            return mOpenHelper.getReadableDatabase();
+        return null;
+    }
 
     public static ThothDatabaseHelper getInstance() {
         if (instance == null) {
@@ -49,18 +62,17 @@ public class ThothDatabaseHelper
             "description TEXT,"+
             "timestamp INTEGER,"+
             "unread INTEGER);";
-    private static final String FEED_TABLE_INSERT = "INSERT INTO " + FEED_TABLE_NAME + " (link,title) VALUES (?,?);";
+    private static final String FEED_TABLE_INSERT = "INSERT INTO " + FEED_TABLE_NAME + " (url,link,title) VALUES (?,?);";
     private static final String FEED_TABLE_DROP = "DROP TABLE IF EXISTS "+FEED_TABLE_NAME+";";
 
-
-    private static final String TAG_TABLE_NAME = "tag";
-    private static final String TAG_TABLE_INSERT = "INSERT INTO " +TAG_TABLE_NAME + " (title) VALUES (?);";
-    private static final String TAG_TABLE_CREATE =
-        "CREATE TABLE " + TAG_TABLE_NAME + " ("+
-            "_id INTEGER PRIMARY KEY,"+
-            "title TEXT,"+
-            "unread INTEGER);";
-    private static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+";";
+    public static final String TAG_TABLE_NAME = "tag";
+    public static final String TAG_TABLE_CREATE =
+            "CREATE TABLE " + TAG_TABLE_NAME + " ("+
+                    "_id INTEGER PRIMARY KEY,"+
+                    "title TEXT,"+
+                    "unread INTEGER);";
+    public static final String TAG_TABLE_INSERT = "INSERT INTO " +TAG_TABLE_NAME + " (title) VALUES (?);";
+    public static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+";";
 
 
     private static final String FEEDTAG_TABLE_NAME = "feedtag";
@@ -111,13 +123,25 @@ public class ThothDatabaseHelper
 
     }
 
-    public long addTag(String title)
+    public Tag getOrCreateTag(String title)
     {
+        Tag tag = new Tag();
         SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+
+        Cursor c = db.rawQuery("SELECT * FROM "+ TAG_TABLE_NAME+" WHERE title=?", new String[] {title});
+        if (c.moveToFirst()) {
+            tag.hydrate(c);
+            return tag;
+        }
+
         SQLiteStatement stmt = db.compileStatement(TAG_TABLE_INSERT);
         stmt.bindString(1, title);
-        return stmt.executeInsert();
+        tag._id = stmt.executeInsert();
+        tag.title = title;
+        return tag;
     }
+
+
 
     public long addFeed(String link, String title, long[] tags)
     {
@@ -172,4 +196,5 @@ public class ThothDatabaseHelper
             return null;
         return c;
     }
+
 }

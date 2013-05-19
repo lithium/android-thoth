@@ -2,6 +2,8 @@ package com.concentricsky.android.thoth;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
@@ -23,6 +25,7 @@ public class SubscribeFragment extends  Fragment
 
 {
     private static final String TAG = "ThothSubscribeFragment";
+    private ThothDatabaseHelper mDbHelper;
     private RequestQueue mRequestQueue;
     private EditText mLinkText;
     private Button mSubmitButton;
@@ -38,6 +41,7 @@ public class SubscribeFragment extends  Fragment
 
     public SubscribeFragment() {
 
+        mDbHelper = ThothDatabaseHelper.getInstance();
     }
 
     @Override
@@ -68,7 +72,19 @@ public class SubscribeFragment extends  Fragment
         mFeedTitle = (TextView)root.findViewById(R.id.feed_title);
         mFeedDescription = (TextView)root.findViewById(R.id.feed_description);
         mFeedLink = (TextView)root.findViewById(R.id.feed_link);
+
         mFeedTags = (AutoCompleteTextView)root.findViewById(R.id.feed_tags);
+        Cursor cursor = mDbHelper.getTagCursor();
+        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
+                                            android.R.layout.simple_list_item_1,
+                                            cursor, new String[] {"title"}, new int[] {android.R.id.text1}, 0);
+        adapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
+            @Override
+            public CharSequence convertToString(Cursor cursor) {
+                return cursor.getString(cursor.getColumnIndexOrThrow("title"));
+            }
+        });
+        mFeedTags.setAdapter(adapter);
 
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -85,8 +101,13 @@ public class SubscribeFragment extends  Fragment
         mConfirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+//                Log.d(TAG, "create new feed with tags: "+tags);
                 String[] tags = mFeedTags.getText().toString().split(",");
-                Log.d(TAG, "create new feed with tags: "+tags);
+                for (String tag_name : tags) {
+                    Tag tag = mDbHelper.getOrCreateTag(tag_name);
+                }
+
+                mFeed.save(mDbHelper.getWritableDatabase());
             }
         });
 
