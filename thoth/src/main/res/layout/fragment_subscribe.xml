@@ -71,7 +71,7 @@
                   android:layout_height="wrap_content"
                   android:text="timestamp"
                 />
-        <AutoCompleteTextView
+        <com.concentricsky.android.thoth.AutoCompleteAppendTextView
                 android:id="@+id/feed_tags"
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"

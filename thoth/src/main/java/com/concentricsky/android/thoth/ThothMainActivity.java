@@ -195,12 +195,12 @@ public class ThothMainActivity extends Activity
         public ThothDrawerAdapter() {
             super(ThothMainActivity.this,
                     null,
-                    android.R.layout.simple_expandable_list_item_2,
-                    new String[]{"_id", "title"}, // groupFrom,
-                    new int[]{android.R.id.text1, android.R.id.text2}, // groupTo,
-                    android.R.layout.simple_expandable_list_item_2,
-                    new String[]{"_id", "title"}, // childFrom,
-                    new int[]{android.R.id.text1, android.R.id.text2}); // childTo);
+                    android.R.layout.simple_expandable_list_item_1,
+                    new String[]{"title"}, // groupFrom,
+                    new int[]{android.R.id.text1}, // groupTo,
+                    android.R.layout.simple_expandable_list_item_1,
+                    new String[]{"title"}, // childFrom,
+                    new int[]{android.R.id.text1}); // childTo);
         }
 
         @Override
