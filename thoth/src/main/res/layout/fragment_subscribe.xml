@@ -22,7 +22,70 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="right"
-            android:text="@string/subscribe"
+            android:text="@string/search"
             />
+
+    <ProgressBar android:id="@android:id/progress"
+           android:layout_marginTop="50dp"
+           android:layout_width="wrap_content"
+           android:layout_height="wrap_content"
+           android:layout_gravity="center"
+           android:visibility="invisible"
+           />
+    <TextView android:id="@+id/subscribe_error"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="error message"
+              android:textStyle="italic"
+              android:visibility="invisible"
+            />
+
+    <LinearLayout android:id="@+id/subscribe_feed_detail"
+        android:layout_marginTop="50dp"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        >
+
+        <TextView android:id="@+id/feed_title"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="center"
+              android:text="title"
+              android:textSize="28dp"
+              />
+        <TextView android:id="@+id/feed_link"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:text="link"
+              android:textSize="14dp"
+              />
+        <TextView android:id="@+id/feed_description"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:text="description"
+                />
+        <TextView android:id="@+id/feed_timestamp"
+                  android:layout_width="fill_parent"
+                  android:layout_height="wrap_content"
+                  android:text="timestamp"
+                />
+        <AutoCompleteTextView
+                android:id="@+id/feed_tags"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/tags"
+                />
+
+
+        <Button android:id="@+id/subscribe_confirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="right"
+                android:text="@string/subscribe"
+                />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -7,7 +7,9 @@
     </string>
     <string name="drawer_open" >Open navigation drawer</string>
     <string name="drawer_close" >Close navigation drawer</string>
-    <string name="subscribe_link_prompt">Feed URL:</string>
+    <string name="subscribe_link_prompt">Enter URL:</string>
     <string name="subscribe">Subscribe</string>
+    <string name="search">Search</string>
+    <string name="tags">tags</string>
 
 </resources>

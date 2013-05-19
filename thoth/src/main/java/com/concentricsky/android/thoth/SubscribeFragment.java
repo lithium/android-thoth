@@ -5,14 +5,13 @@ import android.app.Fragment;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
-import android.widget.Button;
-import android.widget.EditText;
+import android.widget.*;
 import com.android.volley.*;
-import com.android.volley.toolbox.HttpHeaderParser;
 import com.android.volley.toolbox.Volley;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
 
-import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -27,6 +26,15 @@ public class SubscribeFragment extends  Fragment
     private RequestQueue mRequestQueue;
     private EditText mLinkText;
     private Button mSubmitButton;
+    private Button mConfirmButton;
+    private View mDetailView;
+    private TextView mFeedLink;
+    private TextView mFeedDescription;
+    private TextView mFeedTitle;
+    private AutoCompleteTextView mFeedTags;
+    private Feed mFeed;
+    private ProgressBar mProgress;
+    private TextView mError;
 
     public SubscribeFragment() {
 
@@ -50,27 +58,43 @@ public class SubscribeFragment extends  Fragment
 
         mLinkText = (EditText)root.findViewById(R.id.subscribe_link);
         mSubmitButton = (Button)root.findViewById(R.id.subscribe_submit);
+        mConfirmButton = (Button)root.findViewById(R.id.subscribe_confirm);
+        mDetailView = root.findViewById(R.id.subscribe_feed_detail);
+
+        mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
+        mError = (TextView)root.findViewById(R.id.subscribe_error);
+
+
+        mFeedTitle = (TextView)root.findViewById(R.id.feed_title);
+        mFeedDescription = (TextView)root.findViewById(R.id.feed_description);
+        mFeedLink = (TextView)root.findViewById(R.id.feed_link);
+        mFeedTags = (AutoCompleteTextView)root.findViewById(R.id.feed_tags);
+
 
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String link = mLinkText.getText().toString();
-//                ThothDatabaseHelper.getInstance().addFeed(link,title,tags);
-
-                mRequestQueue.add(new SubscribeFeedRequest(link, SubscribeFragment.this, SubscribeFragment.this));
+                String url = mLinkText.getText().toString();
+                mRequestQueue.add(new SubscribeToFeedRequest(url, SubscribeFragment.this, SubscribeFragment.this));
+                mProgress.setVisibility(View.VISIBLE);
+                mDetailView.setVisibility(View.INVISIBLE);
             }
 
+        });
+
+        mConfirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String[] tags = mFeedTags.getText().toString().split(",");
+                Log.d(TAG, "create new feed with tags: "+tags);
+            }
         });
 
         return root;
     }
 
-
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-
-//        menu.findItem(R.id.action_share).setVisible(!drawer_open);
-//        menu.findItem(R.id.action_visitpage).setVisible(!drawer_open);
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -79,69 +103,29 @@ public class SubscribeFragment extends  Fragment
 
     @Override
     public void onResponse(Feed response) {
-        Log.d(TAG, "Response "+response.title);
+        if (response.title == null) { // only found a feed url, re-scrape
+            mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
+        }
+        else {
+            // feed found
+            Log.d(TAG, "Feed found: " + response.title);
+
+            mFeed = response;
+            mFeedTitle.setText(response.title);
+            mFeedLink.setText(response.link);
+            mFeedDescription.setText(response.description);
+            mDetailView.setVisibility(View.VISIBLE);
+            mProgress.setVisibility(View.GONE);
+        }
     }
 
     @Override
     public void onErrorResponse(VolleyError error) {
         Log.d(TAG, "volley error! "+error);
+        mError.setText(error.toString());
+        mProgress.setVisibility(View.INVISIBLE);
+        mError.setVisibility(View.VISIBLE);
     }
 
-
-    private class SubscribeFeedRequest extends Request<Feed> {
-        private Response.Listener<Feed> mListener;
-        private String mUrl;
-        private Response.ErrorListener mErrorListener;
-
-        public SubscribeFeedRequest(String url, Response.Listener<Feed> listener, Response.ErrorListener errorListener)
-        {
-            super(Request.Method.GET, url, errorListener);
-            mListener = listener;
-            mErrorListener = errorListener;
-            mUrl = url;
-        }
-
-        @Override
-        protected Response<Feed> parseNetworkResponse(NetworkResponse response) {
-            String parsed;
-            try {
-                parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
-            } catch (UnsupportedEncodingException e) {
-                parsed = new String(response.data);
-            }
-            Feed feed = null;
-
-            if (response.headers.containsKey("Content-Type") && response.headers.get("Content-Type").startsWith("text/html")) {
-                String feed_url = FeedHelper.scanHtmlForFeedUrl(mUrl, parsed);
-                if (feed_url != null) {
-                    feed = new Feed();
-                    feed.url = feed_url;
-                    feed.title = null; // indicate this still needs to be scraped
-                    return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
-                }
-            }
-            else {
-                feed = FeedHelper.attemptToParseFeed(parsed);
-                feed.url = mUrl;
-                if (feed != null) {
-                    return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
-                }
-            }
-
-            return Response.error(new ParseError());
-        }
-
-        @Override
-        protected void deliverResponse(Feed response) {
-            if (response.title == null) {
-                mRequestQueue.add(new SubscribeFeedRequest(response.url, mListener, mErrorListener));
-            }
-            else {
-                mListener.onResponse(response);
-            }
-
-        }
-
-    }
 
 }
