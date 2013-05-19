@@ -9,8 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import com.android.volley.*;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
 
@@ -19,7 +17,12 @@ import java.io.UnsupportedEncodingException;
 /**
  * Created by wiggins on 5/17/13.
  */
-public class SubscribeFragment extends Fragment implements ThothFragmentInterface {
+public class SubscribeFragment extends  Fragment
+                               implements   ThothFragmentInterface,
+                                            Response.Listener<Feed>,
+                                            Response.ErrorListener
+
+{
     private static final String TAG = "ThothSubscribeFragment";
     private RequestQueue mRequestQueue;
     private EditText mLinkText;
@@ -54,12 +57,7 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
                 String link = mLinkText.getText().toString();
 //                ThothDatabaseHelper.getInstance().addFeed(link,title,tags);
 
-                mRequestQueue.add(new SubscribeFeedRequest(link, new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        Log.d(TAG, "volley error! "+error);
-                    }
-                }));
+                mRequestQueue.add(new SubscribeFeedRequest(link, SubscribeFragment.this, SubscribeFragment.this));
             }
 
         });
@@ -79,16 +77,28 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
         return false;
     }
 
+    @Override
+    public void onResponse(Feed response) {
+        Log.d(TAG, "Response "+response.title);
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Log.d(TAG, "volley error! "+error);
+    }
+
 
     private class SubscribeFeedRequest extends Request<Feed> {
-        private String mLink;
+        private Response.Listener<Feed> mListener;
+        private String mUrl;
         private Response.ErrorListener mErrorListener;
 
-        public SubscribeFeedRequest(String url, Response.ErrorListener errorListener)
+        public SubscribeFeedRequest(String url, Response.Listener<Feed> listener, Response.ErrorListener errorListener)
         {
             super(Request.Method.GET, url, errorListener);
+            mListener = listener;
             mErrorListener = errorListener;
-            mLink = url;
+            mUrl = url;
         }
 
         @Override
@@ -101,18 +111,19 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
             }
             Feed feed = null;
 
-            if (response.headers.get("Content-Type").startsWith("text/xml")) {
-                feed = FeedHelper.attemptToParseFeed(parsed);
-                if (feed != null) {
+            if (response.headers.containsKey("Content-Type") && response.headers.get("Content-Type").startsWith("text/html")) {
+                String feed_url = FeedHelper.scanHtmlForFeedUrl(mUrl, parsed);
+                if (feed_url != null) {
+                    feed = new Feed();
+                    feed.url = feed_url;
+                    feed.title = null; // indicate this still needs to be scraped
                     return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
                 }
             }
             else {
-                String feed_url = FeedHelper.scanHtmlForFeedUrl(mLink, parsed);
-                if (feed_url != null) {
-                    feed = new Feed();
-                    feed.link = feed_url;
-                    feed.title = null; // indicate this still needs to be scraped
+                feed = FeedHelper.attemptToParseFeed(parsed);
+                feed.url = mUrl;
+                if (feed != null) {
                     return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
                 }
             }
@@ -123,10 +134,10 @@ public class SubscribeFragment extends Fragment implements ThothFragmentInterfac
         @Override
         protected void deliverResponse(Feed response) {
             if (response.title == null) {
-                mRequestQueue.add(new SubscribeFeedRequest(response.link, mErrorListener));
+                mRequestQueue.add(new SubscribeFeedRequest(response.url, mListener, mErrorListener));
             }
             else {
-                //we found a new feed!
+                mListener.onResponse(response);
             }
 
         }

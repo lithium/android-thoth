@@ -1,7 +1,14 @@
 package com.concentricsky.android.thoth;
 
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import org.xmlpull.v1.XmlPullParser;
+import org.xmlpull.v1.XmlPullParserException;
+import org.xmlpull.v1.XmlPullParserFactory;
 
+import java.io.IOException;
+import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -9,7 +16,8 @@ import java.util.regex.Pattern;
  * Created by wiggins on 5/18/13.
  */
 public class FeedHelper {
-   public static Feed attemptToParseFeed(String data)
+
+    public static Feed attemptToParseFeed(String data)
    {
        Feed ret = null;
        ret = attemptToParseRss(data);
@@ -18,11 +26,12 @@ public class FeedHelper {
        return ret;
    }
 
+    public enum RssXmlState {RSSXML_NONE, RSSXML_CHANNEL, RSSXML_ITEM};
+
     public static Feed attemptToParseRss(String data)
     {
-
-
-        return null;
+        RssFeedParser parser = new RssFeedParser();
+        return parser.parse(data);
     }
 
     public static Feed attemptToParseAtom(String data)

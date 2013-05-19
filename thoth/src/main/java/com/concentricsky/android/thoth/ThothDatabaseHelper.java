@@ -34,7 +34,7 @@ public class ThothDatabaseHelper
 
 
     private static final String DATABASE_NAME = "thoth.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
 
 
@@ -43,6 +43,7 @@ public class ThothDatabaseHelper
     private static final String FEED_TABLE_CREATE =
         "CREATE TABLE " + FEED_TABLE_NAME + " (" +
             "_id INTEGER PRIMARY KEY,"+
+            "url TEXT,"+
             "link TEXT,"+
             "title TEXT,"+
             "description TEXT,"+
