@@ -91,6 +91,11 @@ public class ThothMainActivity extends Activity
     }
 
 
+    public void reloadTags() {
+        getLoaderManager().restartLoader(TAG_LOADER_ID, null, this);
+    }
+
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.

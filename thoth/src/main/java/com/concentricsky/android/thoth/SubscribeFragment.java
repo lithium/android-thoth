@@ -128,7 +128,9 @@ public class SubscribeFragment extends  Fragment
 
     private void popBackStack()
     {
-        getActivity().getFragmentManager().popBackStack("Subscribe", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        ThothMainActivity activity = (ThothMainActivity)getActivity();
+        activity.reloadTags();
+        activity.getFragmentManager().popBackStack("Subscribe", FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
 
     @Override
