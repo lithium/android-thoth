@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth.com.concentricsky.android.thoth.models;
 
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
@@ -15,7 +16,7 @@ public class Article {
     public String guid;
     public long timestamp;
 
-    public static final int DATABASE_VERSION = 3;
+    public static final int DATABASE_VERSION = 4;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -56,6 +57,15 @@ public class Article {
             //TODO: update read/unread
 
         } else {
+            Cursor c = db.rawQuery("SELECT _id FROM "+ARTICLE_TABLE_NAME+ " WHERE feed_id=? AND guid=?", new String[] {
+                                                                                    String.valueOf(this.feed_id),
+                                                                                    this.guid});
+            if (c != null && c.moveToFirst()) {
+                // article with this guid already exists! we're done...
+                return true;
+            }
+
+
             SQLiteStatement stmt = db.compileStatement(ARTICLE_TABLE_INSERT);
             stmt.bindLong(1, this.feed_id);
             stmt.bindString(2, this.guid);
