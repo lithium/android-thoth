@@ -83,7 +83,7 @@ public class Feed {
         this.description = c.getString(c.getColumnIndexOrThrow("description"));
     }
 
-   public boolean save(SQLiteDatabase db)
+    public boolean save(SQLiteDatabase db)
     {
         if (db.isReadOnly())
             return false;
@@ -126,4 +126,7 @@ public class Feed {
     }
 
 
+    public static Cursor load(SQLiteDatabase db, long feed_id) {
+        return db.rawQuery("SELECT * FROM "+FEED_TABLE_NAME+ " WHERE _id=?", new String[] {String.valueOf(feed_id)});
+    }
 }

@@ -8,20 +8,25 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.view.*;
 import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
 
 /**
  * Created by wiggins on 5/17/13.
  */
 public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface,
-                                            LoaderManager.LoaderCallbacks<Cursor>
+                                 implements ThothFragmentInterface
 {
     private LoaderManager mLoaderManager;
 
-    private static final int FEED_LOADER_ID=-2;
     private SimpleCursorAdapter mAdapter;
-    private long mFeedId=-1;
+    private long mFeedId;
+    private Feed mFeed;
+    private TextView mFeedTitle;
+
+    private static final int FEED_LOADER_ID=-2;
+    private static final int ARTICLE_LOADER_ID=-3;
 
     public ArticleListFragment() {
 
@@ -29,15 +34,32 @@ public class ArticleListFragment extends ListFragment
 
 
     public void setFeed(long feed_id) {
+        if (feed_id == mFeedId) {
+            return;
+        }
+
         mFeedId = feed_id;
+        mFeed = null;
         load_feed();
     }
     private void load_feed()
     {
-        if (mLoaderManager == null || mFeedId < 1) {
+        if (mLoaderManager == null) {
             return;
         }
-        mLoaderManager.initLoader(FEED_LOADER_ID, null, this);
+
+        mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+        if (mFeedId != 0 && mFeed == null) {
+            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
+        }
+    }
+
+    private void update_feed()
+    {
+        if (mFeed == null) {
+            return;
+        }
+        mFeedTitle.setText(mFeed.title);
     }
 
     @Override
@@ -63,6 +85,7 @@ public class ArticleListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
 
+        mFeedTitle = (TextView)root.findViewById(R.id.articlelist_feed_title);
         return root;
     }
 
@@ -90,26 +113,53 @@ public class ArticleListFragment extends ListFragment
         getActivity().invalidateOptionsMenu();
     }
 
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new SimpleCursorLoader(getActivity()) {
-            @Override
-            public Cursor loadInBackground() {
-                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+    private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
+    {
+        @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            return new SimpleCursorLoader(getActivity()) {
+                @Override
+                public Cursor loadInBackground() {
+                    return Feed.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mFeedId);
+                }
+            };
+        }
+        @Override
+        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                mFeed = new Feed();
+                mFeed.hydrate(cursor);
+                update_feed();
             }
-        };
+        }
+        @Override
+        public void onLoaderReset(Loader<Cursor> loader) {
 
-
+        }
     }
 
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAdapter.changeCursor(cursor);
-    }
+    private class ArticleCursorLoader implements LoaderManager.LoaderCallbacks<Cursor>
+    {
 
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.changeCursor(null);
+        @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            return new SimpleCursorLoader(getActivity()) {
+                @Override
+                public Cursor loadInBackground() {
+                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+            mAdapter.changeCursor(cursor);
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
+            mAdapter.changeCursor(null);
+        }
     }
 
 }

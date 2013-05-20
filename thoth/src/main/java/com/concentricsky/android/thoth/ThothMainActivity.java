@@ -174,7 +174,7 @@ public class ThothMainActivity extends Activity
                 }
             };
         }
-        // shouldn't get here!
+        // shouldn't load here!
         return null;
     }
 
