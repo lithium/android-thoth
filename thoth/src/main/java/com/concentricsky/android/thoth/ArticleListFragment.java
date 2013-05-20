@@ -45,8 +45,9 @@ public class ArticleListFragment extends ListFragment
 
         mFeedId = feed_id;
         mFeed = null;
-        if (mAdapter != null) {
+        if (mLoaderManager != null) {
             mLoaderManager.destroyLoader(ARTICLE_LOADER_ID);
+            mLoaderManager.destroyLoader(FEED_LOADER_ID);
         }
         load_feed();
     }
@@ -57,9 +58,7 @@ public class ArticleListFragment extends ListFragment
         }
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        if (mFeedId != 0 && mFeed == null) {
-            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
-        }
+        mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
     }
 
     private void update_feed()
