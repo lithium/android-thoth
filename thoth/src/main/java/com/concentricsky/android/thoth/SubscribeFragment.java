@@ -111,10 +111,11 @@ public class SubscribeFragment extends  Fragment
             @Override
             public void onClick(View view) {
 //                Log.d(TAG, "create new feed with tags: "+tags);
-                String[] tags = mFeedTags.getText().toString().split(",");
-                for (String tag_name : tags) {
-                    Tag tag = mDbHelper.getOrCreateTag(tag_name.trim());
-                }
+
+                mFeed.tags = mFeedTags.getText().toString().split(",");
+//                for (String tag_name : tags) {
+//                    Tag tag = Tag.getOrCreate(mDbHelper.getReadableDatabase(), tag_name.trim());
+//                }
 
                 // TODO: move this off main thread
                 mFeed.save(mDbHelper.getWritableDatabase());

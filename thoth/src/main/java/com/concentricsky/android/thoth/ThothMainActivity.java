@@ -205,6 +205,7 @@ public class ThothMainActivity extends Activity
 
         @Override
         protected Cursor getChildrenCursor(Cursor cursor) {
+            //TODO: move off main thread into a loader
             int tag_id = cursor.getInt(cursor.getColumnIndex("_id"));
             return ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
         }
