@@ -6,9 +6,14 @@ import android.app.LoaderManager;
 import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.*;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
 
@@ -16,8 +21,8 @@ import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Fe
  * Created by wiggins on 5/17/13.
  */
 public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface
-{
+                                 implements ThothFragmentInterface, Response.Listener<Boolean>, Response.ErrorListener {
+    private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
 
     private SimpleCursorAdapter mAdapter;
@@ -27,9 +32,9 @@ public class ArticleListFragment extends ListFragment
 
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
+    private RequestQueue mRequestQueue;
 
     public ArticleListFragment() {
-
     }
 
 
@@ -66,11 +71,13 @@ public class ArticleListFragment extends ListFragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 
+        mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getLoaderManager();
         if (mAdapter == null) {
             mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_1, null,
                     new String[] {"title"},
                     new int[] {android.R.id.text1}, 0);
+            setListAdapter(mAdapter);
         }
         load_feed();
     }
@@ -79,6 +86,7 @@ public class ArticleListFragment extends ListFragment
     public void onDetach() {
         super.onDetach();
         mLoaderManager.destroyLoader(FEED_LOADER_ID);
+        mRequestQueue.stop();
     }
 
     @Override
@@ -103,6 +111,11 @@ public class ArticleListFragment extends ListFragment
                ThothMainActivity act = (ThothMainActivity)getActivity();
                act.showSubscribe();
                return true;
+           case R.id.action_refresh:
+               if (mFeed != null) {
+                   mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
+               }
+               return true;
        }
         return super.onOptionsItemSelected(item);
     }
@@ -112,6 +125,17 @@ public class ArticleListFragment extends ListFragment
         super.onResume();
         getActivity().invalidateOptionsMenu();
     }
+
+    @Override
+    public void onResponse(Boolean response) {
+        mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+    }
+
+    @Override
+    public void onErrorResponse(VolleyError error) {
+        Log.e(TAG, "Volley error: " + error);
+    }
+
 
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {

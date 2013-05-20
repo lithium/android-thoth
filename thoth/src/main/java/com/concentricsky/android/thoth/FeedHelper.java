@@ -17,24 +17,24 @@ import java.util.regex.Pattern;
  */
 public class FeedHelper {
 
-    public static Feed attemptToParseFeed(String data)
+    public static Feed attemptToParseFeed(Feed feed, String data)
    {
        Feed ret = null;
-       ret = attemptToParseRss(data);
+       ret = attemptToParseRss(feed, data);
        if (ret == null)
-           ret = attemptToParseAtom(data);
+           ret = attemptToParseAtom(feed, data);
        return ret;
    }
 
     public enum RssXmlState {RSSXML_NONE, RSSXML_CHANNEL, RSSXML_ITEM};
 
-    public static Feed attemptToParseRss(String data)
+    public static Feed attemptToParseRss(Feed feed, String data)
     {
         RssFeedParser parser = new RssFeedParser();
-        return parser.parse(data);
+        return parser.parse(feed, data);
     }
 
-    public static Feed attemptToParseAtom(String data)
+    public static Feed attemptToParseAtom(Feed feed, String data)
     {
 
         return null;

@@ -19,9 +19,7 @@ public class Feed {
 
 
     public String[] tags;
-
-//    public ArrayList<Tag> tags;
-//    public ArrayList<Article> articles;
+    public ArrayList<Article> articles;
 
     public static final int DATABASE_VERSION = 2;
 
@@ -41,7 +39,7 @@ public class Feed {
             "link,"+
             "title,"+
             "description) VALUES (?,?,?,?);";
-    public static final String FEED_TABLE_UPDATE = "UPDATE " + FEED_TABLE_NAME + " SET" +
+    public static final String FEED_TABLE_UPDATE = "UPDATE " + FEED_TABLE_NAME + " SET " +
             "url=?,"+
             "link=?,"+
             "title=?,"+
@@ -120,6 +118,14 @@ public class Feed {
                 feedtag_insert.bindLong(2, tag._id);
                 feedtag_insert.executeInsert();
             }
+        }
+
+        if (this.articles != null) {
+            for (Article article : this.articles) {
+                article.feed_id = this._id;
+                article.save(db);
+            }
+
         }
 
         return true;

@@ -45,7 +45,7 @@ class SubscribeToFeedRequest extends Request<Feed> {
             }
         }
         else {
-            feed = FeedHelper.attemptToParseFeed(parsed);
+            feed = FeedHelper.attemptToParseFeed(null, parsed);
             feed.url = mUrl;
             if (feed != null) {
                 return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));

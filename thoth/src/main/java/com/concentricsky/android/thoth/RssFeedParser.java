@@ -20,9 +20,11 @@ public class RssFeedParser {
     public RssFeedParser() {
     }
 
-    public Feed parse(String data)
+    public Feed parse(Feed feed, String data)
     {
-        Feed feed = new Feed();
+        if (feed == null) {
+            feed = new Feed();
+        }
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xpp = factory.newPullParser();
@@ -47,9 +49,9 @@ public class RssFeedParser {
                         else
                         if (state == RssXmlState.RSSXML_CHANNEL) {
                             if (tag_name.equals("item")) {
-//                                if (feed.articles == null) {
-//                                    feed.articles = new ArrayList<Article>();
-//                                }
+                                if (feed.articles == null) {
+                                    feed.articles = new ArrayList<Article>();
+                                }
                                 state = RssXmlState.RSSXML_ITEM;
                                 article = new Article();
                             }
@@ -75,10 +77,10 @@ public class RssFeedParser {
                         else if (state == RssXmlState.RSSXML_ITEM) {
                             if (tag_name.equals("item")) {
                                 state = RssXmlState.RSSXML_CHANNEL;
-//                                if (article != null) {
-//                                    feed.articles.add(article);
-//                                    article = null;
-//                                }
+                                if (article != null) {
+                                    feed.articles.add(article);
+                                    article = null;
+                                }
                             }
                             else if (tag_name.equals("title")) {
                                 article.title = lastText;
