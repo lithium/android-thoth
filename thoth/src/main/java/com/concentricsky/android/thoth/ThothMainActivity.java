@@ -56,7 +56,7 @@ public class ThothMainActivity extends Activity
         mDrawerAdapter = new ThothDrawerAdapter();
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
-        mDrawerList.setOnItemClickListener(new DrawerItemClickListener());
+        mDrawerList.setOnChildClickListener(new DrawerItemClickListener());
 
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -204,10 +204,15 @@ public class ThothMainActivity extends Activity
     /*
      * Private Classes
      */
-    private class DrawerItemClickListener implements ListView.OnItemClickListener {
+    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener {
 
         @Override
-        public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+        public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
+            mArticleListFragment.setFeed(l);
+            showArticleList();
+            mDrawerLayout.closeDrawers();
+
+            return true;
         }
     }
 

@@ -53,10 +53,6 @@ public class ThothDatabaseHelper
 
 
 
-
-
-
-
     private class ThothOpenHelper extends SQLiteOpenHelper {
 
         public ThothOpenHelper(Context context) {
@@ -73,7 +69,7 @@ public class ThothDatabaseHelper
 
         @Override
         public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i2) {
-            Tag.upgradeDatabase(sqLiteDatabase,i,i2);
+            Tag.upgradeDatabase(sqLiteDatabase, i, i2);
             Feed.upgradeDatabase(sqLiteDatabase, i, i2);
             Article.upgradeDatabase(sqLiteDatabase, i, i2);
         }
@@ -100,6 +96,13 @@ public class ThothDatabaseHelper
         return c;
     }
 
+    public Cursor getArticleCursor(long feed_id) {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=?", new String[] {String.valueOf(feed_id)});
+        if (!c.moveToFirst())
+            return null;
+        return c;
+    }
 
 
 
