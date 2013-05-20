@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -16,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
+import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends Activity
@@ -30,7 +32,12 @@ public class ThothMainActivity extends Activity
     private SubscribeFragment mSubscribeFragment;
     private ThothDrawerAdapter mDrawerAdapter;
 
-    private RequestQueue mRequestQueue;
+//    private RequestQueue mRequestQueue;
+
+    private SparseIntArray mNavLoaderIds;
+    private static final int TAG_LOADER_ID=-1;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,9 +61,8 @@ public class ThothMainActivity extends Activity
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
-
-        //start loaders
-        getLoaderManager().initLoader(0, null, this);
+        mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
+        getLoaderManager().initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
 
 
         //set up fragments
@@ -80,7 +86,7 @@ public class ThothMainActivity extends Activity
 
 
         //http://www.youtube.com/watch?v=yhv8l9F44qo#t=14m36
-        mRequestQueue = Volley.newRequestQueue(this);
+//        mRequestQueue = Volley.newRequestQueue(this);
 
     }
 
@@ -149,18 +155,49 @@ public class ThothMainActivity extends Activity
      * LoaderManager Methods
      */
     @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new ThothNavigationLoader(this);
+    public Loader<Cursor> onCreateLoader(int loader_id, Bundle bundle) {
+        if (loader_id == TAG_LOADER_ID) { // tag loader
+            return new SimpleCursorLoader(this) {
+                @Override
+                public Cursor loadInBackground() {
+                    return ThothDatabaseHelper.getInstance().getTagCursor();
+                }
+            };
+        }
+
+        final long tag_id = mNavLoaderIds.get(loader_id, -1);
+        if (tag_id != -1) {
+            return new SimpleCursorLoader(this) {
+                @Override
+                public Cursor loadInBackground() {
+                    return ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
+                }
+            };
+        }
+        // shouldn't get here!
+        return null;
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mDrawerAdapter.changeCursor(cursor);
+    public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+        int loader_id = loader.getId();
+        if (loader_id == TAG_LOADER_ID) { //tag cursor
+            mDrawerAdapter.changeCursor(cursor);
+        }
+        else {
+            //loader_id is the group pos of the children cursor we are trying to load
+            mDrawerAdapter.setChildrenCursor(loader_id, cursor);
+        }
     }
 
     @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mDrawerAdapter.changeCursor(null);
+    public void onLoaderReset(Loader<Cursor> loader) {
+        int loader_id = loader.getId();
+        if (loader_id == TAG_LOADER_ID) { //tag cursor
+            mDrawerAdapter.changeCursor(null);
+        } else {
+            mDrawerAdapter.setChildrenCursor(loader_id, null);
+        }
     }
 
 
@@ -205,9 +242,21 @@ public class ThothMainActivity extends Activity
 
         @Override
         protected Cursor getChildrenCursor(Cursor cursor) {
-            //TODO: move off main thread into a loader
             int tag_id = cursor.getInt(cursor.getColumnIndex("_id"));
-            return ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
+            int loader_id = cursor.getPosition();
+
+            mNavLoaderIds.append(loader_id, tag_id);
+
+            LoaderManager loaderManager = getLoaderManager();
+            Loader loader = loaderManager.getLoader(loader_id);
+            if (loader != null && !loader.isReset()) {
+                loaderManager.restartLoader(loader_id, null, ThothMainActivity.this);
+            }
+            else {
+                loaderManager.initLoader(loader_id, null, ThothMainActivity.this);
+            }
+
+            return null;
         }
 
     }
