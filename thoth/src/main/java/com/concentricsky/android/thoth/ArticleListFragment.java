@@ -45,6 +45,9 @@ public class ArticleListFragment extends ListFragment
 
         mFeedId = feed_id;
         mFeed = null;
+        if (mAdapter != null) {
+            mLoaderManager.destroyLoader(ARTICLE_LOADER_ID);
+        }
         load_feed();
     }
     private void load_feed()
