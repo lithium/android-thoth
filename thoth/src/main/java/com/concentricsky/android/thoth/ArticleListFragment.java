@@ -65,6 +65,7 @@ public class ArticleListFragment extends ListFragment
             return;
         }
         mFeedTitle.setText(mFeed.title);
+        mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
     }
 
     @Override

@@ -98,8 +98,14 @@ public class ThothDatabaseHelper
 
     public Cursor getArticleCursor(long feed_id) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=?", new String[] {String.valueOf(feed_id)});
-        if (!c.moveToFirst())
+        Cursor c = null;
+        if (feed_id == 0) { //all articles
+            c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" ",null);
+        }
+        else {
+            c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=?", new String[] {String.valueOf(feed_id)});
+        }
+        if (c == null || !c.moveToFirst())
             return null;
         return c;
     }
