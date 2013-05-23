@@ -39,6 +39,7 @@ public class SubscribeFragment extends  Fragment
     private Feed mFeed;
     private ProgressBar mProgress;
     private TextView mError;
+    private String mUrl;
 
     public SubscribeFragment() {
 
@@ -56,12 +57,13 @@ public class SubscribeFragment extends  Fragment
     public void onDetach() {
         super.onDetach();
         mRequestQueue.stop();
+        mRequestQueue = null;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        mLinkText.setText("");
+        mLinkText.setText(mUrl == null ? "" : mUrl);
         mFeedTags.setText("");
     }
 
@@ -99,10 +101,7 @@ public class SubscribeFragment extends  Fragment
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String url = mLinkText.getText().toString();
-                mRequestQueue.add(new SubscribeToFeedRequest(url, SubscribeFragment.this, SubscribeFragment.this));
-                mProgress.setVisibility(View.VISIBLE);
-                mDetailView.setVisibility(View.INVISIBLE);
+                setUrl(mLinkText.getText().toString());
             }
 
         });
@@ -123,6 +122,7 @@ public class SubscribeFragment extends  Fragment
             }
         });
 
+        scan_url(); // run scan if already have url
         return root;
     }
 
@@ -144,6 +144,7 @@ public class SubscribeFragment extends  Fragment
     @Override
     public void onResponse(Feed response) {
         if (response.title == null) { // only found a feed url, re-scrape
+            Log.d(TAG, "Feed URL found: " + response.url);
             mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
         }
         else {
@@ -168,4 +169,18 @@ public class SubscribeFragment extends  Fragment
     }
 
 
+    public void setUrl(String url) {
+        mUrl = url;
+        scan_url();
+    }
+
+    private void scan_url() {
+        if (mUrl == null || mRequestQueue == null || mLinkText == null) { // we havent attached yet...
+            return;
+        }
+        mLinkText.setText(mUrl);
+        mRequestQueue.add(new SubscribeToFeedRequest(mUrl, SubscribeFragment.this, SubscribeFragment.this));
+        mProgress.setVisibility(View.VISIBLE);
+        mDetailView.setVisibility(View.INVISIBLE);
+    }
 }

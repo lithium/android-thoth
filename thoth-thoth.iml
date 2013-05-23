@@ -69,7 +69,7 @@
     <orderEntry type="jdk" jdkName="Android 4.2.2" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="android-support-v4" level="project" />
-    <orderEntry type="library" exported="" name="volley-c6b2aaa" level="project" />
+    <orderEntry type="library" name="volley-c6b2aaa" level="project" />
   </component>
 </module>
 

@@ -112,7 +112,7 @@ public class ArticleListFragment extends ListFragment
        switch (item.getItemId()) {
            case R.id.action_subscribe:
                ThothMainActivity act = (ThothMainActivity)getActivity();
-               act.showSubscribe();
+               act.showSubscribe(null);
                return true;
            case R.id.action_refresh:
                if (mFeed != null) {

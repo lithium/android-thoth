@@ -21,10 +21,18 @@
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
+            <intent-filter android:label="Add to thoth">
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/*" />
+                <data android:mimeType="application/rss*" />
+                <data android:mimeType="application/atom*" />
+            </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

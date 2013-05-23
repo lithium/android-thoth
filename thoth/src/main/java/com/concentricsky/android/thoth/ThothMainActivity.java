@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.*;
 import android.content.Context;
+import android.content.Intent;
 import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -21,8 +22,7 @@ import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends Activity
-                               implements LoaderManager.LoaderCallbacks<Cursor>
-{
+                               implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener {
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
@@ -36,7 +36,7 @@ public class ThothMainActivity extends Activity
 
     private SparseIntArray mNavLoaderIds;
     private static final int TAG_LOADER_ID=-1;
-
+    private boolean mSharing = false;
 
 
     @Override
@@ -67,29 +67,27 @@ public class ThothMainActivity extends Activity
 
         //set up fragments
         mFragmentManager = getFragmentManager();
+        mFragmentManager.addOnBackStackChangedListener(this);
         mArticleListFragment = new ArticleListFragment();
         mSubscribeFragment = null; //create on demand
 
 
+        Intent intent = getIntent();
+        if (Intent.ACTION_SEND.equals(intent.getAction())) {
+            mSharing = true;
+            String url = intent.getStringExtra(Intent.EXTRA_TEXT);
+            showSubscribe(url);
+        }
+        else {
 
-       if (savedInstanceState == null) {
-           //initial startup
-           showArticleList();
+            if (savedInstanceState == null) {
+                //initial startup
+                showArticleList();
+            }
+        }
 
-           //debug tables
-//           ThothDatabaseHelper mDbHelper = ThothDatabaseHelper.getInstance();
-//           long[] tags = {mDbHelper.addTag("hobby")};
-//           mDbHelper.addFeed("http://diydrones.com/profiles/blog/feed?user=3m9btzxk9mkpg&amp;xn_auth=no", "Joshua Ott's Posts - DIY Drones", tags);
-//           mDbHelper.addFeed("http://www.fleshpilot.com/?feed=rss2", "Flesh Pilot", tags);
-       }
-
-
-
-        //http://www.youtube.com/watch?v=yhv8l9F44qo#t=14m36
-//        mRequestQueue = Volley.newRequestQueue(this);
 
     }
-
 
     public void reloadTags() {
         getLoaderManager().restartLoader(TAG_LOADER_ID, null, this);
@@ -179,7 +177,7 @@ public class ThothMainActivity extends Activity
                 }
             };
         }
-        // shouldn't load here!
+        // shouldn't be here!
         return null;
     }
 
@@ -203,6 +201,12 @@ public class ThothMainActivity extends Activity
         } else {
             mDrawerAdapter.setChildrenCursor(loader_id, null);
         }
+    }
+
+    @Override
+    public void onBackStackChanged() {
+        if (mSharing && mFragmentManager.getBackStackEntryCount() == 0)
+            finish();
     }
 
 
@@ -281,11 +285,12 @@ public class ThothMainActivity extends Activity
         invalidateOptionsMenu();
     }
 
-    public void showSubscribe()
+    public void showSubscribe(String url)
     {
         if (mSubscribeFragment == null) {
             mSubscribeFragment = new SubscribeFragment();
         }
+        mSubscribeFragment.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack("Subscribe");
         trans.commit();
