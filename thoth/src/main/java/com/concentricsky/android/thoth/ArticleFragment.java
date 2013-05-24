@@ -1,13 +1,10 @@
 package com.concentricsky.android.thoth;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager;
-import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.app.*;
+import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.*;
 import android.webkit.WebView;
@@ -45,14 +42,14 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
     }
 
-    @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-//        mRequestQueue = Volley.newRequestQueue(activity);
-        mLoaderManager = activity.getLoaderManager();
-//        load_article();
-    }
+//    @Override
+//    public void onAttach(FragmentActivity activity) {
+//        super.onAttach(activity);
+//
+////        mRequestQueue = Volley.newRequestQueue(activity);
+//        mLoaderManager = activity.getSupportLoaderManager();
+////        load_article();
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -159,7 +156,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     private class ArticlePagerAdapter extends FragmentPagerAdapter {
         private ArticlePagerAdapter() {
-            super(getActivity().getFragmentManager());
+            super(getActivity().getSupportFragmentManager());
         }
 
         @Override

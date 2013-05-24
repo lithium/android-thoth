@@ -1,11 +1,11 @@
 package com.concentricsky.android.thoth;
 
-import android.app.Activity;
-import android.app.ListFragment;
-import android.app.LoaderManager;
-import android.content.Loader;
+import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.ListFragment;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.*;
 import android.widget.ListView;
@@ -79,25 +79,8 @@ public class ArticleListFragment extends ListFragment
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-
-        mRequestQueue = Volley.newRequestQueue(activity);
-        mLoaderManager = activity.getLoaderManager();
-        if (mAdapter == null) {
-            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_1, null,
-                    new String[] {"title"},
-                    new int[] {android.R.id.text1}, 0);
-            setListAdapter(mAdapter);
-        }
-        load_feed();
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mLoaderManager.destroyLoader(FEED_LOADER_ID);
-        mRequestQueue.stop();
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
 
     @Override
@@ -105,7 +88,26 @@ public class ArticleListFragment extends ListFragment
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
 
         mFeedTitle = (TextView)root.findViewById(R.id.articlelist_feed_title);
+
+        FragmentActivity activity = getActivity();
+        mRequestQueue = Volley.newRequestQueue(activity);
+        mLoaderManager = activity.getSupportLoaderManager();
+        if (mAdapter == null) {
+            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_1, null,
+                    new String[] {"title"},
+                    new int[] {android.R.id.text1}, 0);
+            setListAdapter(mAdapter);
+        }
+        load_feed();
+
         return root;
+    }
+
+    @Override
+    public void onDestroyView() {
+        mLoaderManager.destroyLoader(FEED_LOADER_ID);
+        mRequestQueue.stop();
+        super.onDestroyView();
     }
 
     @Override

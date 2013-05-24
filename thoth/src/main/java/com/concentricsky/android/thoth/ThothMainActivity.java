@@ -1,13 +1,14 @@
 package com.concentricsky.android.thoth;
 
-import android.app.*;
+import android.app.ActionBar;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.*;
+import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.util.SparseIntArray;
@@ -21,7 +22,7 @@ import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 
 
-public class ThothMainActivity extends Activity
+public class ThothMainActivity extends FragmentActivity
                                implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener {
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
@@ -38,6 +39,7 @@ public class ThothMainActivity extends Activity
     private static final int TAG_LOADER_ID=-1;
     private boolean mSharing = false;
     private ArticleFragment mArticleFragment;
+    private LoaderManager mLoaderManager;
 
 
     @Override
@@ -63,11 +65,12 @@ public class ThothMainActivity extends Activity
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
-        getLoaderManager().initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
+        mLoaderManager =  getSupportLoaderManager();
+        mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
 
 
         //set up fragments
-        mFragmentManager = getFragmentManager();
+        mFragmentManager = getSupportFragmentManager();
         mFragmentManager.addOnBackStackChangedListener(this);
         mArticleListFragment = new ArticleListFragment();
         mSubscribeFragment = null; //create on demand
@@ -91,7 +94,7 @@ public class ThothMainActivity extends Activity
     }
 
     public void reloadTags() {
-        getLoaderManager().restartLoader(TAG_LOADER_ID, null, this);
+        mLoaderManager.restartLoader(TAG_LOADER_ID, null, this);
     }
 
 
@@ -262,13 +265,12 @@ public class ThothMainActivity extends Activity
 
             mNavLoaderIds.append(loader_id, tag_id);
 
-            LoaderManager loaderManager = getLoaderManager();
-            Loader loader = loaderManager.getLoader(loader_id);
+            Loader loader = mLoaderManager.getLoader(loader_id);
             if (loader != null && !loader.isReset()) {
-                loaderManager.restartLoader(loader_id, null, ThothMainActivity.this);
+                mLoaderManager.restartLoader(loader_id, null, ThothMainActivity.this);
             }
             else {
-                loaderManager.initLoader(loader_id, null, ThothMainActivity.this);
+                mLoaderManager.initLoader(loader_id, null, ThothMainActivity.this);
             }
 
             return null;

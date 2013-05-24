@@ -1,11 +1,11 @@
 package com.concentricsky.android.thoth;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
@@ -19,7 +19,7 @@ import java.util.ArrayList;
 /**
  * Created by wiggins on 5/17/13.
  */
-public class SubscribeFragment extends  Fragment
+public class SubscribeFragment extends Fragment
                                implements   ThothFragmentInterface,
                                             Response.Listener<Feed>,
                                             Response.ErrorListener
