@@ -66,7 +66,7 @@ public class ArticleListFragment extends ListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
 //        super.onListItemClick(l, v, position, id);
         ThothMainActivity activity = (ThothMainActivity) getActivity();
-        activity.showArticle(mFeedId, id);
+        activity.showArticle(mFeedId, position);
     }
 
     private void update_feed()
