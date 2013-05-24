@@ -76,4 +76,18 @@ public class Article {
         }
         return true;
     }
+
+    public static Cursor load(SQLiteDatabase db, long article_id) {
+        return db.rawQuery("SELECT * FROM "+ARTICLE_TABLE_NAME+ " WHERE _id=?", new String[] {String.valueOf(article_id)});
+    }
+
+    public void hydrate(Cursor c) {
+        this._id = c.getLong(c.getColumnIndexOrThrow("_id"));
+        this.feed_id = c.getLong(c.getColumnIndexOrThrow("feed_id"));
+        this.link = c.getString(c.getColumnIndexOrThrow("link"));
+        this.title = c.getString(c.getColumnIndexOrThrow("title"));
+        this.description = c.getString(c.getColumnIndexOrThrow("description"));
+        this.guid = c.getString(c.getColumnIndexOrThrow("guid"));
+
+    }
 }

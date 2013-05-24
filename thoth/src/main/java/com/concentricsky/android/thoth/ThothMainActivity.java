@@ -37,6 +37,7 @@ public class ThothMainActivity extends Activity
     private SparseIntArray mNavLoaderIds;
     private static final int TAG_LOADER_ID=-1;
     private boolean mSharing = false;
+    private ArticleFragment mArticleFragment;
 
 
     @Override
@@ -293,6 +294,18 @@ public class ThothMainActivity extends Activity
         mSubscribeFragment.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack("Subscribe");
+        trans.commit();
+        invalidateOptionsMenu();
+    }
+
+    public void showArticle(long feed_id, long article_id)
+    {
+        if (mArticleFragment == null) {
+            mArticleFragment = new ArticleFragment();
+        }
+//        mArticleFragment.setArticle(feed_id, article_id);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();
         invalidateOptionsMenu();
     }

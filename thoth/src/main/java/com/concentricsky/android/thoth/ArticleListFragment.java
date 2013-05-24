@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.*;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
@@ -59,6 +60,13 @@ public class ArticleListFragment extends ListFragment
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
         mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
+    }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+//        super.onListItemClick(l, v, position, id);
+        ThothMainActivity activity = (ThothMainActivity) getActivity();
+        activity.showArticle(mFeedId, id);
     }
 
     private void update_feed()
