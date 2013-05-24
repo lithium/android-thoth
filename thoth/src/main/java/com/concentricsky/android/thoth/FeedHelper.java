@@ -1,14 +1,7 @@
 package com.concentricsky.android.thoth;
 
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
-import org.xmlpull.v1.XmlPullParser;
-import org.xmlpull.v1.XmlPullParserException;
-import org.xmlpull.v1.XmlPullParserFactory;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

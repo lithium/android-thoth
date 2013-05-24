@@ -1,14 +1,12 @@
 package com.concentricsky.android.thoth;
 
-import android.app.Activity;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.*;
-import android.webkit.WebView;
-import android.widget.TextView;
+import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
 
@@ -33,14 +31,14 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public ArticleFragment()
     {}
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
 
 //        mRequestQueue.stop();
 //        mRequestQueue = null;
-        mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
-    }
+//        mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
+//    }
 
 //    @Override
 //    public void onAttach(FragmentActivity activity) {
@@ -52,19 +50,32 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 //    }
 
     @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        FragmentActivity activity = getActivity();
+        mLoaderManager = activity.getSupportLoaderManager();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article, container, false);
 
         mAdapter = new ArticlePagerAdapter();
         mViewPager = (ViewPager)root;
-//        mViewPager.setAdapter();
-        mViewPager.setOnPageChangeListener(this);
+        mViewPager.setAdapter(mAdapter);
+//        mViewPager.setOnPageChangeListener(this);
 
 //        mTitleText = (TextView)root.findViewById(R.id.article_title);
 //        mBodyWeb = (WebView)root.findViewById(R.id.article_web);
+        load_cursor();
 
         return root;
-
     }
 
     @Override
@@ -89,6 +100,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onResume() {
         super.onResume();
         getActivity().invalidateOptionsMenu();
+        load_cursor();
     }
 
 //    public void setArticle(long article_id) {
@@ -107,14 +119,24 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 //            return;
 //        mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleLoader());
 //    }
-//
-//    private void update_article() {
-//        if (mArticle == null)
-//            return;
-//
-//        mTitleText.setText(mArticle.title);
-//        mBodyWeb.loadData(mArticle.description, "text/html", "UTF-8");
-//    }
+
+    public void setArticle(long feed_id, long article_id)
+    {
+        if (mFeedId == feed_id)
+            return;
+        mArticleId = article_id;
+        mFeedId = feed_id;
+        if (mLoaderManager != null) {
+            mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
+        }
+        load_cursor();
+    }
+    private void load_cursor()
+    {
+        if (mLoaderManager == null)
+            return;
+        mLoaderManager.initLoader(CURSOR_LOADER_ID, null, new ArticleLoader());
+    }
 
     @Override
     public void onPageScrolled(int i, float v, int i2) {
@@ -131,7 +153,8 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     }
 
-    private class ArticleLoader implements LoaderManager.LoaderCallbacks<Cursor>
+
+private class ArticleLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
@@ -154,24 +177,34 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     }
 
 
-    private class ArticlePagerAdapter extends FragmentPagerAdapter {
+    private class ArticlePagerAdapter extends FragmentStatePagerAdapter {
+        private Cursor mCursor;
+
         private ArticlePagerAdapter() {
             super(getActivity().getSupportFragmentManager());
         }
 
         @Override
-        public android.support.v4.app.Fragment getItem(int position) {
-//            return ArticleDetailFragment.newInstance(position);
-            return null;
+        public Fragment getItem(int position) {
+            if (mCursor == null) {
+                return null;
+            }
+            mCursor.moveToPosition(position);
+            Article article = new Article();
+            article.hydrate(mCursor);
+            return ArticleDetailFragment.newInstance(article);
         }
 
         @Override
         public int getCount() {
-            return 0;
+            if (mCursor == null)
+                return 0;
+            return mCursor.getCount();
         }
 
         public void changeCursor(Cursor cursor) {
-
+            mCursor = cursor;
+            notifyDataSetChanged();
         }
     }
 }

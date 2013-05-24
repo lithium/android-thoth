@@ -305,7 +305,7 @@ public class ThothMainActivity extends FragmentActivity
         if (mArticleFragment == null) {
             mArticleFragment = new ArticleFragment();
         }
-//        mArticleFragment.setArticle(feed_id, article_id);
+        mArticleFragment.setArticle(feed_id, article_id);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();

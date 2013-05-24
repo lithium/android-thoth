@@ -4,10 +4,15 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
+import java.io.Serializable;
+
 /**
  * Created by wiggins on 5/18/13.
  */
-public class Article {
+public class Article implements Serializable
+{
+    private static final long serialVersionUID = 1L;
+
     public long _id;
     public long feed_id;
     public String link;
@@ -90,4 +95,6 @@ public class Article {
         this.guid = c.getString(c.getColumnIndexOrThrow("guid"));
 
     }
+
+
 }
