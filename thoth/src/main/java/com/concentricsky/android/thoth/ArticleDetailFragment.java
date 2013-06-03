@@ -5,6 +5,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.TextView;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
@@ -28,6 +29,12 @@ class ArticleDetailFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articledetail, container, false);
         mBodyWeb = (WebView)root.findViewById(R.id.article_web);
+        WebSettings settings = mBodyWeb.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setPluginState(WebSettings.PluginState.ON);
+//        settings.setLoadWithOverviewMode(true);
+//        settings.setUseWideViewPort(true);
+//        mBodyWeb.setInitialScale(100);
         load_article();
         return root;
     }
@@ -46,7 +53,7 @@ class ArticleDetailFragment extends Fragment {
     private void load_article()
     {
         if (mArticle != null) {
-            mBodyWeb.loadData("<h1 id=\"thoth-title\">"+mArticle.title+"</h1>"+mArticle.description, "text/html", "UTF-8");
+            mBodyWeb.loadData("<head></head><body><h1 id=\"thoth-title\">"+mArticle.title+"</h1>"+mArticle.description+"</body>", "text/html", "UTF-8");
         }
     }
 
