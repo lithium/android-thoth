@@ -8,6 +8,8 @@ import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 /**
@@ -32,6 +34,7 @@ public class RssFeedParser {
             String lastText = null;
 
             RssXmlState state = RssXmlState.RSSXML_NONE;
+            SimpleDateFormat sdf = new SimpleDateFormat();
 
             xpp.setInput(new StringReader(data));
             int eventType = xpp.getEventType();
@@ -89,12 +92,18 @@ public class RssFeedParser {
                                 article.link = lastText;
                             }
                             else if (tag_name.equals("description")) {
+                                if (article.description != null) { // prefer content:encoded if present already
+                                    article.description = lastText;
+                                }
+                            }
+                            else if (tag_name.equals("content:encoded")) {
                                 article.description = lastText;
                             }
                             else if (tag_name.equals("guid")) {
                                 article.guid = lastText;
                             }
                             else if (tag_name.equals("pubDate")) {
+                                article.timestamp = sdf.parse(lastText, new ParsePosition(0));
                                 //                            article.timestamp = xpp.getText();
                             }
                         }

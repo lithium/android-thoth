@@ -5,13 +5,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * Created by wiggins on 5/18/13.
  */
 public class Article implements Serializable
 {
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 3L;
 
     public long _id;
     public long feed_id;
@@ -19,9 +20,9 @@ public class Article implements Serializable
     public String title;
     public String description;
     public String guid;
-    public long timestamp;
+    public Date timestamp;
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -39,7 +40,8 @@ public class Article implements Serializable
             "guid,"+
             "link,"+
             "title,"+
-            "description) VALUES (?,?,?,?,?);";
+            "description," +
+            "timestamp) VALUES (?,?,?,?,?);";
 
     public static void createDatabase(SQLiteDatabase db)
     {
@@ -77,6 +79,7 @@ public class Article implements Serializable
             stmt.bindString(3, this.link);
             stmt.bindString(4, this.title);
             stmt.bindString(5, description);
+            stmt.bindLong(6, timestamp.getTime());
             this._id = stmt.executeInsert();
         }
         return true;
