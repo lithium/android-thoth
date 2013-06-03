@@ -20,7 +20,7 @@ public class Feed {
     public String[] tags;
     public ArrayList<Article> articles;
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
 
     public static final String FEED_TABLE_NAME = "feed";
     public static final String FEED_TABLE_CREATE =
@@ -97,11 +97,16 @@ public class Feed {
             };
         }
         else {
+            Cursor c = db.rawQuery("SELECT _id FROM "+FEED_TABLE_NAME+ " WHERE url=?", new String[] {this.url});
+            if (c.moveToFirst()) {
+                return false; // feed with url already exists
+            }
+
             SQLiteStatement feed_insert = db.compileStatement(FEED_TABLE_INSERT);
             feed_insert.bindString(1, this.url);
-            feed_insert.bindString(2, this.link);
-            feed_insert.bindString(3, this.title);
-            feed_insert.bindString(4, this.description);
+            feed_insert.bindString(2, link != null ? link : "");
+            feed_insert.bindString(3, title != null ? title : "");
+            feed_insert.bindString(4, description != null ? description : "");
             this._id = feed_insert.executeInsert();
         }
 

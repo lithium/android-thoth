@@ -8,6 +8,16 @@ import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Ar
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
+
 /**
  * Created by wiggins on 5/17/13.
  */
@@ -75,6 +85,32 @@ public class ThothDatabaseHelper
 
     }
 
+
+    public ArrayList<Feed> importTakeoutZip(InputStream zipfile) {
+        ZipInputStream zis = new ZipInputStream(new BufferedInputStream(zipfile));
+        try {
+            ZipEntry ze;
+            while ((ze = zis.getNextEntry()) != null) {
+                String name = ze.getName();
+                if (name.endsWith("Reader/subscriptions.xml")) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[1024];
+                    int count;
+                    while ((count = zis.read(buffer)) != -1) {
+                        baos.write(buffer, 0, count);
+                    }
+                    return OpmlParser.parse(baos.toString());
+                }
+
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+
+    }
 
 
     public Cursor getTagCursor()

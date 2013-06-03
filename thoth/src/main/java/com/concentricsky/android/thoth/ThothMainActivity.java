@@ -6,6 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
@@ -18,8 +20,17 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.zip.ZipFile;
 
 
 public class ThothMainActivity extends FragmentActivity
@@ -40,6 +51,9 @@ public class ThothMainActivity extends FragmentActivity
     private boolean mSharing = false;
     private ArticleFragment mArticleFragment;
     private LoaderManager mLoaderManager;
+    private ThothDatabaseHelper mDbHelper;
+    private SQLiteDatabase mWritableDb;
+    private RequestQueue mRequestQueue;
 
 
     @Override
@@ -76,11 +90,58 @@ public class ThothMainActivity extends FragmentActivity
         mSubscribeFragment = null; //create on demand
 
 
+        mDbHelper = ThothDatabaseHelper.getInstance();
+        mRequestQueue = Volley.newRequestQueue(this);
+
         Intent intent = getIntent();
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
+            // share intent
             mSharing = true;
             String url = intent.getStringExtra(Intent.EXTRA_TEXT);
             showSubscribe(url);
+        }
+        else
+        if (Intent.ACTION_VIEW.equals(intent.getAction())) {
+//            mSharing = true;
+//            showSubscribe("");
+            try {
+                Uri uri  = getIntent().getData();
+                if (uri != null) {
+                    InputStream zip = getContentResolver().openInputStream(uri);
+                    
+                    ArrayList<Feed> feeds = mDbHelper.importTakeoutZip(zip);
+                    
+                    if (feeds != null) {
+//                        final RequestQueue queue = Volley.newRequestQueue(this);
+                        for (Feed feed : feeds) {
+                            new AddFeedHelper(feed);
+//                            final SubscribeToFeedRequest request = new SubscribeToFeedRequest(feed.url,
+//                                    new Response.Listener<Feed>() {
+//                                        @Override
+//                                        public void onResponse(Feed feed) {
+//                                            if (feed.title == null) { // only found a feed url, re-scrape
+////                                                queue.add(new SubscribeToFeedRequest(feed.url, this, this));
+//                                                //found an html...
+//                                            }
+//                                            else {
+//                                                feed.save(writedb);
+//                                            }
+//                                        }
+//                                    },
+//                                    new Response.ErrorListener() {
+//                                        @Override
+//                                        public void onErrorResponse(VolleyError error) {
+//
+//                                        }
+//                                    });
+//                            queue.add(request);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                finish();
+//                e.printStackTrace();
+            }
         }
         else {
 
@@ -92,6 +153,32 @@ public class ThothMainActivity extends FragmentActivity
 
 
     }
+
+    private class AddFeedHelper implements Response.Listener<Feed>, Response.ErrorListener {
+        private Feed mFeed;
+        public AddFeedHelper(Feed f) {
+            mFeed = f;
+            mRequestQueue.add(new SubscribeToFeedRequest(mFeed.url, this, this));
+        }
+
+        @Override
+        public void onResponse(Feed response) {
+            if (response.title == null) {//
+                mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
+            }
+            else {
+                response.tags = mFeed.tags;
+                response.save(mDbHelper.getWritableDatabase());
+            }
+        }
+
+        @Override
+        public void onErrorResponse(VolleyError error) {
+
+        }
+    }
+
+
 
     public void reloadTags() {
         mLoaderManager.restartLoader(TAG_LOADER_ID, null, this);

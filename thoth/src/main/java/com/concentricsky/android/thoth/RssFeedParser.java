@@ -34,7 +34,7 @@ public class RssFeedParser {
             String lastText = null;
 
             RssXmlState state = RssXmlState.RSSXML_NONE;
-            SimpleDateFormat sdf = new SimpleDateFormat();
+            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
 
             xpp.setInput(new StringReader(data));
             int eventType = xpp.getEventType();
@@ -92,7 +92,7 @@ public class RssFeedParser {
                                 article.link = lastText;
                             }
                             else if (tag_name.equals("description")) {
-                                if (article.description != null) { // prefer content:encoded if present already
+                                if (article.description == null) { // prefer content:encoded if present already
                                     article.description = lastText;
                                 }
                             }

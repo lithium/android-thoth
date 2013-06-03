@@ -31,6 +31,12 @@
                 <data android:mimeType="application/rss*" />
                 <data android:mimeType="application/atom*" />
             </intent-filter>
+
+            <intent-filter android:label="Import to thoth">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="application/zip"/>
+            </intent-filter>
         </activity>
 
     </application>

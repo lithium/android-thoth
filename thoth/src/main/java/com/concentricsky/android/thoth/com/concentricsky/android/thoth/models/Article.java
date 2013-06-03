@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth.com.concentricsky.android.thoth.models;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -22,7 +23,7 @@ public class Article implements Serializable
     public String guid;
     public Date timestamp;
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -41,7 +42,7 @@ public class Article implements Serializable
             "link,"+
             "title,"+
             "description," +
-            "timestamp) VALUES (?,?,?,?,?);";
+            "timestamp) VALUES (?,?,?,?,?,?);";
 
     public static void createDatabase(SQLiteDatabase db)
     {
@@ -64,6 +65,9 @@ public class Article implements Serializable
             //TODO: update read/unread
 
         } else {
+            if (this.guid == null) {
+                this.guid = this.link;
+            }
             Cursor c = db.rawQuery("SELECT _id FROM "+ARTICLE_TABLE_NAME+ " WHERE feed_id=? AND guid=?", new String[] {
                                                                                     String.valueOf(this.feed_id),
                                                                                     this.guid});
@@ -77,9 +81,9 @@ public class Article implements Serializable
             stmt.bindLong(1, this.feed_id);
             stmt.bindString(2, this.guid);
             stmt.bindString(3, this.link);
-            stmt.bindString(4, this.title);
-            stmt.bindString(5, description);
-            stmt.bindLong(6, timestamp.getTime());
+            stmt.bindString(4, title != null ? title : "no title");
+            stmt.bindString(5, description != null ? description : "");
+            stmt.bindLong(6, timestamp != null ? timestamp.getTime() : System.currentTimeMillis());
             this._id = stmt.executeInsert();
         }
         return true;
