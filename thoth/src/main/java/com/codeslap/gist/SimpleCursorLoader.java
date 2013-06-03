@@ -16,9 +16,9 @@ package com.codeslap.gist;
  * limitations under the License.
  */
 
-import android.content.AsyncTaskLoader;
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v4.content.AsyncTaskLoader;
 
 /**
  * Used to write apps that run on platforms prior to Android 3.0.  When running

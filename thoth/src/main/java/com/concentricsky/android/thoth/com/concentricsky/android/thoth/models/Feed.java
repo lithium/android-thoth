@@ -3,7 +3,6 @@ package com.concentricsky.android.thoth.com.concentricsky.android.thoth.models;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
-import com.concentricsky.android.thoth.ThothDatabaseHelper;
 
 import java.util.ArrayList;
 
