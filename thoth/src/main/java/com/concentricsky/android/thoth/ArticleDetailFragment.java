@@ -13,7 +13,6 @@ import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Ar
 * Created by wiggins on 5/23/13.
 */
 class ArticleDetailFragment extends Fragment {
-    private TextView mTitleText;
     private WebView mBodyWeb;
     private Article mArticle;
 
@@ -28,7 +27,6 @@ class ArticleDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articledetail, container, false);
-        mTitleText = (TextView)root.findViewById(R.id.article_title);
         mBodyWeb = (WebView)root.findViewById(R.id.article_web);
         load_article();
         return root;
@@ -48,8 +46,7 @@ class ArticleDetailFragment extends Fragment {
     private void load_article()
     {
         if (mArticle != null) {
-            mTitleText.setText(mArticle.title);
-            mBodyWeb.loadData(mArticle.description, "text/html", "UTF-8");
+            mBodyWeb.loadData("<h1 id=\"thoth-title\">"+mArticle.title+"</h1>"+mArticle.description, "text/html", "UTF-8");
         }
     }
 
