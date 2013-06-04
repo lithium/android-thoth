@@ -54,6 +54,7 @@ public class ThothMainActivity extends FragmentActivity
     private ThothDatabaseHelper mDbHelper;
     private SQLiteDatabase mWritableDb;
     private RequestQueue mRequestQueue;
+    private DrawerItemClickListener mDrawerClickListener;
 
 
     @Override
@@ -73,7 +74,10 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerAdapter = new ThothDrawerAdapter();
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
-        mDrawerList.setOnChildClickListener(new DrawerItemClickListener());
+        mDrawerClickListener = new DrawerItemClickListener();
+        mDrawerList.setOnChildClickListener(mDrawerClickListener);
+//        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
+        mDrawerList.setOnGroupExpandListener(mDrawerClickListener);
 
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -304,7 +308,7 @@ public class ThothMainActivity extends FragmentActivity
     /*
      * Private Classes
      */
-    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener {
+    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupExpandListener {
 
         @Override
         public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
@@ -313,6 +317,12 @@ public class ThothMainActivity extends FragmentActivity
             mDrawerLayout.closeDrawers();
 
             return true;
+        }
+
+        @Override
+        public void onGroupExpand(int groupPosition) {
+            mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
+            showArticleList();
         }
     }
 

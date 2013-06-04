@@ -145,6 +145,17 @@ public class ThothDatabaseHelper
         return c;
     }
 
+    public Cursor getArticleCursorByTag(long tag_id) {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = null;
+        c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".* FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id IN ("+
+                        "SELECT feed_id from "+Feed.FEEDTAG_TABLE_NAME+" WHERE "+Feed.FEEDTAG_TABLE_NAME+".tag_id=?) ", new String[] {String.valueOf(tag_id)});
+        if (c == null || !c.moveToFirst()) {
+            return null;
+        }
+        return c;
+    }
+
 
 
 //

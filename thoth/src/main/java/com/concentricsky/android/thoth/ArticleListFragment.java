@@ -28,6 +28,7 @@ public class ArticleListFragment extends ListFragment
 
     private SimpleCursorAdapter mAdapter;
     private long mFeedId;
+    private long mTagId;
     private Feed mFeed;
     private TextView mFeedTitle;
 
@@ -39,27 +40,37 @@ public class ArticleListFragment extends ListFragment
     }
 
 
+    public void setTag(long tag_id) {
+        mTagId = tag_id;
+        mFeedId = -1;
+        mFeed = null;
+        load_feed();
+    }
+
     public void setFeed(long feed_id) {
+
         if (feed_id == mFeedId) {
             return;
         }
 
+        mTagId = -1;
         mFeedId = feed_id;
         mFeed = null;
-        if (mLoaderManager != null) {
-            mLoaderManager.destroyLoader(ARTICLE_LOADER_ID);
-            mLoaderManager.destroyLoader(FEED_LOADER_ID);
-        }
         load_feed();
     }
     private void load_feed()
     {
         if (mLoaderManager == null) {
             return;
+        } else {
+            mLoaderManager.destroyLoader(ARTICLE_LOADER_ID);
+            mLoaderManager.destroyLoader(FEED_LOADER_ID);
         }
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
+        if (mFeedId != -1) {
+            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
+        }
     }
 
     @Override
@@ -150,6 +161,7 @@ public class ArticleListFragment extends ListFragment
     }
 
 
+
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
         @Override
@@ -183,7 +195,11 @@ public class ArticleListFragment extends ListFragment
             return new SimpleCursorLoader(getActivity()) {
                 @Override
                 public Cursor loadInBackground() {
-                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                    if (mFeedId != -1)
+                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                    if (mTagId != -1)
+                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
+                    return null;
                 }
             };
         }
