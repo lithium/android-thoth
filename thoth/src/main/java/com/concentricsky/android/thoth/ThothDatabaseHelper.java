@@ -149,7 +149,7 @@ public class ThothDatabaseHelper
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = null;
         c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".* FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id IN ("+
-                        "SELECT feed_id from "+Feed.FEEDTAG_TABLE_NAME+" WHERE "+Feed.FEEDTAG_TABLE_NAME+".tag_id=?) ", new String[] {String.valueOf(tag_id)});
+                        "SELECT feed_id from "+Feed.FEEDTAG_TABLE_NAME+" WHERE "+Feed.FEEDTAG_TABLE_NAME+".tag_id=?) ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
         if (c == null || !c.moveToFirst()) {
             return null;
         }

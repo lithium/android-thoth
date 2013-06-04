@@ -17,6 +17,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -29,8 +30,6 @@ public class ArticleListFragment extends ListFragment
     private SimpleCursorAdapter mAdapter;
     private long mFeedId;
     private long mTagId;
-    private Feed mFeed;
-    private TextView mFeedTitle;
 
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
@@ -43,7 +42,6 @@ public class ArticleListFragment extends ListFragment
     public void setTag(long tag_id) {
         mTagId = tag_id;
         mFeedId = -1;
-        mFeed = null;
         load_feed();
     }
 
@@ -55,7 +53,6 @@ public class ArticleListFragment extends ListFragment
 
         mTagId = -1;
         mFeedId = feed_id;
-        mFeed = null;
         load_feed();
     }
     private void load_feed()
@@ -68,25 +65,13 @@ public class ArticleListFragment extends ListFragment
         }
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        if (mFeedId != -1) {
-            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
-        }
+        mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
     }
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-//        super.onListItemClick(l, v, position, id);
         ThothMainActivity activity = (ThothMainActivity) getActivity();
         activity.showArticle(mFeedId, position);
-    }
-
-    private void update_feed()
-    {
-        if (mFeed == null) {
-            return;
-        }
-        mFeedTitle.setText(mFeed.title);
-        mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
     }
 
     @Override
@@ -98,15 +83,13 @@ public class ArticleListFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
 
-        mFeedTitle = (TextView)root.findViewById(R.id.articlelist_feed_title);
-
         FragmentActivity activity = getActivity();
         mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
         if (mAdapter == null) {
-            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_1, null,
-                    new String[] {"title"},
-                    new int[] {android.R.id.text1}, 0);
+            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_2, null,
+                    new String[] {"title","timestamp"},
+                    new int[] {android.R.id.text1, android.R.id.text2}, 0);
             setListAdapter(mAdapter);
         }
         load_feed();
@@ -136,12 +119,14 @@ public class ArticleListFragment extends ListFragment
                act.showSubscribe(null);
                return true;
            case R.id.action_refresh:
-               if (mFeed != null) {
-                   mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
-               }
+               refresh_feeds();
                return true;
        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void refresh_feeds() {
+//        mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
     }
 
     @Override
@@ -169,16 +154,19 @@ public class ArticleListFragment extends ListFragment
             return new SimpleCursorLoader(getActivity()) {
                 @Override
                 public Cursor loadInBackground() {
-                    return Feed.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mFeedId);
+                    if (mFeedId != -1)
+                        return Feed.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mFeedId);
+                    if (mTagId != -1)
+                        return Tag.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mTagId);
+                    return null;
                 }
             };
         }
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             if (cursor.moveToFirst()) {
-                mFeed = new Feed();
-                mFeed.hydrate(cursor);
-                update_feed();
+                getActivity().getActionBar().setTitle( cursor.getString(cursor.getColumnIndexOrThrow("title")) );
+                refresh_feeds();
             }
         }
         @Override
@@ -186,6 +174,8 @@ public class ArticleListFragment extends ListFragment
 
         }
     }
+
+
 
     private class ArticleCursorLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {

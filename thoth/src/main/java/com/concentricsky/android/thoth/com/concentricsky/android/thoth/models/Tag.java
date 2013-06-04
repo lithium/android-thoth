@@ -60,4 +60,7 @@ public class Tag {
 
     }
 
+    public static Cursor load(SQLiteDatabase readableDatabase, long tag_id) {
+        return readableDatabase.rawQuery("SELECT * FROM "+TAG_TABLE_NAME+ " WHERE _id=?", new String[] {String.valueOf(tag_id)});
+    }
 }
