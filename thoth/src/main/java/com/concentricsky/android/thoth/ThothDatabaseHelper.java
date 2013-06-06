@@ -4,18 +4,16 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
+import com.concentricsky.android.thoth.models.Article;
+import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Tag;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
 
 /**

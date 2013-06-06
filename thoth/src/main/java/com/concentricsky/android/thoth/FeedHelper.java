@@ -1,6 +1,6 @@
 package com.concentricsky.android.thoth;
 
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Feed;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

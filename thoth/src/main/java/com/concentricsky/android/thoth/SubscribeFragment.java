@@ -10,7 +10,7 @@ import android.view.*;
 import android.widget.*;
 import com.android.volley.*;
 import com.android.volley.toolbox.Volley;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Feed;
 
 /**
  * Created by wiggins on 5/17/13.

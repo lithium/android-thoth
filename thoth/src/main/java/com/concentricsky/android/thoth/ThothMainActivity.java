@@ -1,8 +1,6 @@
 package com.concentricsky.android.thoth;
 
 import android.app.ActionBar;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -17,20 +15,17 @@ import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.*;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Feed;
 
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.zip.ZipFile;
 
 
 public class ThothMainActivity extends FragmentActivity

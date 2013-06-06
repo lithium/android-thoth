@@ -4,7 +4,7 @@ import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Feed;
 
 import java.io.UnsupportedEncodingException;
 

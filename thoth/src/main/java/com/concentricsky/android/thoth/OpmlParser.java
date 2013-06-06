@@ -1,7 +1,7 @@
 package com.concentricsky.android.thoth;
 
 import android.util.Log;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Feed;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;

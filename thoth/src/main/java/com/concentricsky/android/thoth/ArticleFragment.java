@@ -1,15 +1,13 @@
 package com.concentricsky.android.thoth;
 
 import android.database.Cursor;
-import android.database.DataSetObserver;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.*;
-import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
+import com.concentricsky.android.thoth.models.Article;
 
 /**
  * Created by wiggins on 5/23/13.

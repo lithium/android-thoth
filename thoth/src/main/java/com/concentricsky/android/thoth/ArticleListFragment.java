@@ -1,7 +1,6 @@
 package com.concentricsky.android.thoth;
 
 import android.content.Context;
-import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -12,16 +11,14 @@ import android.util.Log;
 import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
+import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.thoth.models.Tag;
 
 /**
  * Created by wiggins on 5/17/13.

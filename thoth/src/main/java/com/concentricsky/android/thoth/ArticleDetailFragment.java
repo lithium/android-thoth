@@ -7,8 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.TextView;
-import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
+import com.concentricsky.android.thoth.models.Article;
 
 /**
 * Created by wiggins on 5/23/13.
