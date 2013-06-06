@@ -1,6 +1,7 @@
 package com.concentricsky.android.thoth;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -310,12 +311,18 @@ public class ThothMainActivity extends FragmentActivity
             mArticleListFragment.setFeed(l);
             showArticleList();
             mDrawerLayout.closeDrawers();
-
             return true;
         }
 
         @Override
         public void onGroupExpand(int groupPosition) {
+            if (groupPosition == 0) {
+                // all feeds clicked
+                mArticleListFragment.setFeed(0);
+                mDrawerLayout.closeDrawers();
+                mDrawerList.collapseGroup(groupPosition);
+                return;
+            }
             mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
             showArticleList();
         }
