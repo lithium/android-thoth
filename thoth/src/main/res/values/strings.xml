@@ -12,4 +12,16 @@
     <string name="search">Search</string>
     <string name="tags">tags</string>
 
+    <string name="time_ago_seconds">seconds ago</string>
+    <string name="time_ago_minute">a minute ago</string>
+    <string name="time_ago_minutes">%d minutes ago</string>
+    <string name="time_ago_hour">an hour ago</string>
+    <string name="time_ago_hours">%d hours ago</string>
+    <string name="time_ago_day">a day ago</string>
+    <string name="time_ago_days">%d days ago</string>
+    <string name="time_ago_years">%d years ago</string>
+    <string name="time_ago_year">a year ago</string>
+    <string name="time_ago_months">%d months ago</string>
+    <string name="time_ago_month">a month ago</string>
+
 </resources>

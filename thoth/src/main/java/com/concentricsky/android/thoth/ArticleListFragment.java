@@ -246,7 +246,7 @@ public class ArticleListFragment extends ListFragment
             if (mFeedTitleIdx != -1)
                 holder.feed.setText( cursor.getString(mFeedTitleIdx) );
             if (mTimestampIdx != -1)
-                holder.date.setText( cursor.getString(mTimestampIdx) );
+                holder.date.setText( DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)) );
 
 //            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
 //            holder.title.setTypeface(holder.title.getTypeface(), unread ? Typeface.BOLD : Typeface.NORMAL);
