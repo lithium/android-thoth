@@ -1,5 +1,7 @@
 package com.concentricsky.android.thoth;
 
+import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -8,6 +10,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.Log;
 import android.view.*;
+import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
@@ -16,6 +19,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.com.concentricsky.android.thoth.models.Tag;
 
@@ -27,7 +31,7 @@ public class ArticleListFragment extends ListFragment
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
 
-    private SimpleCursorAdapter mAdapter;
+    private ArticleListAdapter mAdapter;
     private long mFeedId;
     private long mTagId;
 
@@ -87,9 +91,10 @@ public class ArticleListFragment extends ListFragment
         mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
         if (mAdapter == null) {
-            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_2, null,
-                    new String[] {"title","timestamp"},
-                    new int[] {android.R.id.text1, android.R.id.text2}, 0);
+//            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_2, null,
+//                    new String[] {"title","timestamp"},
+//                    new int[] {android.R.id.text1, android.R.id.text2}, 0);
+            mAdapter = new ArticleListAdapter(activity, null);
             setListAdapter(mAdapter);
         }
         load_feed();
@@ -205,4 +210,60 @@ public class ArticleListFragment extends ListFragment
         }
     }
 
+    private class ArticleListAdapter extends CursorAdapter {
+        private final LayoutInflater mInflater;
+        private int mArticleTitleIdx=-1;
+        private int mFeedTitleIdx=-1;
+        private int mTimestampIdx=-1;
+        private int mUnreadIdx=-1;
+
+        private class ViewHolder {
+            TextView title;
+            TextView feed;
+            TextView date;
+
+        };
+
+        public ArticleListAdapter(Context context, Cursor cursor) {
+            super(context, cursor, 0);
+            mInflater = LayoutInflater.from(context);
+        }
+
+        @Override
+        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
+            View root = mInflater.inflate(R.layout.item_articlelist, viewGroup, false);
+            final ViewHolder holder = new ViewHolder();
+            holder.title = (TextView)root.findViewById(R.id.title);
+            holder.feed = (TextView)root.findViewById(R.id.feed_title);
+            holder.date = (TextView)root.findViewById(R.id.timestamp);
+            root.setTag(holder);
+            return root;
+        }
+
+        @Override
+        public void bindView(View view, Context context, Cursor cursor) {
+            ViewHolder holder = (ViewHolder)view.getTag();
+
+            if (mArticleTitleIdx != -1)
+                holder.title.setText( cursor.getString(mArticleTitleIdx) );
+            if (mFeedTitleIdx != -1)
+                holder.feed.setText( cursor.getString(mFeedTitleIdx) );
+            if (mTimestampIdx != -1)
+                holder.date.setText( cursor.getString(mTimestampIdx) );
+
+//            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
+//            holder.title.setTypeface(holder.title.getTypeface(), unread ? Typeface.BOLD : Typeface.NORMAL);
+        }
+
+        @Override
+        public void changeCursor(Cursor cursor) {
+            super.changeCursor(cursor);
+            if (cursor != null) {
+                mArticleTitleIdx = cursor.getColumnIndex("title");
+                mFeedTitleIdx = cursor.getColumnIndex("feed_title");
+                mTimestampIdx = cursor.getColumnIndex("timestamp");
+                mUnreadIdx = cursor.getColumnIndex("unread");
+            }
+        }
+    }
 }

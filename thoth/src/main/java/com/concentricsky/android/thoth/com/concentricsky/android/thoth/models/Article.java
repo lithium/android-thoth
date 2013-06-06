@@ -22,8 +22,9 @@ public class Article implements Serializable
     public String description;
     public String guid;
     public Date timestamp;
+    public int unread=1;
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 7;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -34,6 +35,7 @@ public class Article implements Serializable
                     "link TEXT,"+
                     "title TEXT,"+
                     "description TEXT,"+
+                    "unread INTEGER,"+
                     "timestamp INTEGER);";
     public static final String ARTICLE_TABLE_DROP = "DROP TABLE IF EXISTS "+ARTICLE_TABLE_NAME+";";
     public static final String ARTICLE_TABLE_INSERT = "INSERT INTO " + ARTICLE_TABLE_NAME + " (" +
@@ -42,7 +44,8 @@ public class Article implements Serializable
             "link,"+
             "title,"+
             "description," +
-            "timestamp) VALUES (?,?,?,?,?,?);";
+            "unread,"+
+            "timestamp) VALUES (?,?,?,?,?,?,?);";
 
     public static void createDatabase(SQLiteDatabase db)
     {
@@ -62,7 +65,10 @@ public class Article implements Serializable
             return false;
 
         if (this._id != 0) {
-            //TODO: update read/unread
+            //update read/unread
+            SQLiteStatement stmt = db.compileStatement("UPDATE " + ARTICLE_TABLE_NAME + " SET unread=?");
+            stmt.bindLong(1, this.unread);
+            stmt.executeUpdateDelete();
 
         } else {
             if (this.guid == null) {
@@ -83,7 +89,8 @@ public class Article implements Serializable
             stmt.bindString(3, this.link);
             stmt.bindString(4, title != null ? title : "no title");
             stmt.bindString(5, description != null ? description : "");
-            stmt.bindLong(6, timestamp != null ? timestamp.getTime() : System.currentTimeMillis());
+            stmt.bindLong(6, 1);
+            stmt.bindLong(7, timestamp != null ? timestamp.getTime() : System.currentTimeMillis());
             this._id = stmt.executeInsert();
         }
         return true;
@@ -99,6 +106,7 @@ public class Article implements Serializable
         this.link = c.getString(c.getColumnIndexOrThrow("link"));
         this.title = c.getString(c.getColumnIndexOrThrow("title"));
         this.description = c.getString(c.getColumnIndexOrThrow("description"));
+        this.unread = c.getInt(c.getColumnIndexOrThrow("unread"));
         this.guid = c.getString(c.getColumnIndexOrThrow("guid"));
 
     }

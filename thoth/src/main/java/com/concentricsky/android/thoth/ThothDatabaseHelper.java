@@ -148,8 +148,9 @@ public class ThothDatabaseHelper
     public Cursor getArticleCursorByTag(long tag_id) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = null;
-        c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".* FROM "+Article.ARTICLE_TABLE_NAME+
+        c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
                             " JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON "+Article.ARTICLE_TABLE_NAME+".feed_id="+Feed.FEEDTAG_TABLE_NAME+".feed_id "+
+                            " JOIN "+Feed.FEED_TABLE_NAME+" ON "+Feed.FEED_TABLE_NAME+"._id="+Feed.FEEDTAG_TABLE_NAME+".feed_id "+
                             " WHERE feedtag.tag_id=? ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
         if (c == null || !c.moveToFirst()) {
             return null;
