@@ -133,10 +133,15 @@ public class ThothDatabaseHelper
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = null;
         if (feed_id == 0) { //all articles
-            c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" ORDER BY timestamp DESC",null);
+            c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
+                                " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
+                                " ORDER BY timestamp DESC",null);
         }
         else {
-            c = db.rawQuery("SELECT * FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=? ORDER BY timestamp DESC", new String[] {String.valueOf(feed_id)});
+            c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
+                    " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
+                    " WHERE feed_id=?"+
+                    " ORDER BY timestamp DESC", new String[] {String.valueOf(feed_id)});
         }
         if (c == null || !c.moveToFirst())
             return null;
