@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth.models;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.AsyncTask;
 import android.util.Log;
 
 import java.io.Serializable;
@@ -66,8 +67,8 @@ public class Article implements Serializable
 
         if (this._id != 0) {
             //update read/unread
-            SQLiteStatement stmt = db.compileStatement("UPDATE " + ARTICLE_TABLE_NAME + " SET unread=?");
-            stmt.bindLong(1, this.unread);
+            SQLiteStatement stmt = db.compileStatement("UPDATE " + ARTICLE_TABLE_NAME + " SET unread=0 WHERE _id=?");
+            stmt.bindLong(1, this._id);
             stmt.executeUpdateDelete();
 
         } else {
@@ -111,5 +112,16 @@ public class Article implements Serializable
 
     }
 
-
+    public void asyncSave(final SQLiteDatabase db) {
+        AsyncTask<Article, Void, Void> task = new AsyncTask<Article, Void, Void>() {
+            @Override
+            protected Void doInBackground(Article... articles) {
+                for (Article article : articles) {
+                    article.save(db);
+                }
+                return null;
+            }
+        };
+        task.execute(this);
+    }
 }

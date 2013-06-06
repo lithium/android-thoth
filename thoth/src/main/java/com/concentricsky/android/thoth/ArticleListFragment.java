@@ -1,6 +1,7 @@
 package com.concentricsky.android.thoth;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -246,10 +247,10 @@ public class ArticleListFragment extends ListFragment
             if (mFeedTitleIdx != -1)
                 holder.feed.setText( cursor.getString(mFeedTitleIdx) );
             if (mTimestampIdx != -1)
-                holder.date.setText( DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)) );
+                holder.date.setText(DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)));
 
-//            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
-//            holder.title.setTypeface(holder.title.getTypeface(), unread ? Typeface.BOLD : Typeface.NORMAL);
+            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
+            holder.title.setTypeface(holder.title.getTypeface(), unread ? Typeface.BOLD : Typeface.NORMAL);
         }
 
         @Override

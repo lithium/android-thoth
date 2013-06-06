@@ -114,7 +114,7 @@ public class ThothDatabaseHelper
     public Cursor getTagCursor()
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_TABLE_NAME + " ORDER BY title", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_TABLE_NAME + " ORDER BY ordering,title", null);
         if (!c.moveToFirst())
             return null;
         return c;

@@ -21,7 +21,16 @@ class ArticleDetailFragment extends Fragment {
         Bundle args = new Bundle();
         args.putSerializable("article", article);
         f.setArguments(args);
+        f.setArticle(article);
         return f;
+    }
+
+    void setArticle(Article article) {
+        this.mArticle = article;
+    }
+
+    Article getArticle() {
+        return mArticle;
     }
 
     @Override

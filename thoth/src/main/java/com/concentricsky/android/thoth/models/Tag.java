@@ -11,13 +11,14 @@ public class Tag {
     public long _id;
     public String title;
 
-    public static final int DATABASE_VERSION = 2;
+    public static final int DATABASE_VERSION = 4;
 
     public static final String TAG_TABLE_NAME = "tag";
     public static final String TAG_TABLE_CREATE =
             "CREATE TABLE " + TAG_TABLE_NAME + " ("+
                     "_id INTEGER PRIMARY KEY,"+
                     "title TEXT,"+
+                    "ordering INTEGER default 99,"+
                     "unread INTEGER);";
     public static final String TAG_TABLE_INSERT = "INSERT INTO " +TAG_TABLE_NAME + " (title) VALUES (?);";
     public static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+";";
@@ -27,6 +28,7 @@ public class Tag {
     public static void createDatabase(SQLiteDatabase db)
     {
         db.execSQL(TAG_TABLE_CREATE);
+        db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (1,0,?)", new String[] {"All feeds"});
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {

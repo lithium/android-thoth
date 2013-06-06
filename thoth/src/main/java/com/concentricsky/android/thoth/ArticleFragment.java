@@ -12,7 +12,7 @@ import com.concentricsky.android.thoth.models.Article;
 /**
  * Created by wiggins on 5/23/13.
  */
-public class ArticleFragment extends Fragment implements ThothFragmentInterface {
+public class ArticleFragment extends Fragment implements ThothFragmentInterface, ViewPager.OnPageChangeListener {
     private static final int CURSOR_LOADER_ID = 1;
 
     private long mFeedId;
@@ -47,6 +47,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface 
         mAdapter = new ArticlePagerAdapter();
         mViewPager = (ViewPager)root;
         mViewPager.setAdapter(mAdapter);
+        mViewPager.setOnPageChangeListener(this);
 
         load_cursor();
 
@@ -96,6 +97,25 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface 
         mLoaderManager.restartLoader(CURSOR_LOADER_ID, null, new ArticleLoader());
     }
 
+    @Override
+    public void onPageScrolled(int i, float v, int i2) {
+
+    }
+
+    @Override
+    public void onPageSelected(int i) {
+        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(i);
+        Article a = frag.getArticle();
+        if (a != null) {
+            a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
+        }
+
+    }
+
+    @Override
+    public void onPageScrollStateChanged(int i) {
+
+    }
 
 
     private class ArticleLoader implements LoaderManager.LoaderCallbacks<Cursor>
