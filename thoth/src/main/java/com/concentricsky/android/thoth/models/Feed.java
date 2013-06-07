@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth.models;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
+import android.os.AsyncTask;
 
 import java.util.ArrayList;
 
@@ -20,7 +21,7 @@ public class Feed {
     public String[] tags;
     public ArrayList<Article> articles;
 
-    public static final int DATABASE_VERSION = 4;
+    public static final int DATABASE_VERSION = 5;
 
     public static final String FEED_TABLE_NAME = "feed";
     public static final String FEED_TABLE_CREATE =
@@ -138,5 +139,18 @@ public class Feed {
 
     public static Cursor load(SQLiteDatabase db, long feed_id) {
         return db.rawQuery("SELECT * FROM "+FEED_TABLE_NAME+ " WHERE _id=?", new String[] {String.valueOf(feed_id)});
+    }
+
+    public void asyncSave(final SQLiteDatabase db) {
+        AsyncTask<Feed, Void, Void> task = new AsyncTask<Feed, Void, Void>() {
+            @Override
+            protected Void doInBackground(Feed... feeds) {
+                for (Feed feed : feeds) {
+                    feed.save(db);
+                }
+                return null;
+            }
+        };
+        task.execute(this);
     }
 }
