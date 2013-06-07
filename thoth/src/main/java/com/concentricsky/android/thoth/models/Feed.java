@@ -101,6 +101,10 @@ public class Feed {
             stmt.bindLong(1, this._id);
             stmt.bindLong(2, this._id);
             stmt.executeUpdateDelete();
+
+            stmt = db.compileStatement("UPDATE tag SET unread=(SELECT SUM(unread) FROM feed JOIN feedtag ON feed._id=feed_id WHERE tag_id=tag._id) WHERE _id IN (SELECT tag_id FROM feedtag WHERE feed_id=?)");
+            stmt.bindLong(1, this._id);
+            stmt.executeUpdateDelete();
         }
         else {
             Cursor c = db.rawQuery("SELECT _id FROM "+FEED_TABLE_NAME+ " WHERE url=?", new String[] {this.url});
@@ -127,8 +131,10 @@ public class Feed {
                 feedtag_insert.bindLong(1, this._id);
                 feedtag_insert.bindLong(2, tag._id);
                 feedtag_insert.executeInsert();
+
             }
         }
+
 
         if (this.articles != null) {
             for (Article article : this.articles) {

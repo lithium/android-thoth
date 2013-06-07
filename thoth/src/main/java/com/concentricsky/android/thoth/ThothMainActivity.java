@@ -274,6 +274,7 @@ public class ThothMainActivity extends FragmentActivity
 
         @Override
         public void onDrawerOpened(View drawerView) {
+            reloadTags();
             invalidateOptionsMenu();
         }
     }
