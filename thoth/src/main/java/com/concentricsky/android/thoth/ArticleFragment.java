@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.*;
@@ -92,7 +93,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     }
     private void load_cursor()
     {
-        if (mLoaderManager == null)
+        if (mLoaderManager == null || getActivity() == null)
             return;
         mLoaderManager.restartLoader(CURSOR_LOADER_ID, null, new ArticleLoader());
     }
@@ -122,7 +123,8 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     {
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            return new SimpleCursorLoader(getActivity()) {
+            Context context = getActivity();
+            return new SimpleCursorLoader(context) {
                 @Override
                 public Cursor loadInBackground() {
                     return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);

@@ -183,6 +183,9 @@ public class ImportFragment extends ListFragment
 
         @Override
         public void onResponse(Feed response) {
+            if (mRequestQueue == null)
+                return;
+
             if (response.title == null) {//
                 mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
             }
@@ -196,6 +199,9 @@ public class ImportFragment extends ListFragment
 
         @Override
         public void onErrorResponse(VolleyError error) {
+            if (mRequestQueue == null)
+                return;
+            
             mStatus = AddHelperStatus.STATUS_ERROR;
             mAdapter.notifyDataSetChanged();
 
