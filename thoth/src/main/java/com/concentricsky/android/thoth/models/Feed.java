@@ -96,6 +96,11 @@ public class Feed {
             if (feed_update.executeUpdateDelete() < 1) {
                 return false;
             };
+
+            SQLiteStatement stmt = db.compileStatement("UPDATE "+Feed.FEED_TABLE_NAME+" SET unread=(SELECT COUNT(_id) FROM "+Article.ARTICLE_TABLE_NAME+" WHERE unread=1 AND feed_id=?) WHERE _id=?");
+            stmt.bindLong(1, this._id);
+            stmt.bindLong(2, this._id);
+            stmt.executeUpdateDelete();
         }
         else {
             Cursor c = db.rawQuery("SELECT _id FROM "+FEED_TABLE_NAME+ " WHERE url=?", new String[] {this.url});

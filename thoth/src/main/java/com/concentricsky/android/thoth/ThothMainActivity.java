@@ -265,6 +265,10 @@ public class ThothMainActivity extends FragmentActivity
         }
         @Override
         public void onDrawerClosed(View drawerView) {
+            int l = mDrawerAdapter.getGroupCount();
+            for (int i=0; i < l; i++) {
+                mDrawerList.collapseGroup(i);
+            }
             invalidateOptionsMenu();
         }
 
