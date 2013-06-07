@@ -120,6 +120,15 @@ public class ThothDatabaseHelper
         return c;
     }
 
+    public Cursor getAllFeedsCursor()
+    {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT * FROM "+Feed.FEED_TABLE_NAME, null);
+        if (!c.moveToFirst())
+            return null;
+        return c;
+    }
+
     public Cursor getFeedCursor(long tag_id)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();

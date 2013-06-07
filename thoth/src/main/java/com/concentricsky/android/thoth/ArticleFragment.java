@@ -129,11 +129,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             return new SimpleCursorLoader(context) {
                 @Override
                 public Cursor loadInBackground() {
-                    if (mFeedId > 0)
-                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
                     if (mTagId > 0)
                         return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
-                    return null;
+                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
                 }
             };
         }

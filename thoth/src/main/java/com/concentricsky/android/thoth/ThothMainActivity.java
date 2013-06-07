@@ -100,6 +100,9 @@ public class ThothMainActivity extends FragmentActivity
             showImport(uri);
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
+        else {
+            showArticleList();
+        }
 
 
     }

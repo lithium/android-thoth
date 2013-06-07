@@ -72,13 +72,12 @@ public class ArticleListFragment extends ListFragment
         }
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        if (mFeedId > 0)
-            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
-        else
         if (mTagId > 0) {
             RefreshFeedsTask task = new RefreshFeedsTask();
             task.execute(mTagId);
         }
+        else
+            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
     }
 
     @Override
@@ -146,7 +145,8 @@ public class ArticleListFragment extends ListFragment
         if (mFeedId > 0) {
             mLoaderManager.restartLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
         }
-        if (mTagId > 0) {
+        else
+        {
             RefreshFeedsTask task = new RefreshFeedsTask();
             task.execute(mTagId);
         }
@@ -193,8 +193,13 @@ public class ArticleListFragment extends ListFragment
         @Override
         protected Void doInBackground(Long... tag_ids) {
             for (long tag_id : tag_ids) {
-                Cursor cursor = ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
-                if (cursor.moveToFirst()) {
+                Cursor cursor = null;
+                if (tag_id == -1) {
+                    cursor = ThothDatabaseHelper.getInstance().getAllFeedsCursor();
+                } else {
+                    cursor = ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
+                }
+                if (cursor != null && cursor.moveToFirst()) {
                     int id_idx = cursor.getColumnIndexOrThrow("_id");
                     for (; !cursor.isAfterLast(); cursor.moveToNext()) {
                         Feed feed = new Feed();
@@ -205,6 +210,7 @@ public class ArticleListFragment extends ListFragment
             }
             return null;
         }
+
     }
 
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
