@@ -17,4 +17,12 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="TextAppearance.article_read" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textStyle">normal</item>
+    </style>
+
+    <style name="TextAppearance.article_unread" parent="@android:style/TextAppearance.Medium">
+        <item name="android:textStyle">bold</item>
+    </style>
+
 </resources>

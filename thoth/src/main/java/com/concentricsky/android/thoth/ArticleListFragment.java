@@ -252,7 +252,7 @@ public class ArticleListFragment extends ListFragment
                 holder.date.setText(DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)));
 
             boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
-            holder.title.setTypeface(holder.title.getTypeface(), unread ? Typeface.BOLD : Typeface.NORMAL);
+            holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
         }
 
         @Override
