@@ -1,6 +1,7 @@
 package com.concentricsky.android.thoth;
 
 import android.app.ActionBar;
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
@@ -15,8 +16,10 @@ import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ExpandableListView;
 import android.widget.SimpleCursorTreeAdapter;
+import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
 
 
@@ -210,6 +213,9 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
+        if (mDrawerAdapter == null)
+            return;
+
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
             mDrawerAdapter.changeCursor(null);
@@ -273,12 +279,37 @@ public class ThothMainActivity extends FragmentActivity
         public ThothDrawerAdapter() {
             super(ThothMainActivity.this,
                     null,
-                    android.R.layout.simple_expandable_list_item_1,
-                    new String[]{"title"}, // groupFrom,
-                    new int[]{android.R.id.text1}, // groupTo,
-                    android.R.layout.simple_expandable_list_item_1,
-                    new String[]{"title"}, // childFrom,
-                    new int[]{android.R.id.text1}); // childTo);
+                    R.layout.item_navigation,
+                    new String[]{"title","unread"}, // groupFrom,
+                    new int[]{android.R.id.text1, android.R.id.text2}, // groupTo,
+                    R.layout.item_navigation,
+                    new String[]{"title","unread"}, // childFrom,
+                    new int[]{android.R.id.text1, android.R.id.text2} // childTo,
+            );
+        }
+
+
+        protected void bindView(View view, Context context, Cursor cursor, boolean isLastChild) {
+            TextView tv = (TextView) view.findViewById(android.R.id.text1);
+            tv.setText( String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title"))) );
+            tv = (TextView) view.findViewById(android.R.id.text2);
+            long unread = cursor.getLong(cursor.getColumnIndexOrThrow("unread"));
+            if (unread > 0) {
+                tv.setVisibility(View.VISIBLE);
+                tv.setText( String.valueOf(unread) );
+            }
+            else {
+                tv.setVisibility(View.INVISIBLE);
+            }
+        }
+
+        @Override
+        protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
+            bindView(view,context,cursor,isLastChild);
+        }
+        @Override
+        protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
+            bindView(view,context,cursor,isLastChild);
         }
 
         @Override
