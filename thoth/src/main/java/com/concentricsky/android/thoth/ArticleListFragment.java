@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
 import android.support.v4.app.FragmentActivity;
@@ -36,6 +37,8 @@ public class ArticleListFragment extends ListFragment
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
     private RequestQueue mRequestQueue;
+    private MenuItem mRefreshMenuItem;
+    private boolean mRefreshing=false;
 
     public ArticleListFragment() {
     }
@@ -67,7 +70,8 @@ public class ArticleListFragment extends ListFragment
         }
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader());
+        if (mFeedId > 0)
+            mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
     }
 
     @Override
@@ -89,9 +93,6 @@ public class ArticleListFragment extends ListFragment
         mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
         if (mAdapter == null) {
-//            mAdapter = new SimpleCursorAdapter(activity, android.R.layout.simple_list_item_2, null,
-//                    new String[] {"title","timestamp"},
-//                    new int[] {android.R.id.text1, android.R.id.text2}, 0);
             mAdapter = new ArticleListAdapter(activity, null);
             setListAdapter(mAdapter);
         }
@@ -110,7 +111,8 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
         menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
-        menu.findItem(R.id.action_refresh).setVisible(!drawer_open);
+        mRefreshMenuItem = menu.findItem(R.id.action_refresh);
+        mRefreshMenuItem.setVisible(mRefreshing ? false : !drawer_open);
     }
 
     @Override
@@ -129,7 +131,14 @@ public class ArticleListFragment extends ListFragment
     }
 
     private void refresh_feeds() {
-//        mRequestQueue.add(new UpdateFeedRequest(mFeed, this, this));
+        mRefreshing = true;
+        Activity activity = getActivity();
+        activity.setProgressBarIndeterminateVisibility(true);
+        mRefreshMenuItem.setVisible(false);
+
+        if (mFeedId > 0) {
+            mLoaderManager.restartLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
+        }
     }
 
     @Override
@@ -142,6 +151,9 @@ public class ArticleListFragment extends ListFragment
 
     @Override
     public void onResponse(Boolean response) {
+        mRefreshing = false;
+        mRefreshMenuItem.setVisible(true);
+        getActivity().setProgressBarIndeterminateVisibility(false);
         mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
     }
 
@@ -154,24 +166,31 @@ public class ArticleListFragment extends ListFragment
 
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
+        private long _feed_id;
+
+        public FeedLoader(long feed_id)
+        {
+            _feed_id = feed_id;
+        }
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
             return new SimpleCursorLoader(getActivity()) {
                 @Override
                 public Cursor loadInBackground() {
-                    if (mFeedId != -1)
-                        return Feed.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mFeedId);
-                    if (mTagId != -1)
-                        return Tag.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), mTagId);
-                    return null;
+                    return Feed.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), _feed_id);
                 }
             };
         }
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             if (cursor.moveToFirst()) {
-                getActivity().getActionBar().setTitle( cursor.getString(cursor.getColumnIndexOrThrow("title")) );
-                refresh_feeds();
+                Feed feed = new Feed();
+                feed.hydrate(cursor);
+
+                getActivity().getActionBar().setTitle( feed.title );
+                mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
+
+//                refresh_feeds();
             }
         }
         @Override
