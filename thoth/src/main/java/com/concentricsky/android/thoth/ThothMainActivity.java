@@ -323,12 +323,12 @@ public class ThothMainActivity extends FragmentActivity
         invalidateOptionsMenu();
     }
 
-    public void showArticle(long feed_id, int position)
+    public void showArticle(long tag_id, long feed_id, int position)
     {
         if (mArticleFragment == null) {
             mArticleFragment = new ArticleFragment();
         }
-        mArticleFragment.setArticle(feed_id, position);
+        mArticleFragment.setArticle(tag_id, feed_id, position);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();

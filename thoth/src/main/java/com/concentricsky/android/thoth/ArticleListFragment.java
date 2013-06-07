@@ -73,7 +73,7 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         ThothMainActivity activity = (ThothMainActivity) getActivity();
-        activity.showArticle(mFeedId, position);
+        activity.showArticle(mTagId, mFeedId, position);
     }
 
     @Override
@@ -136,6 +136,8 @@ public class ArticleListFragment extends ListFragment
     public void onResume() {
         super.onResume();
         getActivity().invalidateOptionsMenu();
+        if (mLoaderManager != null)
+            mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
     }
 
     @Override

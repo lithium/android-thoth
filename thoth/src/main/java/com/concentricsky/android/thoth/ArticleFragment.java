@@ -17,6 +17,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private static final int CURSOR_LOADER_ID = 1;
 
     private long mFeedId;
+    private long mTagId;
     private long mArticleId;
 
     private LoaderManager mLoaderManager;
@@ -80,12 +81,13 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         load_cursor();
     }
 
-    public void setArticle(long feed_id, int position)
+    public void setArticle(long tag_id, long feed_id, int position)
     {
         mPosition = position;
-        if (mFeedId == feed_id)
+        if (mFeedId == feed_id && mTagId == tag_id)
             return;
         mFeedId = feed_id;
+        mTagId = tag_id;
         if (mLoaderManager != null) {
             mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
         }
@@ -127,14 +129,18 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             return new SimpleCursorLoader(context) {
                 @Override
                 public Cursor loadInBackground() {
-                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                    if (mFeedId > 0)
+                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                    if (mTagId > 0)
+                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
+                    return null;
                 }
             };
         }
         @Override
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             mAdapter.changeCursor(cursor);
-            mViewPager.setCurrentItem(mPosition);
+            mViewPager.setCurrentItem(mPosition, true);
         }
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {

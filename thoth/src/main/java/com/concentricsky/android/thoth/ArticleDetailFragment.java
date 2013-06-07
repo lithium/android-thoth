@@ -12,8 +12,12 @@ import com.concentricsky.android.thoth.models.Article;
 /**
 * Created by wiggins on 5/23/13.
 */
-class ArticleDetailFragment extends Fragment {
+public class ArticleDetailFragment extends Fragment {
     private WebView mBodyWeb;
+
+    public ArticleDetailFragment() {
+    }
+
     private Article mArticle;
 
     static ArticleDetailFragment newInstance(Article article) {
