@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -72,6 +74,11 @@ public class ArticleListFragment extends ListFragment
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
         if (mFeedId > 0)
             mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
+        else
+        if (mTagId > 0) {
+            RefreshFeedsTask task = new RefreshFeedsTask();
+            task.execute(mTagId);
+        }
     }
 
     @Override
@@ -139,6 +146,10 @@ public class ArticleListFragment extends ListFragment
         if (mFeedId > 0) {
             mLoaderManager.restartLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
         }
+        if (mTagId > 0) {
+            RefreshFeedsTask task = new RefreshFeedsTask();
+            task.execute(mTagId);
+        }
     }
 
     @Override
@@ -162,7 +173,39 @@ public class ArticleListFragment extends ListFragment
         Log.e(TAG, "Volley error: " + error);
     }
 
+    private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
+    {
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mRefreshing = false;
+            mRefreshMenuItem.setVisible(true);
+            getActivity().setProgressBarIndeterminateVisibility(false);
+        }
 
+        @Override
+        protected void onPreExecute() {
+            mRefreshing = true;
+            if (mRefreshMenuItem != null)
+                mRefreshMenuItem.setVisible(false);
+            getActivity().setProgressBarIndeterminateVisibility(true);
+        }
+
+        @Override
+        protected Void doInBackground(Long... tag_ids) {
+            for (long tag_id : tag_ids) {
+                Cursor cursor = ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
+                if (cursor.moveToFirst()) {
+                    int id_idx = cursor.getColumnIndexOrThrow("_id");
+                    for (; !cursor.isAfterLast(); cursor.moveToNext()) {
+                        Feed feed = new Feed();
+                        feed.hydrate( cursor );
+                        mRequestQueue.add(new UpdateFeedRequest(feed, null, null));
+                    }
+                }
+            }
+            return null;
+        }
+    }
 
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
