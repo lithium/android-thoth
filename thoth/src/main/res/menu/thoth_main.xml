@@ -22,7 +22,9 @@
           android:orderInCategory="20"
           android:icon="@drawable/social_share"
           android:title="Share"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="ifRoom"
+          android:actionProviderClass="android.widget.ShareActionProvider"
+            />
 
 
     <!-- menu -->

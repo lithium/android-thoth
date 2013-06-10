@@ -1,12 +1,15 @@
 package com.concentricsky.android.thoth;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 import android.support.v4.view.ViewPager;
 import android.view.*;
+import android.widget.ShareActionProvider;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Article;
 
@@ -24,6 +27,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private ViewPager mViewPager;
     private ArticlePagerAdapter mAdapter;
     private int mPosition;
+    private ShareActionProvider mShareActionProvider;
 
 
     public ArticleFragment()
@@ -57,20 +61,36 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        MenuItem item = menu.findItem(R.id.action_share);
+        mShareActionProvider = new ShareActionProvider(getActivity());
+        item.setActionProvider(mShareActionProvider);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_share:
+            case R.id.action_visitpage: {
+                Article article = getArticle();
+                if (article != null) {
+                    Intent i = new Intent(Intent.ACTION_VIEW);
+                    i.setData(Uri.parse(article.link));
+                    startActivity(i);
+                }
                 return true;
-            case R.id.action_visitpage:
-                return true;
+            }
         }
 
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        menu.findItem(R.id.action_share).setVisible(!drawer_open);
+        MenuItem share =  menu.findItem(R.id.action_share);
+        share.setVisible(!drawer_open);
+        mShareActionProvider = (ShareActionProvider)share.getActionProvider();
         menu.findItem(R.id.action_visitpage).setVisible(!drawer_open);
     }
 
@@ -79,6 +99,14 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         super.onResume();
         getActivity().invalidateOptionsMenu();
         load_cursor();
+    }
+
+    public Article getArticle()
+    {
+        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(mViewPager.getCurrentItem());
+        if (frag != null)
+            return frag.getArticle();
+        return null;
     }
 
     public void setArticle(long tag_id, long feed_id, int position)
@@ -111,6 +139,11 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         Article a = frag.getArticle();
         if (a != null) {
             a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
+
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.putExtra(Intent.EXTRA_TEXT, a.link);
+            intent.setType("text/plain");
+            mShareActionProvider.setShareIntent(intent);
         }
 
     }
