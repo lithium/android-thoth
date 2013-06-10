@@ -1,0 +1,6 @@
+#thoth-title a:link,
+#thoth-title a:visited, 
+#thoth-title a:hover {
+    text-decoration: none;
+    color: black;
+}

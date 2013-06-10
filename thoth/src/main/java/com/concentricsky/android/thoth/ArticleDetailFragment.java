@@ -73,11 +73,12 @@ public class ArticleDetailFragment extends Fragment {
     private void load_article()
     {
         if (mArticle != null) {
-            StringBuilder builder = new StringBuilder("<head></head><body><a href=\"")
+            StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"css/articledetail.css\" /></head>"+
+                    "<body><h1 id=\"thoth-title\"><a href=\"")
                     .append(mArticle.link)
-                    .append("\"><h1 id=\"thoth-title\">")
+                    .append("\">")
                     .append(mArticle.title)
-                    .append("</h1></a>");
+                    .append("</h1>");
             if (mArticle.timestamp != null) {
                 builder.append("<div id=\"thoth-timestamp\">")
                        .append(DateUtils.fuzzyTimestamp(getActivity(), mArticle.timestamp.getTime()))
@@ -86,7 +87,7 @@ public class ArticleDetailFragment extends Fragment {
             builder.append("<div id=\"thoth-content\">")
                    .append(mArticle.description)
                    .append("</div></body>");
-            mBodyWeb.loadData(builder.toString(), "text/html", "UTF-8");
+            mBodyWeb.loadDataWithBaseURL("file:///android_asset/", builder.toString(), "text/html", "UTF-8", null);
 
 //            mTitleText.setText(mArticle.title);
 //            mSubtitleText.setText(DateUtils.fuzzyTimestamp(getActivity(), mArticle.timestamp.getTime()));
