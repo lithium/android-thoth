@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.TextView;
 import com.concentricsky.android.thoth.models.Article;
 
 /**
@@ -14,6 +15,8 @@ import com.concentricsky.android.thoth.models.Article;
 */
 public class ArticleDetailFragment extends Fragment {
     private WebView mBodyWeb;
+    private TextView mTitleText;
+    private TextView mSubtitleText;
 
     public ArticleDetailFragment() {
     }
@@ -40,6 +43,10 @@ public class ArticleDetailFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articledetail, container, false);
+
+//        mTitleText = (TextView) root.findViewById(R.id.article_title);
+//        mSubtitleText = (TextView) root.findViewById(R.id.article_title);
+
         mBodyWeb = (WebView)root.findViewById(R.id.article_web);
         WebSettings settings = mBodyWeb.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -66,7 +73,23 @@ public class ArticleDetailFragment extends Fragment {
     private void load_article()
     {
         if (mArticle != null) {
-            mBodyWeb.loadData("<head></head><body><h1 id=\"thoth-title\">"+mArticle.title+"</h1>"+mArticle.description+"</body>", "text/html", "UTF-8");
+            StringBuilder builder = new StringBuilder("<head></head><body><a href=\"")
+                    .append(mArticle.link)
+                    .append("\"><h1 id=\"thoth-title\">")
+                    .append(mArticle.title)
+                    .append("</h1></a>");
+            if (mArticle.timestamp != null) {
+                builder.append("<div id=\"thoth-timestamp\">")
+                       .append(DateUtils.fuzzyTimestamp(getActivity(), mArticle.timestamp.getTime()))
+                       .append("</div>");
+            }
+            builder.append("<div id=\"thoth-content\">")
+                   .append(mArticle.description)
+                   .append("</div></body>");
+            mBodyWeb.loadData(builder.toString(), "text/html", "UTF-8");
+
+//            mTitleText.setText(mArticle.title);
+//            mSubtitleText.setText(DateUtils.fuzzyTimestamp(getActivity(), mArticle.timestamp.getTime()));
         }
     }
 
