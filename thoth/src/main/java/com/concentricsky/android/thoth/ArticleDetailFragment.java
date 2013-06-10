@@ -44,9 +44,10 @@ public class ArticleDetailFragment extends Fragment {
         WebSettings settings = mBodyWeb.getSettings();
         settings.setJavaScriptEnabled(true);
         settings.setPluginState(WebSettings.PluginState.ON);
-        settings.setLoadWithOverviewMode(true);
+        settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+//        settings.setLoadWithOverviewMode(true);
 //        settings.setUseWideViewPort(true);
-        mBodyWeb.setInitialScale(100);
+//        mBodyWeb.setInitialScale(100);
         load_article();
         return root;
     }
