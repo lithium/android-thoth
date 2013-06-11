@@ -14,6 +14,7 @@ import android.util.Log;
 import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,6 +42,9 @@ public class ArticleListFragment extends ListFragment
     private RequestQueue mRequestQueue;
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
+    private TextView mNoFeedsText;
+    private ProgressBar mEmpty;
+    private boolean mNoFeeds=false;
 
     public ArticleListFragment() {
     }
@@ -94,6 +98,16 @@ public class ArticleListFragment extends ListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
+        mNoFeedsText = (TextView) root.findViewById(R.id.no_feeds);
+        mNoFeedsText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ThothMainActivity activity = (ThothMainActivity) getActivity();
+                activity.showSubscribe(null);
+            }
+        });
+        mEmpty = (ProgressBar)root.findViewById(android.R.id.empty);
+
 
         FragmentActivity activity = getActivity();
         mRequestQueue = Volley.newRequestQueue(activity);
@@ -158,6 +172,8 @@ public class ArticleListFragment extends ListFragment
         getActivity().invalidateOptionsMenu();
         if (mLoaderManager != null)
             mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+
+        setNoFeeds(mNoFeeds);
     }
 
     @Override
@@ -171,6 +187,12 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onErrorResponse(VolleyError error) {
         Log.e(TAG, "Volley error: " + error);
+    }
+
+    public void setNoFeeds(boolean has_none) {
+        mNoFeeds = has_none;
+        mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
+        mEmpty.setVisibility(has_none ? View.INVISIBLE : View.VISIBLE);
     }
 
     private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>

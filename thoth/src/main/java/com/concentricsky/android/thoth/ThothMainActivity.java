@@ -208,6 +208,11 @@ public class ThothMainActivity extends FragmentActivity
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
             mDrawerAdapter.changeCursor(cursor);
+            if (cursor.getCount() < 2) {
+                mArticleListFragment.setNoFeeds(true);
+            } else {
+                mArticleListFragment.setNoFeeds(false);
+            }
         }
         else {
             //loader_id is the group pos of the children cursor we are trying to load
