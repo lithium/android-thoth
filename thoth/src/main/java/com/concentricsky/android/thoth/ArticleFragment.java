@@ -116,9 +116,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             return;
         mFeedId = feed_id;
         mTagId = tag_id;
-        if (mLoaderManager != null) {
-            mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
-        }
+//        if (mLoaderManager != null) {
+//            mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
+//        }
         load_cursor();
     }
     private void load_cursor()

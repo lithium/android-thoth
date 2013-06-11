@@ -117,6 +117,7 @@ public class Article implements Serializable
         this.description = c.getString(c.getColumnIndexOrThrow("description"));
         this.unread = c.getInt(c.getColumnIndexOrThrow("unread"));
         this.guid = c.getString(c.getColumnIndexOrThrow("guid"));
+        this.timestamp = new Date(c.getLong(c.getColumnIndexOrThrow("timestamp")));
 
     }
 
