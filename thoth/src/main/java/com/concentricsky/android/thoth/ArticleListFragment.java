@@ -45,6 +45,7 @@ public class ArticleListFragment extends ListFragment
     private TextView mNoFeedsText;
     private ProgressBar mEmpty;
     private boolean mNoFeeds=false;
+    private ListView mList;
 
     public ArticleListFragment() {
     }
@@ -107,6 +108,8 @@ public class ArticleListFragment extends ListFragment
             }
         });
         mEmpty = (ProgressBar)root.findViewById(android.R.id.empty);
+
+        mList = (ListView)root.findViewById(android.R.id.list);
 
 
         FragmentActivity activity = getActivity();
@@ -173,7 +176,7 @@ public class ArticleListFragment extends ListFragment
         if (mLoaderManager != null)
             mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
 
-        setNoFeeds(mNoFeeds);
+//        setNoFeeds(mNoFeeds);
     }
 
     @Override
@@ -294,6 +297,9 @@ public class ArticleListFragment extends ListFragment
         @Override
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             mAdapter.changeCursor(cursor);
+            if (mList != null) {
+                mList.setSelectionAfterHeaderView();
+            }
         }
 
         @Override

@@ -43,8 +43,9 @@ public class AtomFeedParser {
 //            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             SimpleDateFormat[] date_formats = {
                 new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss'Z'"),
+                new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ssZ"),
                 new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
-                new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss.SSSzzzz"),
+                new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss.SSSZ"),
             };
             for (SimpleDateFormat sdf : date_formats) {
                 sdf.setTimeZone(TimeZone.getTimeZone("GMT"));

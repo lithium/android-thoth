@@ -109,7 +109,6 @@ public class ImportFragment extends ListFragment
     }
 
     private class ScanZipfileTask extends AsyncTask<Uri, AddFeedHelper, Void> {
-
         @Override
         protected void onProgressUpdate(AddFeedHelper... helpers) {
 //            super.onProgressUpdate(values);
@@ -117,6 +116,12 @@ public class ImportFragment extends ListFragment
                 mAdapter.add(helper);
                 mAdapter.notifyDataSetChanged();
             }
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            popBackStack();
         }
 
         @Override
@@ -201,7 +206,7 @@ public class ImportFragment extends ListFragment
         public void onErrorResponse(VolleyError error) {
             if (mRequestQueue == null)
                 return;
-            
+
             mStatus = AddHelperStatus.STATUS_ERROR;
             mAdapter.notifyDataSetChanged();
 
