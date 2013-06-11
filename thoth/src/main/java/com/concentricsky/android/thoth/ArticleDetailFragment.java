@@ -52,6 +52,9 @@ public class ArticleDetailFragment extends Fragment {
         settings.setJavaScriptEnabled(true);
         settings.setPluginState(WebSettings.PluginState.ON);
         settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+        settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+        settings.setAppCachePath(getActivity().getCacheDir().toString());
+        settings.setAppCacheEnabled(true);
 //        settings.setLoadWithOverviewMode(true);
 //        settings.setUseWideViewPort(true);
 //        mBodyWeb.setInitialScale(100);
