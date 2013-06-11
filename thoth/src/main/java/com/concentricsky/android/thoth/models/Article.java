@@ -89,6 +89,9 @@ public class Article implements Serializable
             }
 
 
+            if (this.link == null || this.guid == null) {
+                return false;
+            }
             SQLiteStatement stmt = db.compileStatement(ARTICLE_TABLE_INSERT);
             stmt.bindLong(1, this.feed_id);
             stmt.bindString(2, this.guid);

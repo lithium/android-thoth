@@ -14,7 +14,7 @@ public class FeedHelper {
    {
        Feed ret = null;
        ret = attemptToParseRss(feed, data);
-       if (ret == null)
+       if (ret == null || ret.link == null)
            ret = attemptToParseAtom(feed, data);
        return ret;
    }
@@ -29,8 +29,8 @@ public class FeedHelper {
 
     public static Feed attemptToParseAtom(Feed feed, String data)
     {
-
-        return null;
+        AtomFeedParser parser = new AtomFeedParser();
+        return parser.parse(feed, data);
     }
 
     public static String scanHtmlForFeedUrl(String root, String data)

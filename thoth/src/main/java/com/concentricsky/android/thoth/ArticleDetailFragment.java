@@ -81,7 +81,7 @@ public class ArticleDetailFragment extends Fragment {
                     .append(mArticle.link)
                     .append("\">")
                     .append(mArticle.title)
-                    .append("</h1>");
+                    .append("</a></h1>");
             if (mArticle.timestamp != null) {
                 builder.append("<div id=\"thoth-timestamp\">")
                        .append(DateUtils.fuzzyTimestamp(getActivity(), mArticle.timestamp.getTime()))

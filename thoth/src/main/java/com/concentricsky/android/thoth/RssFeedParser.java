@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.util.Log;
 import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import org.xmlpull.v1.XmlPullParser;
@@ -11,6 +12,7 @@ import java.io.StringReader;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * Created by wiggins on 5/18/13.
@@ -24,6 +26,7 @@ public class RssFeedParser {
 
     public Feed parse(Feed feed, String data)
     {
+        boolean is_valid = false;
         if (feed == null) {
             feed = new Feed();
         }
@@ -47,6 +50,7 @@ public class RssFeedParser {
                         if (state == RssXmlState.RSSXML_NONE) {
                             if (tag_name.equals("channel")) {
                                 state = RssXmlState.RSSXML_CHANNEL;
+                                is_valid = true;
                             }
                         }
                         else
@@ -103,7 +107,14 @@ public class RssFeedParser {
                                 article.guid = lastText;
                             }
                             else if (tag_name.equals("pubDate")) {
-                                article.timestamp = sdf.parse(lastText, new ParsePosition(0));
+                                Date date = sdf.parse(lastText, new ParsePosition(0));
+                                if (date != null) {
+                                    article.timestamp = date;
+                                }
+                                else {
+                                    Log.v("foo", "foo");
+                                    //nop
+                                }
                                 //                            article.timestamp = xpp.getText();
                             }
                         }
@@ -121,6 +132,6 @@ public class RssFeedParser {
             feed = null;
         }
 
-        return feed;
+        return is_valid ? feed : null;
     }
 }

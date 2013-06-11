@@ -167,6 +167,9 @@ public class SubscribeFragment extends Fragment
 
     public void setUrl(String url) {
         mUrl = url;
+        if (mUrl != null && !mUrl.startsWith("http://")) {
+            mUrl = "http://"+mUrl;
+        }
         scan_url();
     }
 
