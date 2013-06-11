@@ -39,6 +39,7 @@ public class ArticleListFragment extends ListFragment
 
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
+    private static final int TAG_LOADER_ID=-4;
     private RequestQueue mRequestQueue;
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
@@ -80,9 +81,14 @@ public class ArticleListFragment extends ListFragment
         if (mTagId > 0) {
             RefreshFeedsTask task = new RefreshFeedsTask();
             task.execute(mTagId);
+            mLoaderManager.restartLoader(TAG_LOADER_ID, null, new TagLoader(mTagId));
         }
-        else
+        else {
+            if (mFeedId < 1) {
+                getActivity().getActionBar().setTitle("All Feeds");
+            }
             mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
+        }
     }
 
     @Override
@@ -175,8 +181,6 @@ public class ArticleListFragment extends ListFragment
         getActivity().invalidateOptionsMenu();
         if (mLoaderManager != null)
             mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-
-//        setNoFeeds(mNoFeeds);
     }
 
     @Override
@@ -271,6 +275,40 @@ public class ArticleListFragment extends ListFragment
         }
         @Override
         public void onLoaderReset(Loader<Cursor> loader) {
+
+        }
+    }
+
+    private class TagLoader implements LoaderManager.LoaderCallbacks<Cursor>
+    {
+        private long _tag_id;
+
+        public TagLoader(long tag_id) {
+            _tag_id = tag_id;
+        }
+
+        @Override
+        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            return new SimpleCursorLoader(getActivity()) {
+                @Override
+                public Cursor loadInBackground() {
+                    return Tag.load(ThothDatabaseHelper.getInstance().getReadableDatabase(), _tag_id);
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+            if (cursor.moveToFirst()) {
+                Tag tag = new Tag();
+                tag.hydrate(cursor);
+                getActivity().getActionBar().setTitle(tag.title);
+            }
+
+        }
+
+        @Override
+        public void onLoaderReset(Loader<Cursor> cursorLoader) {
 
         }
     }
