@@ -4,35 +4,42 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?android:attr/listPreferredItemHeight"
-        >
-
+                android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
+                android:paddingTop="?android:attr/listPreferredItemPaddingLeft"
+                android:paddingBottom="?android:attr/listPreferredItemPaddingLeft"
+                android:paddingRight="?android:attr/listPreferredItemPaddingRight">
 
     <TextView android:id="@+id/title"
+              android:textAppearance="?android:attr/textAppearanceListItem"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginStart="?android:attr/listPreferredItemPaddingStart"
-              android:layout_marginTop="8dip"
-              android:textAppearance="?android:attr/textAppearanceListItem"
-              android:text="article title"
-            />
+              android:layout_marginBottom="5dp"
+              android:text="article title"/>
 
     <TextView android:id="@+id/feed_title"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:textColor="?android:attr/textColorHint"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_below="@id/title"
-              android:layout_alignStart="@id/title"
-              android:paddingRight="16dp"
+              android:layout_below="@+id/title"
+              android:text="feed title"/>
+
+    <TextView android:id="@+id/seperator"
               android:textAppearance="?android:attr/textAppearanceSmall"
-              android:text="feed title"
-            />
+              android:textColor="?android:attr/textColorHint"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/title"
+              android:layout_toRightOf="@+id/feed_title"
+              android:text=" / "/>
 
     <TextView android:id="@+id/timestamp"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:textColor="?android:attr/textColorHint"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_below="@id/title"
-              android:layout_toRightOf="@id/feed_title"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:text="date"
-            />
+              android:layout_below="@+id/title"
+              android:layout_toRightOf="@+id/seperator"
+              android:text="date"/>
 
 </RelativeLayout>

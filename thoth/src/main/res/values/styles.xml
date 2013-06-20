@@ -19,6 +19,7 @@
 
     <style name="TextAppearance.article_read" parent="@android:style/TextAppearance.Medium">
         <item name="android:textStyle">normal</item>
+        <item name="android:textColor">?android:attr/textColorHint</item>
     </style>
 
     <style name="TextAppearance.article_unread" parent="@android:style/TextAppearance.Medium">
