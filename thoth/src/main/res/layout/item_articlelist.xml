@@ -7,7 +7,9 @@
                 android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
                 android:paddingTop="?android:attr/listPreferredItemPaddingLeft"
                 android:paddingBottom="?android:attr/listPreferredItemPaddingLeft"
-                android:paddingRight="?android:attr/listPreferredItemPaddingRight">
+                android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+                android:background="@drawable/item_background"
+        >
 
     <TextView android:id="@+id/title"
               android:textAppearance="?android:attr/textAppearanceListItem"

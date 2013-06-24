@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
@@ -353,6 +354,10 @@ public class ArticleListFragment extends ListFragment
         private int mTimestampIdx=-1;
         private int mUnreadIdx=-1;
 
+
+        private final int[] UNREAD_STATES = {android.R.attr.state_checked};
+        private final int[] READ_STATES = {};
+
         private class ViewHolder {
             TextView title;
             TextView feed;
@@ -389,6 +394,10 @@ public class ArticleListFragment extends ListFragment
 
             boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
+
+            Drawable bg = view.getBackground();
+            bg.setState(unread ? UNREAD_STATES : READ_STATES);
+            view.invalidateDrawable(bg);
         }
 
         @Override
