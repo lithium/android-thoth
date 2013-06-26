@@ -4,10 +4,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?android:attr/listPreferredItemHeight"
-                android:paddingLeft="?android:attr/listPreferredItemPaddingLeft"
-                android:paddingTop="?android:attr/listPreferredItemPaddingLeft"
-                android:paddingBottom="?android:attr/listPreferredItemPaddingLeft"
-                android:paddingRight="?android:attr/listPreferredItemPaddingRight"
+                android:paddingLeft="18dp"
+                android:paddingTop="10dp"
+                android:paddingBottom="10dp"
+                android:paddingRight="18dp"
                 android:background="@drawable/item_background"
         >
 
@@ -15,7 +15,7 @@
               android:textAppearance="?android:attr/textAppearanceListItem"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginBottom="5dp"
+              android:layout_marginBottom="3dp"
               android:text="article title"/>
 
     <TextView android:id="@+id/feed_title"

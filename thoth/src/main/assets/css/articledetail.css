@@ -1,6 +1,142 @@
-#thoth-title a:link,
-#thoth-title a:visited, 
-#thoth-title a:hover {
+/* http://meyerweb.com/eric/tools/css/reset/
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure,
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+}
+
+/* Begin Thoth CSS */
+
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    color: #58585b;
+    line-height: 1.5em;
+}
+h1#thoth-title {
+    font-size: 28px;
+    line-height: 1.2em;
+    padding: 8% 10% 0 10%;
+    font-weight: 200;
+}
+h1#thoth-title a:link,
+h1#thoth-title a:visited,
+h1#thoth-title a:hover,
+h1#thoth-title a:visited {
     text-decoration: none;
-    color: black;
+    display: block;
+    color: #58585b;
+}
+p#thoth-timestamp {
+    display: block;
+    margin: 0;
+    color: #777777;
+    padding: 0 10% 5% 10%;
+}
+p#thoth-timestamp span {
+    display: block;
+    padding-bottom: 5%;
+    border-bottom: 1px solid #efefef;
+}
+div#thoth-content{
+    padding: 0 10% 5% 10%;
+    position: relative;
+}
+div#thoth-content a, div#thoth-content a:visited {
+    color: #000
+}
+div#thoth-content p,
+div#thoth-content ol,
+div#thoth-content ul,
+div#thoth-content table,
+div#thoth-content pre {
+    display: block;
+    margin-bottom: 1em;
+}
+div#thoth-content h1,
+div#thoth-content h2 {
+    font-size: 1.618em;
+    margin-bottom: .618em;
+    line-height: 1.2em;
+    margin-top: .381em;
+}
+div#thoth-content h3,
+div#thoth-content h4,
+div#thoth-content h5,
+div#thoth-content h6 {
+    font-weight: bold;
+    margin-bottom: 1em;
+    font-size: 1em;
+    margin-top: .381em;
+}
+div#thoth-content ul, div#thoth-content ol {
+    padding-left: 1.2em;
+}
+div#thoth-content ul li, div#thoth-content ol li {
+    margin-bottom: .5em;
+}
+div#thoth-content ul li {
+    list-style: outside disc;
+}
+div#thoth-content ol li {
+    list-style: outside decimal;
+}
+div#thoth-content pre {
+  margin-left: -12% !important;
+  margin-right: -12% !important;
+  background: #efefef;
+  color: #000000;
+  font-size: 0.83em;
+  padding: 5% 12% !important;
+  width: 100%;
+  overflow-x: scroll;
+  -webkit-overflow-scrolling: touch;
+}
+div#thoth-content pre code {
+  padding-right: 12%;
 }

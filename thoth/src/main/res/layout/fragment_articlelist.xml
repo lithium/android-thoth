@@ -3,7 +3,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="vertical"
               android:layout_width="match_parent"
-              android:layout_height="match_parent">
+              android:layout_height="wrap_content">
 
    <!--<TextView android:id="@+id/articlelist_feed_title"-->
               <!--android:layout_width="match_parent"-->
@@ -11,17 +11,19 @@
               <!--android:textSize="20dp"-->
               <!--android:text="All Feeds"/>-->
 
+    <ProgressBar android:id="@id/android:empty"
+                 style="?android:attr/progressBarStyleHorizontal"
+                 android:layout_marginBottom="-6dp"
+                 android:layout_marginTop="-6dp"
+                 android:layout_width="match_parent"
+                 android:layout_height="wrap_content"
+                 android:indeterminate="true"
+                 android:maxHeight="5dp"
+            />
+
     <ListView android:id="@id/android:list"
               android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:layout_weight="1"
-              />
-
-    <ProgressBar android:id="@id/android:empty"
-              android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:layout_gravity="center"
-              android:layout_marginTop="10dp"
               />
 
     <TextView android:id="@+id/no_feeds"
