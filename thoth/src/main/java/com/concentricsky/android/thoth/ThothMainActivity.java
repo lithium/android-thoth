@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.SparseIntArray;
 import android.view.*;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
@@ -64,9 +65,7 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerClickListener = new DrawerItemClickListener();
-        mDrawerList.setOnChildClickListener(mDrawerClickListener);
-//        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
-        mDrawerList.setOnGroupExpandListener(mDrawerClickListener);
+        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
 
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -240,30 +239,15 @@ public class ThothMainActivity extends FragmentActivity
     }
 
 
+
     /*
      * Private Classes
      */
-    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupExpandListener {
-
+    private class DrawerItemClickListener implements ExpandableListView.OnGroupClickListener
+    {
         @Override
-        public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
-            mArticleListFragment.setFeed(l);
-            showArticleList();
-            mDrawerLayout.closeDrawers();
-            return true;
-        }
-
-        @Override
-        public void onGroupExpand(int groupPosition) {
-            if (groupPosition == 0) {
-                // all feeds clicked
-                mArticleListFragment.setFeed(0);
-                mDrawerLayout.closeDrawers();
-                mDrawerList.collapseGroup(groupPosition);
-                return;
-            }
-            mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
-            showArticleList();
+        public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+            return false;
         }
     }
 
@@ -273,10 +257,6 @@ public class ThothMainActivity extends FragmentActivity
         }
         @Override
         public void onDrawerClosed(View drawerView) {
-//            int l = mDrawerAdapter.getGroupCount();
-//            for (int i=0; i < l; i++) {
-//                mDrawerList.collapseGroup(i);
-//            }
             invalidateOptionsMenu();
         }
 
@@ -293,10 +273,10 @@ public class ThothMainActivity extends FragmentActivity
         public ThothDrawerAdapter() {
             super(ThothMainActivity.this,
                     null,
-                    R.layout.item_navigation,
+                    R.layout.item_navigation_group,
                     new String[]{"title","unread"}, // groupFrom,
                     new int[]{android.R.id.text1, android.R.id.text2}, // groupTo,
-                    R.layout.item_navigation,
+                    R.layout.item_navigation_child,
                     new String[]{"title","unread"}, // childFrom,
                     new int[]{android.R.id.text1, android.R.id.text2} // childTo,
             );
@@ -305,7 +285,8 @@ public class ThothMainActivity extends FragmentActivity
 
         protected void bindView(View view, Context context, Cursor cursor, boolean isLastChild) {
             TextView tv = (TextView) view.findViewById(android.R.id.text1);
-            tv.setText( String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title"))) );
+            String title = String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+            tv.setText(title.isEmpty() ? getString(R.string.unfiled) : title);
             tv = (TextView) view.findViewById(android.R.id.text2);
             long unread = cursor.getLong(cursor.getColumnIndexOrThrow("unread"));
             if (unread > 0) {
@@ -315,15 +296,60 @@ public class ThothMainActivity extends FragmentActivity
             else {
                 tv.setVisibility(View.INVISIBLE);
             }
+
         }
 
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
+            final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mArticleListFragment.setFeed(feed_id);
+                    showArticleList();
+                    mDrawerLayout.closeDrawers();
+                }
+            });
         }
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
+            final int groupPosition = cursor.getPosition();
+
+            ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
+            iv.setImageResource(mDrawerList.isGroupExpanded(groupPosition) ? R.drawable.collapse : R.drawable.expand);
+            if (groupPosition == 0) {
+                iv.setVisibility(View.INVISIBLE);
+            } else {
+                iv.setVisibility(View.VISIBLE);
+            }
+
+            View left = view.findViewById(R.id.left);
+            View right = view.findViewById(R.id.right);
+            left.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (groupPosition == 0) { // All feeds clicked
+                        mArticleListFragment.setFeed(0);
+                    }
+                    else {
+                        mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
+                    }
+                    showArticleList();
+                    mDrawerLayout.closeDrawers();
+                }
+            });
+//            right.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (mDrawerList.isGroupExpanded(groupPosition)) {
+//                        mDrawerList.collapseGroup(groupPosition);
+//                    } else {
+//                        mDrawerList.expandGroup(groupPosition);
+//                    }
+//                }
+//            });
         }
 
         @Override
@@ -343,6 +369,12 @@ public class ThothMainActivity extends FragmentActivity
 
             return null;
         }
+
+//        @Override
+//        public boolean areAllItemsEnabled() {
+//            return false;
+//        }
+
 
     }
 
@@ -368,17 +400,18 @@ public class ThothMainActivity extends FragmentActivity
         invalidateOptionsMenu();
     }
 
-    public void showArticle(long tag_id, long feed_id, int position)
+    public void showArticle(Cursor cursor, int position)
     {
         if (mArticleFragment == null) {
             mArticleFragment = new ArticleFragment();
         }
-        mArticleFragment.setArticle(tag_id, feed_id, position);
+        mArticleFragment.setArticle(cursor, position);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();
         invalidateOptionsMenu();
     }
+
 
     public void showImport(Uri uri)
     {

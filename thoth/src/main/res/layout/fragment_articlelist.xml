@@ -19,6 +19,7 @@
                  android:layout_height="wrap_content"
                  android:indeterminate="true"
                  android:maxHeight="5dp"
+                 android:visibility="invisible"
             />
 
     <ListView android:id="@id/android:list"

@@ -7,8 +7,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.ShareActionProvider;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Article;
@@ -23,10 +29,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private long mTagId;
     private long mArticleId;
 
-    private LoaderManager mLoaderManager;
     private ViewPager mViewPager;
     private ArticlePagerAdapter mAdapter;
     private int mPosition;
+    private Cursor mCursor;
     private ShareActionProvider mShareActionProvider;
 
 
@@ -37,13 +43,11 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FragmentActivity activity = getActivity();
-        mLoaderManager = activity.getSupportLoaderManager();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
     }
 
     @Override
@@ -72,17 +76,22 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_visitpage: {
-                Article article = getArticle();
+                Article article = mAdapter.getArticle(mViewPager.getCurrentItem());
                 if (article != null) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(article.link));
-                    startActivity(i);
+                    visit_link(article.link);
                 }
                 return true;
             }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void visit_link(String link)
+    {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(link));
+        startActivity(i);
     }
 
 
@@ -101,31 +110,19 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         load_cursor();
     }
 
-    public Article getArticle()
-    {
-        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(mViewPager.getCurrentItem());
-        if (frag != null)
-            return frag.getArticle();
-        return null;
+
+    public void setArticle(Cursor cursor, int position) {
+        mCursor = cursor;
+        mPosition = position;
     }
 
-    public void setArticle(long tag_id, long feed_id, int position)
-    {
-        mPosition = position;
-        if (mFeedId == feed_id && mTagId == tag_id)
-            return;
-        mFeedId = feed_id;
-        mTagId = tag_id;
-//        if (mLoaderManager != null) {
-//            mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
-//        }
-        load_cursor();
-    }
     private void load_cursor()
     {
-        if (mLoaderManager == null || getActivity() == null)
+        if (mCursor == null)
             return;
-        mLoaderManager.restartLoader(CURSOR_LOADER_ID, null, new ArticleLoader());
+        mAdapter.changeCursor(mCursor);
+        mViewPager.setCurrentItem(mPosition, true);
+
     }
 
     @Override
@@ -135,15 +132,17 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     @Override
     public void onPageSelected(int i) {
-        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(i);
-        Article a = frag.getArticle();
+        Article a = (Article) mAdapter.getArticle(i);
         if (a != null) {
-            a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
+            if (a.unread == 1)
+                a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
 
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);
             intent.setType("text/plain");
-            mShareActionProvider.setShareIntent(intent);
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(intent);
+            }
         }
 
     }
@@ -154,49 +153,85 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     }
 
 
-    private class ArticleLoader implements LoaderManager.LoaderCallbacks<Cursor>
-    {
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            Context context = getActivity();
-            return new SimpleCursorLoader(context) {
-                @Override
-                public Cursor loadInBackground() {
-                    if (mTagId > 0)
-                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
-                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
-                }
-            };
-        }
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            mAdapter.changeCursor(cursor);
-            mViewPager.setCurrentItem(mPosition, true);
-        }
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            mAdapter.changeCursor(null);
-        }
-    }
-
-
-    private class ArticlePagerAdapter extends FragmentStatePagerAdapter
+    private class ArticlePagerAdapter extends PagerAdapter
     {
         private Cursor mCursor;
 
-        private ArticlePagerAdapter() {
-            super(getActivity().getSupportFragmentManager());
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Article article = getArticle(position);
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            ViewGroup page = (ViewGroup)inflater.inflate(R.layout.fragment_articledetail, container, false);
+
+            final ProgressBar progressbar = (ProgressBar) page.findViewById(android.R.id.progress);
+            progressbar.setProgress(0);
+            progressbar.setVisibility(View.VISIBLE);
+
+            WebView webview = (WebView) page.findViewById(R.id.article_web);
+            WebSettings settings = webview.getSettings();
+            settings.setJavaScriptEnabled(true);
+            settings.setPluginState(WebSettings.PluginState.ON);
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+            settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+            settings.setAppCachePath(getActivity().getCacheDir().toString());
+            settings.setAppCacheEnabled(true);
+            webview.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    if (progressbar != null) {
+                        progressbar.setProgress(newProgress * 100);
+                    }
+
+                }
+            });
+            webview.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    progressbar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    if (url.startsWith("http")) {
+                        visit_link(url);
+                        return true;
+                    }
+                    return false;
+                }
+            });
+            StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"css/articledetail.css\" /></head>"+
+                    "<body><h1 id=\"thoth-title\"><a href=\"")
+                    .append(article.link)
+                    .append("\">")
+                    .append(article.title)
+                    .append("</a></h1>");
+            if (article.timestamp != null) {
+                builder.append("<p id=\"thoth-timestamp\"><span>")
+                        .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
+                        .append("</span></p>");
+            }
+            builder.append("<div id=\"thoth-content\">")
+                    .append(article.description)
+                    .append("</div></body>");
+            webview.loadDataWithBaseURL("file:///android_asset/", builder.toString(), "text/html", "UTF-8", null);
+
+            container.addView(page);
+
+
+            return page;
         }
 
         @Override
-        public Fragment getItem(int position) {
-            if (mCursor == null) {
-                return null;
-            }
-            mCursor.moveToPosition(position);
-            Article article = new Article();
-            article.hydrate(mCursor);
-            return ArticleDetailFragment.newInstance(article);
+        public void destroyItem(ViewGroup container, int position, Object object) {
+//            super.destroyItem(container, position, object);
+            ViewGroup page = (ViewGroup)object;
+            container.removeViewInLayout(page);
+        }
+
+        @Override
+        public boolean isViewFromObject(View view, Object o) {
+            return view == o;
         }
 
         @Override
@@ -209,6 +244,16 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         public void changeCursor(Cursor cursor) {
             mCursor = cursor;
             notifyDataSetChanged();
+        }
+
+        public Article getArticle(int position) {
+            if (mCursor.isClosed()) {
+                return null;
+            }
+            Article article = new Article();
+            mCursor.moveToPosition(position);
+            article.hydrate(mCursor);
+            return article;
         }
 
     }

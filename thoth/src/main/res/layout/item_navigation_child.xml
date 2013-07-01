@@ -1,42 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
               android:orientation="horizontal"
               android:layout_width="match_parent"
               android:layout_height="48dp"
-              android:paddingLeft="?android:attr/expandableListPreferredItemPaddingLeft"
-              >
+              android:paddingLeft="16dp"
+              android:paddingTop="10dp"
+              android:paddingBottom="12dp"
+        >
 
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:paddingTop="10dp"
-        android:paddingBottom="12dp"
-        android:orientation="horizontal">
+    <LinearLayout android:id="@+id/left"
+                  android:layout_width="0dp"
+                  android:layout_height="match_parent"
+                  android:layout_weight="3"
+                  android:orientation="horizontal">
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                   android:id="@android:id/text1"
-                  android:layout_width="fill_parent"
+                  android:layout_width="0dp"
                   android:layout_height="wrap_content"
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   android:ellipsize="end"
                   android:singleLine="true"
-                  android:layout_weight="2"
+                  android:layout_weight="7"
                   android:text="feed name"
+                  android:paddingLeft="32dp"
                 />
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                   android:id="@android:id/text2"
-                  android:layout_width="fill_parent"
+                  android:layout_width="0dp"
                   android:layout_height="wrap_content"
                   android:textAppearance="?android:attr/textAppearanceMedium"
                   android:textColor="?android:attr/textColorHint"
                   android:gravity="right"
                   android:layout_marginRight="10dp"
-                  android:layout_weight="12"
+                  android:layout_weight="1"
                   android:text="999"
                 />
 
     </LinearLayout>
 
-</RelativeLayout>
+    <LinearLayout android:id="@+id/right"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:orientation="horizontal">
+
+    </LinearLayout>
+
+</LinearLayout>
