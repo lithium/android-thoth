@@ -395,9 +395,7 @@ public class ArticleListFragment extends ListFragment
             boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
 
-            Drawable bg = view.getBackground();
-            bg.setState(unread ? UNREAD_STATES : READ_STATES);
-            view.invalidateDrawable(bg);
+            view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
         }
 
         @Override
