@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.util.SparseIntArray;
 import android.view.*;
 import android.widget.ExpandableListView;
+import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
@@ -67,6 +68,7 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerList.setOnChildClickListener(mDrawerClickListener);
 //        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
         mDrawerList.setOnGroupExpandListener(mDrawerClickListener);
+        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
 
         mDrawerToggle = new ThothActionBarDrawerToggle();
         mDrawerLayout.setDrawerListener(mDrawerToggle);
@@ -243,7 +245,7 @@ public class ThothMainActivity extends FragmentActivity
     /*
      * Private Classes
      */
-    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupExpandListener {
+    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupExpandListener, ExpandableListView.OnGroupClickListener {
 
         @Override
         public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
@@ -263,7 +265,15 @@ public class ThothMainActivity extends FragmentActivity
                 return;
             }
             mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
+
             showArticleList();
+        }
+
+        @Override
+        public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
+            ImageView indicator = (ImageView) view.findViewById(R.id.group_indicator);
+            indicator.setImageResource(expandableListView.isGroupExpanded(i) ? R.drawable.collapse : R.drawable.expand);
+            return false;
         }
     }
 
@@ -315,15 +325,21 @@ public class ThothMainActivity extends FragmentActivity
             else {
                 tv.setVisibility(View.INVISIBLE);
             }
+
         }
 
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
+            ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
+            iv.setVisibility(View.GONE);
         }
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
+            ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
+            iv.setImageResource(mDrawerList.isGroupExpanded(cursor.getPosition()) ? R.drawable.collapse : R.drawable.expand);
+            iv.setVisibility(View.VISIBLE);
         }
 
         @Override
