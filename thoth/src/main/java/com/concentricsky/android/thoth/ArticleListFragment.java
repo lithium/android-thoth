@@ -243,6 +243,11 @@ public class ArticleListFragment extends ListFragment
         }
 
         @Override
+        protected void onProgressUpdate(Void... values) {
+            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
         protected Void doInBackground(Long... tag_ids) {
             Vector<UpdateFeedRequest> requests = new Vector<UpdateFeedRequest>();
 
@@ -272,6 +277,7 @@ public class ArticleListFragment extends ListFragment
                     UpdateFeedRequest request = it.next();
                     if (request.hasHadResponseDelivered()) {
                         it.remove();
+                        publishProgress();
                     }
                 }
 
