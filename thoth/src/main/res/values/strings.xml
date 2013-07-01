@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" >Pensive
-    </string>
+    <string name="app_name" >Pensive</string>
     <string name="action_settings" >Settings
     </string>
     <string name="drawer_open" >Open navigation drawer</string>
@@ -23,5 +22,6 @@
     <string name="time_ago_year">A Year Ago</string>
     <string name="time_ago_months">%d Months Ago</string>
     <string name="time_ago_month">A Month Ago</string>
+    <string name="share_with_label">Add to Pensive</string>
 
 </resources>
