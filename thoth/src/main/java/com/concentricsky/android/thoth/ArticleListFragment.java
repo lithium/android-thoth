@@ -218,8 +218,9 @@ public class ArticleListFragment extends ListFragment
         mNoFeeds = has_none;
         if (mNoFeedsText != null) {
             mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
-            mEmpty.setVisibility(has_none ? View.INVISIBLE : View.VISIBLE);
         }
+        if (mEmpty != null)
+            mEmpty.setVisibility(has_none ? View.INVISIBLE : View.VISIBLE);
     }
 
     private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
