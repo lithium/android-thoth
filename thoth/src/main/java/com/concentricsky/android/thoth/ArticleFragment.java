@@ -23,10 +23,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private long mTagId;
     private long mArticleId;
 
-    private LoaderManager mLoaderManager;
     private ViewPager mViewPager;
     private ArticlePagerAdapter mAdapter;
     private int mPosition;
+    private Cursor mCursor;
     private ShareActionProvider mShareActionProvider;
 
 
@@ -37,13 +37,11 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FragmentActivity activity = getActivity();
-        mLoaderManager = activity.getSupportLoaderManager();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
     }
 
     @Override
@@ -109,23 +107,18 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         return null;
     }
 
-    public void setArticle(long tag_id, long feed_id, int position)
-    {
+    public void setArticle(Cursor cursor, int position) {
+        mCursor = cursor;
         mPosition = position;
-        if (mFeedId == feed_id && mTagId == tag_id)
-            return;
-        mFeedId = feed_id;
-        mTagId = tag_id;
-//        if (mLoaderManager != null) {
-//            mLoaderManager.destroyLoader(CURSOR_LOADER_ID);
-//        }
-        load_cursor();
     }
+
     private void load_cursor()
     {
-        if (mLoaderManager == null || getActivity() == null)
+        if (mCursor == null)
             return;
-        mLoaderManager.restartLoader(CURSOR_LOADER_ID, null, new ArticleLoader());
+        mAdapter.changeCursor(mCursor);
+        mViewPager.setCurrentItem(mPosition, true);
+
     }
 
     @Override
@@ -138,12 +131,15 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(i);
         Article a = frag.getArticle();
         if (a != null) {
-            a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
+            if (a.unread == 1)
+                a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
 
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);
             intent.setType("text/plain");
-            mShareActionProvider.setShareIntent(intent);
+            if (mShareActionProvider != null) {
+                mShareActionProvider.setShareIntent(intent);
+            }
         }
 
     }
@@ -151,32 +147,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     @Override
     public void onPageScrollStateChanged(int i) {
 
-    }
-
-
-    private class ArticleLoader implements LoaderManager.LoaderCallbacks<Cursor>
-    {
-        @Override
-        public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            Context context = getActivity();
-            return new SimpleCursorLoader(context) {
-                @Override
-                public Cursor loadInBackground() {
-                    if (mTagId > 0)
-                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
-                    return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
-                }
-            };
-        }
-        @Override
-        public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-            mAdapter.changeCursor(cursor);
-            mViewPager.setCurrentItem(mPosition, true);
-        }
-        @Override
-        public void onLoaderReset(Loader<Cursor> loader) {
-            mAdapter.changeCursor(null);
-        }
     }
 
 

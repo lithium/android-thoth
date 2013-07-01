@@ -23,6 +23,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
 
@@ -95,7 +96,8 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         ThothMainActivity activity = (ThothMainActivity) getActivity();
-        activity.showArticle(mTagId, mFeedId, position);
+        Cursor cursor = mAdapter.getCursor();
+        activity.showArticle(cursor, position);
     }
 
     @Override

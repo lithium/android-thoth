@@ -239,6 +239,7 @@ public class ThothMainActivity extends FragmentActivity
     }
 
 
+
     /*
      * Private Classes
      */
@@ -399,17 +400,18 @@ public class ThothMainActivity extends FragmentActivity
         invalidateOptionsMenu();
     }
 
-    public void showArticle(long tag_id, long feed_id, int position)
+    public void showArticle(Cursor cursor, int position)
     {
         if (mArticleFragment == null) {
             mArticleFragment = new ArticleFragment();
         }
-        mArticleFragment.setArticle(tag_id, feed_id, position);
+        mArticleFragment.setArticle(cursor, position);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();
         invalidateOptionsMenu();
     }
+
 
     public void showImport(Uri uri)
     {
