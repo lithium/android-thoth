@@ -27,6 +27,11 @@ import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.Vector;
+
 /**
  * Created by wiggins on 5/17/13.
  */
@@ -95,7 +100,7 @@ public class ArticleListFragment extends ListFragment
 
     private void refresh_task_execute()
     {
-        if (mRefreshTask == null)
+        if (mRefreshTask != null)
             return;
 
         mRefreshTask = new RefreshFeedsTask();
@@ -222,10 +227,10 @@ public class ArticleListFragment extends ListFragment
         @Override
         protected void onPostExecute(Void aVoid) {
             mRefreshing = false;
-            mRefreshMenuItem.setVisible(true);
-            Activity activity = getActivity();
-            if (activity != null)
-                activity.setProgressBarIndeterminateVisibility(false);
+            if (mRefreshMenuItem != null)
+                mRefreshMenuItem.setVisible(true);
+            getActivity().setProgressBarIndeterminateVisibility(false);
+            mRefreshTask = null;
         }
 
         @Override
@@ -238,9 +243,11 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         protected Void doInBackground(Long... tag_ids) {
+            Vector<UpdateFeedRequest> requests = new Vector<UpdateFeedRequest>();
+
             for (long tag_id : tag_ids) {
                 Cursor cursor = null;
-                if (tag_id == -1) {
+                if (tag_id == 0) {
                     cursor = ThothDatabaseHelper.getInstance().getAllFeedsCursor();
                 } else {
                     cursor = ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
@@ -250,10 +257,28 @@ public class ArticleListFragment extends ListFragment
                     for (; !cursor.isAfterLast(); cursor.moveToNext()) {
                         Feed feed = new Feed();
                         feed.hydrate( cursor );
-                        mRequestQueue.add(new UpdateFeedRequest(feed, null, null));
+                        UpdateFeedRequest request = new UpdateFeedRequest(feed, null, null);
+                        requests.add(request);
+                        mRequestQueue.add(request);
                     }
                 }
             }
+
+            int completed = 0;
+            while (requests.size() > 0) {
+                Iterator<UpdateFeedRequest> it = requests.iterator();
+                while (it.hasNext()) {
+                    UpdateFeedRequest request = it.next();
+                    if (request.hasHadResponseDelivered()) {
+                        it.remove();
+                    }
+                }
+
+                synchronized (this) {
+                    try { this.wait(500); } catch (InterruptedException e) { }
+                }
+            }
+
             return null;
         }
 
@@ -286,7 +311,7 @@ public class ArticleListFragment extends ListFragment
                 getActivity().getActionBar().setTitle( feed.title );
                 mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
 
-//                refresh_feeds();
+                refresh_feeds();
             }
         }
         @Override

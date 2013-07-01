@@ -193,9 +193,11 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    visit_link(url);
-                    return true;
-//                    return super.shouldOverrideUrlLoading(view, url);
+                    if (url.startsWith("http")) {
+                        visit_link(url);
+                        return true;
+                    }
+                    return false;
                 }
             });
             StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"css/articledetail.css\" /></head>"+
@@ -221,9 +223,15 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         }
 
         @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+//            super.destroyItem(container, position, object);
+            ViewGroup page = (ViewGroup)object;
+            container.removeViewInLayout(page);
+        }
+
+        @Override
         public boolean isViewFromObject(View view, Object o) {
             return view == o;
-            
         }
 
         @Override
@@ -239,6 +247,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         }
 
         public Article getArticle(int position) {
+            if (mCursor.isClosed()) {
+                return null;
+            }
             Article article = new Article();
             mCursor.moveToPosition(position);
             article.hydrate(mCursor);
