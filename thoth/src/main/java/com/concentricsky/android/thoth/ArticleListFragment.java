@@ -49,6 +49,7 @@ public class ArticleListFragment extends ListFragment
     private ProgressBar mEmpty;
     private boolean mNoFeeds=false;
     private ListView mList;
+    private RefreshFeedsTask mRefreshTask;
 
     public ArticleListFragment() {
     }
@@ -81,8 +82,7 @@ public class ArticleListFragment extends ListFragment
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
         if (mTagId > 0) {
-            RefreshFeedsTask task = new RefreshFeedsTask();
-            task.execute(mTagId);
+            refresh_task_execute();
             mLoaderManager.restartLoader(TAG_LOADER_ID, null, new TagLoader(mTagId));
         }
         else {
@@ -91,6 +91,15 @@ public class ArticleListFragment extends ListFragment
             }
             mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
         }
+    }
+
+    private void refresh_task_execute()
+    {
+        if (mRefreshTask == null)
+            return;
+
+        mRefreshTask = new RefreshFeedsTask();
+        mRefreshTask.execute(mTagId);
     }
 
     @Override
@@ -137,6 +146,8 @@ public class ArticleListFragment extends ListFragment
     public void onDestroyView() {
         mLoaderManager.destroyLoader(FEED_LOADER_ID);
         mRequestQueue.stop();
+        if (mRefreshTask != null)
+            mRefreshTask.cancel(true);
         super.onDestroyView();
     }
 
@@ -173,8 +184,7 @@ public class ArticleListFragment extends ListFragment
         }
         else
         {
-            RefreshFeedsTask task = new RefreshFeedsTask();
-            task.execute(mTagId);
+            refresh_task_execute();
         }
     }
 
@@ -213,7 +223,9 @@ public class ArticleListFragment extends ListFragment
         protected void onPostExecute(Void aVoid) {
             mRefreshing = false;
             mRefreshMenuItem.setVisible(true);
-            getActivity().setProgressBarIndeterminateVisibility(false);
+            Activity activity = getActivity();
+            if (activity != null)
+                activity.setProgressBarIndeterminateVisibility(false);
         }
 
         @Override
@@ -246,6 +258,7 @@ public class ArticleListFragment extends ListFragment
         }
 
     }
+
 
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
