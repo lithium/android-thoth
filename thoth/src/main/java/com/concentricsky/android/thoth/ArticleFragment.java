@@ -78,15 +78,20 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             case R.id.action_visitpage: {
                 Article article = mAdapter.getArticle(mViewPager.getCurrentItem());
                 if (article != null) {
-                    Intent i = new Intent(Intent.ACTION_VIEW);
-                    i.setData(Uri.parse(article.link));
-                    startActivity(i);
+                    visit_link(article.link);
                 }
                 return true;
             }
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void visit_link(String link)
+    {
+        Intent i = new Intent(Intent.ACTION_VIEW);
+        i.setData(Uri.parse(link));
+        startActivity(i);
     }
 
 
@@ -184,6 +189,13 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                 @Override
                 public void onPageFinished(WebView view, String url) {
                     progressbar.setVisibility(View.GONE);
+                }
+
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String url) {
+                    visit_link(url);
+                    return true;
+//                    return super.shouldOverrideUrlLoading(view, url);
                 }
             });
             StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"css/articledetail.css\" /></head>"+
