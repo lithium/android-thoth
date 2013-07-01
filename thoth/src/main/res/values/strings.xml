@@ -23,5 +23,6 @@
     <string name="time_ago_months">%d Months Ago</string>
     <string name="time_ago_month">A Month Ago</string>
     <string name="share_with_label">Add to Pensive</string>
+    <string name="unfiled">Unfiled</string>
 
 </resources>

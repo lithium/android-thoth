@@ -284,7 +284,8 @@ public class ThothMainActivity extends FragmentActivity
 
         protected void bindView(View view, Context context, Cursor cursor, boolean isLastChild) {
             TextView tv = (TextView) view.findViewById(android.R.id.text1);
-            tv.setText( String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title"))) );
+            String title = String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+            tv.setText(title.isEmpty() ? getString(R.string.unfiled) : title);
             tv = (TextView) view.findViewById(android.R.id.text2);
             long unread = cursor.getLong(cursor.getColumnIndexOrThrow("unread"));
             if (unread > 0) {
