@@ -51,6 +51,8 @@ public class ArticleDetailFragment extends Fragment {
 //        mTitleText = (TextView) root.findViewById(R.id.article_title);
 //        mSubtitleText = (ATextView) root.findViewById(R.id.article_title);
         mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
+        mProgress.setProgress(0);
+        mProgress.setVisibility(View.VISIBLE);
 
         mBodyWeb = (WebView)root.findViewById(R.id.article_web);
         WebSettings settings = mBodyWeb.getSettings();
@@ -116,8 +118,6 @@ public class ArticleDetailFragment extends Fragment {
             builder.append("<div id=\"thoth-content\">")
                    .append(mArticle.description)
                    .append("</div></body>");
-            mProgress.setProgress(0);
-            mProgress.setVisibility(View.VISIBLE);
             mBodyWeb.loadDataWithBaseURL("file:///android_asset/", builder.toString(), "text/html", "UTF-8", null);
 
 //            mTitleText.setText(mArticle.title);
