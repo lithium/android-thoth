@@ -246,7 +246,7 @@ public class ThothMainActivity extends FragmentActivity
     {
         @Override
         public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-            return true;
+            return false;
         }
     }
 
@@ -338,16 +338,16 @@ public class ThothMainActivity extends FragmentActivity
                     mDrawerLayout.closeDrawers();
                 }
             });
-            right.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    if (mDrawerList.isGroupExpanded(groupPosition)) {
-                        mDrawerList.collapseGroup(groupPosition);
-                    } else {
-                        mDrawerList.expandGroup(groupPosition);
-                    }
-                }
-            });
+//            right.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View view) {
+//                    if (mDrawerList.isGroupExpanded(groupPosition)) {
+//                        mDrawerList.collapseGroup(groupPosition);
+//                    } else {
+//                        mDrawerList.expandGroup(groupPosition);
+//                    }
+//                }
+//            });
         }
 
         @Override
@@ -368,10 +368,10 @@ public class ThothMainActivity extends FragmentActivity
             return null;
         }
 
-        @Override
-        public boolean areAllItemsEnabled() {
-            return false;
-        }
+//        @Override
+//        public boolean areAllItemsEnabled() {
+//            return false;
+//        }
 
 
     }

@@ -20,7 +20,6 @@
         android:choiceMode="singleChoice"
         android:background="#eee"
         android:groupIndicator="@null"
-        android:listSelector="@android:color/transparent"
         />
 
 
