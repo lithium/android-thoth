@@ -7,8 +7,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 import android.widget.ShareActionProvider;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Article;
@@ -70,7 +76,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_visitpage: {
-                Article article = getArticle();
+                Article article = mAdapter.getArticle(mViewPager.getCurrentItem());
                 if (article != null) {
                     Intent i = new Intent(Intent.ACTION_VIEW);
                     i.setData(Uri.parse(article.link));
@@ -99,13 +105,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         load_cursor();
     }
 
-    public Article getArticle()
-    {
-        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(mViewPager.getCurrentItem());
-        if (frag != null)
-            return frag.getArticle();
-        return null;
-    }
 
     public void setArticle(Cursor cursor, int position) {
         mCursor = cursor;
@@ -128,8 +127,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     @Override
     public void onPageSelected(int i) {
-        ArticleDetailFragment frag = (ArticleDetailFragment) mAdapter.getItem(i);
-        Article a = frag.getArticle();
+        Article a = (Article) mAdapter.getArticle(i);
         if (a != null) {
             if (a.unread == 1)
                 a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
@@ -150,23 +148,70 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     }
 
 
-    private class ArticlePagerAdapter extends FragmentStatePagerAdapter
+    private class ArticlePagerAdapter extends PagerAdapter
     {
         private Cursor mCursor;
 
-        private ArticlePagerAdapter() {
-            super(getActivity().getSupportFragmentManager());
+        @Override
+        public Object instantiateItem(ViewGroup container, int position) {
+            Article article = getArticle(position);
+
+            LayoutInflater inflater = getActivity().getLayoutInflater();
+            ViewGroup page = (ViewGroup)inflater.inflate(R.layout.fragment_articledetail, container, false);
+
+            final ProgressBar progressbar = (ProgressBar) page.findViewById(android.R.id.progress);
+            progressbar.setProgress(0);
+            progressbar.setVisibility(View.VISIBLE);
+
+            WebView webview = (WebView) page.findViewById(R.id.article_web);
+            WebSettings settings = webview.getSettings();
+            settings.setJavaScriptEnabled(true);
+            settings.setPluginState(WebSettings.PluginState.ON);
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+            settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+            settings.setAppCachePath(getActivity().getCacheDir().toString());
+            settings.setAppCacheEnabled(true);
+            webview.setWebChromeClient(new WebChromeClient() {
+                @Override
+                public void onProgressChanged(WebView view, int newProgress) {
+                    if (progressbar != null) {
+                        progressbar.setProgress(newProgress * 100);
+                    }
+
+                }
+            });
+            webview.setWebViewClient(new WebViewClient() {
+                @Override
+                public void onPageFinished(WebView view, String url) {
+                    progressbar.setVisibility(View.GONE);
+                }
+            });
+            StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"css/articledetail.css\" /></head>"+
+                    "<body><h1 id=\"thoth-title\"><a href=\"")
+                    .append(article.link)
+                    .append("\">")
+                    .append(article.title)
+                    .append("</a></h1>");
+            if (article.timestamp != null) {
+                builder.append("<p id=\"thoth-timestamp\"><span>")
+                        .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
+                        .append("</span></p>");
+            }
+            builder.append("<div id=\"thoth-content\">")
+                    .append(article.description)
+                    .append("</div></body>");
+            webview.loadDataWithBaseURL("file:///android_asset/", builder.toString(), "text/html", "UTF-8", null);
+
+            container.addView(page);
+
+
+            return page;
         }
 
         @Override
-        public Fragment getItem(int position) {
-            if (mCursor == null) {
-                return null;
-            }
-            mCursor.moveToPosition(position);
-            Article article = new Article();
-            article.hydrate(mCursor);
-            return ArticleDetailFragment.newInstance(article);
+        public boolean isViewFromObject(View view, Object o) {
+            return view == o;
+            
         }
 
         @Override
@@ -179,6 +224,13 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         public void changeCursor(Cursor cursor) {
             mCursor = cursor;
             notifyDataSetChanged();
+        }
+
+        public Article getArticle(int position) {
+            Article article = new Article();
+            mCursor.moveToPosition(position);
+            article.hydrate(mCursor);
+            return article;
         }
 
     }
