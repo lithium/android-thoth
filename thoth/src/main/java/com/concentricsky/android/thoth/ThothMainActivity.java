@@ -65,9 +65,6 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerClickListener = new DrawerItemClickListener();
-        mDrawerList.setOnChildClickListener(mDrawerClickListener);
-//        mDrawerList.setOnGroupClickListener(mDrawerClickListener);
-        mDrawerList.setOnGroupExpandListener(mDrawerClickListener);
         mDrawerList.setOnGroupClickListener(mDrawerClickListener);
 
         mDrawerToggle = new ThothActionBarDrawerToggle();
@@ -245,35 +242,11 @@ public class ThothMainActivity extends FragmentActivity
     /*
      * Private Classes
      */
-    private class DrawerItemClickListener implements ExpandableListView.OnChildClickListener, ExpandableListView.OnGroupExpandListener, ExpandableListView.OnGroupClickListener {
-
-        @Override
-        public boolean onChildClick(ExpandableListView expandableListView, View view, int i, int i2, long l) {
-            mArticleListFragment.setFeed(l);
-            showArticleList();
-            mDrawerLayout.closeDrawers();
-            return true;
-        }
-
-        @Override
-        public void onGroupExpand(int groupPosition) {
-            if (groupPosition == 0) {
-                // all feeds clicked
-                mArticleListFragment.setFeed(0);
-                mDrawerLayout.closeDrawers();
-                mDrawerList.collapseGroup(groupPosition);
-                return;
-            }
-            mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
-
-            showArticleList();
-        }
-
+    private class DrawerItemClickListener implements ExpandableListView.OnGroupClickListener
+    {
         @Override
         public boolean onGroupClick(ExpandableListView expandableListView, View view, int i, long l) {
-            ImageView indicator = (ImageView) view.findViewById(R.id.group_indicator);
-            indicator.setImageResource(expandableListView.isGroupExpanded(i) ? R.drawable.collapse : R.drawable.expand);
-            return false;
+            return true;
         }
     }
 
@@ -283,10 +256,6 @@ public class ThothMainActivity extends FragmentActivity
         }
         @Override
         public void onDrawerClosed(View drawerView) {
-//            int l = mDrawerAdapter.getGroupCount();
-//            for (int i=0; i < l; i++) {
-//                mDrawerList.collapseGroup(i);
-//            }
             invalidateOptionsMenu();
         }
 
@@ -303,10 +272,10 @@ public class ThothMainActivity extends FragmentActivity
         public ThothDrawerAdapter() {
             super(ThothMainActivity.this,
                     null,
-                    R.layout.item_navigation,
+                    R.layout.item_navigation_group,
                     new String[]{"title","unread"}, // groupFrom,
                     new int[]{android.R.id.text1, android.R.id.text2}, // groupTo,
-                    R.layout.item_navigation,
+                    R.layout.item_navigation_child,
                     new String[]{"title","unread"}, // childFrom,
                     new int[]{android.R.id.text1, android.R.id.text2} // childTo,
             );
@@ -331,15 +300,54 @@ public class ThothMainActivity extends FragmentActivity
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
-            ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setVisibility(View.GONE);
+            final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
+            view.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    mArticleListFragment.setFeed(feed_id);
+                    showArticleList();
+                    mDrawerLayout.closeDrawers();
+                }
+            });
         }
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
+            final int groupPosition = cursor.getPosition();
+
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setImageResource(mDrawerList.isGroupExpanded(cursor.getPosition()) ? R.drawable.collapse : R.drawable.expand);
-            iv.setVisibility(View.VISIBLE);
+            iv.setImageResource(mDrawerList.isGroupExpanded(groupPosition) ? R.drawable.collapse : R.drawable.expand);
+            if (groupPosition == 0) {
+                iv.setVisibility(View.INVISIBLE);
+            } else {
+                iv.setVisibility(View.VISIBLE);
+            }
+
+            View left = view.findViewById(R.id.left);
+            View right = view.findViewById(R.id.right);
+            left.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (groupPosition == 0) { // All feeds clicked
+                        mArticleListFragment.setFeed(0);
+                    }
+                    else {
+                        mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
+                    }
+                    showArticleList();
+                    mDrawerLayout.closeDrawers();
+                }
+            });
+            right.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    if (mDrawerList.isGroupExpanded(groupPosition)) {
+                        mDrawerList.collapseGroup(groupPosition);
+                    } else {
+                        mDrawerList.expandGroup(groupPosition);
+                    }
+                }
+            });
         }
 
         @Override
@@ -359,6 +367,12 @@ public class ThothMainActivity extends FragmentActivity
 
             return null;
         }
+
+        @Override
+        public boolean areAllItemsEnabled() {
+            return false;
+        }
+
 
     }
 

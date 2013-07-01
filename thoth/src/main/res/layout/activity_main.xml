@@ -19,7 +19,8 @@
         android:layout_gravity="start"
         android:choiceMode="singleChoice"
         android:background="#eee"
-        android:groupIndicator="@android:color/transparent"
+        android:groupIndicator="@null"
+        android:listSelector="@android:color/transparent"
         />
 
 
