@@ -90,11 +90,18 @@ div#thoth-content{
 div#thoth-content a, div#thoth-content a:visited {
     color: #000
 }
+div#thoth-content em {
+    font-style: italic;
+}
+div#thoth-content strong {
+    font-weight: bold;
+}
 div#thoth-content p,
 div#thoth-content ol,
 div#thoth-content ul,
 div#thoth-content table,
-div#thoth-content pre {
+div#thoth-content pre,
+div#thoth-content blockquote {
     display: block;
     margin-bottom: 1em;
 }
@@ -125,6 +132,13 @@ div#thoth-content ul li {
 }
 div#thoth-content ol li {
     list-style: outside decimal;
+}
+div#thoth-content blockquote {
+    padding-left: 1.2em;
+    border-left: 1px solid #efefef;
+}
+div#thoth-content cite {
+    font-style: italic;
 }
 div#thoth-content pre {
   margin-left: -12% !important;
