@@ -27,5 +27,6 @@
 
     <string name="action_show_unread">Show unread</string>
     <string name="action_hide_unread">Hide unread</string>
+    <string name="action_mark_as_read">Mark all as read</string>
 
 </resources>

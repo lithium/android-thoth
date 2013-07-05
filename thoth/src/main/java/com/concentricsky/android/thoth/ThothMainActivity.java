@@ -124,6 +124,7 @@ public class ThothMainActivity extends FragmentActivity
         menu.findItem(R.id.action_share).setVisible(false);
         menu.findItem(R.id.action_visitpage).setVisible(false);
         menu.findItem(R.id.action_toggle_unread).setVisible(false);
+        menu.findItem(R.id.action_mark_as_read).setVisible(false);
         return true;
     }
 

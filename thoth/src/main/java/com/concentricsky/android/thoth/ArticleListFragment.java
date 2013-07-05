@@ -160,6 +160,9 @@ public class ArticleListFragment extends ListFragment
 
         mToggleMenuItem = menu.findItem(R.id.action_toggle_unread);
         mToggleMenuItem.setVisible(true);
+        mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
+
+        menu.findItem(R.id.action_mark_as_read).setVisible(true);
     }
 
     @Override
@@ -177,8 +180,8 @@ public class ArticleListFragment extends ListFragment
                mHideUnread = !mHideUnread;
                mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
                mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-
-
+               return true;
+           case R.id.action_mark_as_read:
                return true;
        }
         return super.onOptionsItemSelected(item);

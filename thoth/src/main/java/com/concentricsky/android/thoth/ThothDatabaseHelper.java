@@ -167,7 +167,7 @@ public class ThothDatabaseHelper
                             " JOIN "+Feed.FEED_TABLE_NAME+" ON "+Feed.FEED_TABLE_NAME+"._id="+Feed.FEEDTAG_TABLE_NAME+".feed_id "+
                             " WHERE feedtag.tag_id=? "+
                             (hide_unread ? " AND article.unread=1" : "")+
-                            "ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
+                            " ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
         if (c == null || !c.moveToFirst()) {
             return null;
         }
