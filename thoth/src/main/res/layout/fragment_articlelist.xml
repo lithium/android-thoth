@@ -20,6 +20,7 @@
                  android:indeterminate="true"
                  android:maxHeight="5dp"
                  android:visibility="gone"
+                 android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
             />
 
     <ListView android:id="@id/android:list"
