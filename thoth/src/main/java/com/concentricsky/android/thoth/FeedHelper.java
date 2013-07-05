@@ -14,7 +14,7 @@ public class FeedHelper {
    {
        Feed ret = null;
        ret = attemptToParseRss(feed, data);
-       if (ret == null || ret.link == null)
+       if (ret == null || ret.title == null)
            ret = attemptToParseAtom(feed, data);
        return ret;
    }
