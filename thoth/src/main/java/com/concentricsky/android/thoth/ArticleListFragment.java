@@ -56,6 +56,87 @@ public class ArticleListFragment extends ListFragment
     }
 
 
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        ThothMainActivity activity = (ThothMainActivity) getActivity();
+        Cursor cursor = mAdapter.getCursor();
+        activity.showArticle(cursor, position);
+    }
+
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        FragmentActivity activity = getActivity();
+        mAdapter = new ArticleListAdapter(activity, null);
+        mRequestQueue = Volley.newRequestQueue(activity);
+        mLoaderManager = activity.getSupportLoaderManager();
+        load_feed();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
+        mNoFeedsText = (TextView) root.findViewById(R.id.no_feeds);
+        mNoFeedsText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ThothMainActivity activity = (ThothMainActivity) getActivity();
+                activity.showSubscribe(null);
+            }
+        });
+        mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
+        Loader<Object> loader = mLoaderManager.getLoader(ARTICLE_LOADER_ID);
+        mProgress.setVisibility(loader.isStarted() ? View.GONE : View.VISIBLE);
+
+        mList = (ListView)root.findViewById(android.R.id.list);
+
+
+        setListAdapter(mAdapter);
+//        load_feed();
+
+        return root;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+    }
+
+    @Override
+    public void onViewStateRestored(Bundle savedInstanceState) {
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        getActivity().invalidateOptionsMenu();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onDestroyView() {
+        mLoaderManager.destroyLoader(FEED_LOADER_ID);
+        mRequestQueue.stop();
+        if (mRefreshTask != null)
+            mRefreshTask.cancel(true);
+        super.onDestroyView();
+    }
+
+
+
+
     public void setTag(long tag_id) {
         mTagId = tag_id;
         mFeedId = -1;
@@ -103,54 +184,6 @@ public class ArticleListFragment extends ListFragment
         mRefreshTask.execute(mTagId);
     }
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        ThothMainActivity activity = (ThothMainActivity) getActivity();
-        Cursor cursor = mAdapter.getCursor();
-        activity.showArticle(cursor, position);
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
-        mNoFeedsText = (TextView) root.findViewById(R.id.no_feeds);
-        mNoFeedsText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                ThothMainActivity activity = (ThothMainActivity) getActivity();
-                activity.showSubscribe(null);
-            }
-        });
-        mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
-
-        mList = (ListView)root.findViewById(android.R.id.list);
-
-
-        FragmentActivity activity = getActivity();
-        mRequestQueue = Volley.newRequestQueue(activity);
-        mLoaderManager = activity.getSupportLoaderManager();
-        if (mAdapter == null) {
-            mAdapter = new ArticleListAdapter(activity, null);
-            setListAdapter(mAdapter);
-        }
-        load_feed();
-
-        return root;
-    }
-
-    @Override
-    public void onDestroyView() {
-        mLoaderManager.destroyLoader(FEED_LOADER_ID);
-        mRequestQueue.stop();
-        if (mRefreshTask != null)
-            mRefreshTask.cancel(true);
-        super.onDestroyView();
-    }
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
@@ -202,13 +235,6 @@ public class ArticleListFragment extends ListFragment
         }
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        getActivity().invalidateOptionsMenu();
-        if (mLoaderManager != null)
-            mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-    }
 
     @Override
     public void onResponse(Boolean response) {
@@ -273,8 +299,6 @@ public class ArticleListFragment extends ListFragment
                         UpdateFeedRequest request = UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, null, null);
                         if (request != null)
                             requests.add(request);
-//                        UpdateFeedRequest request = new UpdateFeedRequest(feed, null, null);
-//                        mRequestQueue.add(request);
                     }
                 }
             }
@@ -325,7 +349,6 @@ public class ArticleListFragment extends ListFragment
                 feed.hydrate(cursor);
 
                 getActivity().getActionBar().setTitle( feed.title );
-//                mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
                 UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, ArticleListFragment.this, ArticleListFragment.this);
 
 //                refresh_feeds();
@@ -378,7 +401,8 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-            mProgress.setVisibility(View.VISIBLE);
+            if (mProgress != null)
+                mProgress.setVisibility(View.VISIBLE);
             return new SimpleCursorLoader(getActivity()) {
                 @Override
                 public Cursor loadInBackground() {
@@ -394,10 +418,8 @@ public class ArticleListFragment extends ListFragment
         @Override
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
             mAdapter.changeCursor(cursor);
-            if (mList != null) {
-                mList.setSelectionAfterHeaderView();
-            }
-            mProgress.setVisibility(View.GONE);
+            if (mProgress != null)
+                mProgress.setVisibility(View.GONE);
         }
 
         @Override
