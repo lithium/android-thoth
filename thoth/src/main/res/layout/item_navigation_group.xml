@@ -12,7 +12,7 @@
     <LinearLayout android:id="@+id/left"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="3"
+        android:layout_weight="2"
         android:orientation="horizontal">
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
@@ -26,18 +26,6 @@
                   android:text="feed name"
                 />
 
-        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
-                  android:id="@android:id/text2"
-                  android:layout_width="0dp"
-                  android:layout_height="wrap_content"
-                  android:textAppearance="?android:attr/textAppearanceMedium"
-                  android:textColor="?android:attr/textColorHint"
-                  android:gravity="right"
-                  android:layout_marginRight="10dp"
-                  android:layout_weight="1"
-                  android:text="999"
-                />
-
     </LinearLayout>
 
     <RelativeLayout android:id="@+id/right"
@@ -45,6 +33,17 @@
         android:layout_height="match_parent"
         android:layout_weight="1"
         android:orientation="horizontal">
+        <TextView xmlns:android="http://schemas.android.com/apk/res/android"
+                  android:id="@android:id/text2"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:textAppearance="?android:attr/textAppearanceMedium"
+                  android:textColor="?android:attr/textColorHint"
+                  android:gravity="right"
+                  android:layout_marginRight="10dp"
+                  android:text="999"
+                />
+
 
         <ImageView android:id="@+id/group_indicator"
                    android:layout_width="wrap_content"
