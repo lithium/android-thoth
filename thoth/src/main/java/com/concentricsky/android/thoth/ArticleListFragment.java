@@ -263,9 +263,11 @@ public class ArticleListFragment extends ListFragment
                     for (; !cursor.isAfterLast(); cursor.moveToNext()) {
                         Feed feed = new Feed();
                         feed.hydrate( cursor );
-                        UpdateFeedRequest request = new UpdateFeedRequest(feed, null, null);
-                        requests.add(request);
-                        mRequestQueue.add(request);
+                        UpdateFeedRequest request = UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, null, null);
+                        if (request != null)
+                            requests.add(request);
+//                        UpdateFeedRequest request = new UpdateFeedRequest(feed, null, null);
+//                        mRequestQueue.add(request);
                     }
                 }
             }
@@ -316,7 +318,8 @@ public class ArticleListFragment extends ListFragment
                 feed.hydrate(cursor);
 
                 getActivity().getActionBar().setTitle( feed.title );
-                mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
+//                mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
+                UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, ArticleListFragment.this, ArticleListFragment.this);
 
                 refresh_feeds();
             }

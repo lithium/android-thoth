@@ -80,6 +80,9 @@ public class RssFeedParser {
                             else if (tag_name.equals("link")) {
                                 feed.link = lastText;
                             }
+                            else if (tag_name.equals("ttl")) {
+                                feed.ttl = Long.valueOf(lastText);
+                            }
                         }
                         else if (state == RssXmlState.RSSXML_ITEM) {
                             if (tag_name.equals("item")) {
@@ -112,7 +115,7 @@ public class RssFeedParser {
                                     article.timestamp = date;
                                 }
                                 else {
-                                    Log.v("foo", "foo");
+//                                    Log.v("foo", "foo");
                                     //nop
                                 }
                                 //                            article.timestamp = xpp.getText();

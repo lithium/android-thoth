@@ -16,12 +16,14 @@ public class Feed {
     public String link;
     public String title;
     public String description;
+    public long ttl = 900;
+    public long timestamp;
 
 
     public String[] tags;
     public ArrayList<Article> articles;
 
-    public static final int DATABASE_VERSION = 5;
+    public static final int DATABASE_VERSION = 6;
 
     public static final String FEED_TABLE_NAME = "feed";
     public static final String FEED_TABLE_CREATE =
@@ -31,6 +33,7 @@ public class Feed {
                     "link TEXT,"+
                     "title TEXT,"+
                     "description TEXT,"+
+                    "ttl INTEGER,"+
                     "timestamp INTEGER,"+
                     "unread INTEGER);";
     public static final String FEED_TABLE_DROP = "DROP TABLE IF EXISTS "+FEED_TABLE_NAME+";";
@@ -38,12 +41,16 @@ public class Feed {
             "url,"+
             "link,"+
             "title,"+
-            "description) VALUES (?,?,?,?);";
+            "ttl,"+
+            "description,"+
+            "timestamp) VALUES (?,?,?,?,?,strftime('%s', 'now'));";
     public static final String FEED_TABLE_UPDATE = "UPDATE " + FEED_TABLE_NAME + " SET " +
             "url=?,"+
             "link=?,"+
             "title=?,"+
-            "description=? WHERE _id=?";
+            "ttl=?,"+
+            "description=?,"+
+            "timestamp=strftime('%s', 'now') WHERE _id=?";
 
 
 
@@ -79,6 +86,7 @@ public class Feed {
         this.link = c.getString(c.getColumnIndexOrThrow("link"));
         this.title = c.getString(c.getColumnIndexOrThrow("title"));
         this.description = c.getString(c.getColumnIndexOrThrow("description"));
+        this.timestamp = c.getLong(c.getColumnIndexOrThrow("timestamp"));
     }
 
     public boolean save(SQLiteDatabase db)
@@ -91,8 +99,9 @@ public class Feed {
             feed_update.bindString(1, this.url);
             feed_update.bindString(2, this.link);
             feed_update.bindString(3, this.title);
-            feed_update.bindString(4, this.description);
-            feed_update.bindLong(5, this._id);
+            feed_update.bindLong(4, this.ttl);
+            feed_update.bindString(5, this.description);
+            feed_update.bindLong(6, this._id);
             if (feed_update.executeUpdateDelete() < 1) {
                 return false;
             };
@@ -116,7 +125,8 @@ public class Feed {
             feed_insert.bindString(1, this.url);
             feed_insert.bindString(2, link != null ? link : "");
             feed_insert.bindString(3, title != null ? title : "");
-            feed_insert.bindString(4, description != null ? description : "");
+            feed_insert.bindLong(4, ttl);
+            feed_insert.bindString(5, description != null ? description : "");
             this._id = feed_insert.executeInsert();
         }
 

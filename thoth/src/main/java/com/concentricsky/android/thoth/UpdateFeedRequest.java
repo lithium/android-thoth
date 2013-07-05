@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.concentricsky.android.thoth.models.Feed;
@@ -17,6 +18,18 @@ public class UpdateFeedRequest extends Request<Boolean> {
 
     private final Response.Listener<Boolean> mListener;
     private final Feed mFeed;
+
+
+    public static UpdateFeedRequest queue_if_needed(RequestQueue queue, Feed feed, Response.Listener<Boolean> listener, Response.ErrorListener errorListener)
+    {
+        long now = System.currentTimeMillis()/1000;
+        if (now - feed.timestamp <= feed.ttl) {
+            return null;
+        }
+        UpdateFeedRequest request = new UpdateFeedRequest(feed, listener, errorListener);
+        queue.add(request);
+        return request;
+    }
 
     public UpdateFeedRequest(Feed feed, Response.Listener<Boolean> listener, Response.ErrorListener errorListener)
     {
