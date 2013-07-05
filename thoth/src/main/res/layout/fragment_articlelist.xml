@@ -11,7 +11,7 @@
               <!--android:textSize="20dp"-->
               <!--android:text="All Feeds"/>-->
 
-    <ProgressBar android:id="@id/android:empty"
+    <ProgressBar android:id="@id/android:progress"
                  style="?android:attr/progressBarStyleHorizontal"
                  android:layout_marginBottom="-6dp"
                  android:layout_marginTop="-6dp"
@@ -19,7 +19,7 @@
                  android:layout_height="wrap_content"
                  android:indeterminate="true"
                  android:maxHeight="5dp"
-                 android:visibility="invisible"
+                 android:visibility="gone"
             />
 
     <ListView android:id="@id/android:list"

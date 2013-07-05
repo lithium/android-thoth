@@ -2,8 +2,6 @@ package com.concentricsky.android.thoth;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
@@ -17,18 +15,14 @@ import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Vector;
 
@@ -51,7 +45,7 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
     private TextView mNoFeedsText;
-    private ProgressBar mEmpty;
+    private ProgressBar mProgress;
     private boolean mNoFeeds=false;
     private ListView mList;
     private RefreshFeedsTask mRefreshTask;
@@ -130,7 +124,7 @@ public class ArticleListFragment extends ListFragment
                 activity.showSubscribe(null);
             }
         });
-        mEmpty = (ProgressBar)root.findViewById(android.R.id.empty);
+        mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
 
         mList = (ListView)root.findViewById(android.R.id.list);
 
@@ -219,8 +213,6 @@ public class ArticleListFragment extends ListFragment
         if (mNoFeedsText != null) {
             mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
         }
-        if (mEmpty != null)
-            mEmpty.setVisibility(has_none ? View.INVISIBLE : View.VISIBLE);
     }
 
     private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
@@ -371,6 +363,7 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+            mProgress.setVisibility(View.VISIBLE);
             return new SimpleCursorLoader(getActivity()) {
                 @Override
                 public Cursor loadInBackground() {
@@ -389,6 +382,7 @@ public class ArticleListFragment extends ListFragment
             if (mList != null) {
                 mList.setSelectionAfterHeaderView();
             }
+            mProgress.setVisibility(View.GONE);
         }
 
         @Override
