@@ -4,7 +4,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteStatement;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -24,6 +23,7 @@ public class Article implements Serializable
     public String guid;
     public Date timestamp;
     public int unread=1;
+    public String feed_title;
 
     public static final int DATABASE_VERSION = 10;
 
@@ -118,6 +118,11 @@ public class Article implements Serializable
         this.unread = c.getInt(c.getColumnIndexOrThrow("unread"));
         this.guid = c.getString(c.getColumnIndexOrThrow("guid"));
         this.timestamp = new Date(c.getLong(c.getColumnIndexOrThrow("timestamp")));
+
+        int feed_idx = c.getColumnIndex("feed_title");
+        if (feed_idx != -1) {
+            this.feed_title = c.getString(feed_idx);
+        }
 
     }
 

@@ -72,15 +72,11 @@ h1#thoth-title a:visited {
     display: block;
     color: #58585b;
 }
-p#thoth-timestamp {
+p#thoth-metadata {
     display: block;
     margin: 0;
     color: #777777;
     padding: 0 10% 5% 10%;
-}
-p#thoth-timestamp span {
-    display: block;
-    padding-bottom: 5%;
     border-bottom: 1px solid #efefef;
 }
 div#thoth-content{

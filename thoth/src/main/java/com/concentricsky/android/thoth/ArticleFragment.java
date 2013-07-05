@@ -1,12 +1,10 @@
 package com.concentricsky.android.thoth;
 
-import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
-import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
@@ -16,7 +14,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.ShareActionProvider;
-import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Article;
 
 /**
@@ -207,7 +204,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                     .append(article.title)
                     .append("</a></h1>");
             if (article.timestamp != null) {
-                builder.append("<p id=\"thoth-timestamp\"><span>")
+                builder.append("<p id=\"thoth-metadata\"><span class=\"feed-name\">")
+                        .append(article.feed_title)
+                        .append("</span> / <span class=\"timestamp\">")
                         .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
                         .append("</span></p>");
             }
