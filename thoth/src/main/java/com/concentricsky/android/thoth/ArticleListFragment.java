@@ -49,6 +49,8 @@ public class ArticleListFragment extends ListFragment
     private boolean mNoFeeds=false;
     private ListView mList;
     private RefreshFeedsTask mRefreshTask;
+    private boolean mHideUnread = false;
+    private MenuItem mToggleMenuItem;
 
     public ArticleListFragment() {
     }
@@ -155,6 +157,9 @@ public class ArticleListFragment extends ListFragment
         menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
         mRefreshMenuItem = menu.findItem(R.id.action_refresh);
         mRefreshMenuItem.setVisible(mRefreshing ? false : !drawer_open);
+
+        mToggleMenuItem = menu.findItem(R.id.action_toggle_unread);
+        mToggleMenuItem.setVisible(true);
     }
 
     @Override
@@ -167,6 +172,13 @@ public class ArticleListFragment extends ListFragment
                return true;
            case R.id.action_refresh:
                refresh_feeds();
+               return true;
+           case R.id.action_toggle_unread:
+               mHideUnread = !mHideUnread;
+               mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
+               mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+
+
                return true;
        }
         return super.onOptionsItemSelected(item);
@@ -313,7 +325,7 @@ public class ArticleListFragment extends ListFragment
 //                mRequestQueue.add(new UpdateFeedRequest(feed, ArticleListFragment.this, ArticleListFragment.this));
                 UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, ArticleListFragment.this, ArticleListFragment.this);
 
-                refresh_feeds();
+//                refresh_feeds();
             }
         }
         @Override
@@ -368,9 +380,9 @@ public class ArticleListFragment extends ListFragment
                 @Override
                 public Cursor loadInBackground() {
                     if (mFeedId != -1)
-                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId);
+                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideUnread);
                     if (mTagId != -1)
-                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId);
+                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideUnread);
                     return null;
                 }
             };

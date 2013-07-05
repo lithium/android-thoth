@@ -138,18 +138,20 @@ public class ThothDatabaseHelper
         return c;
     }
 
-    public Cursor getArticleCursor(long feed_id) {
+    public Cursor getArticleCursor(long feed_id, boolean hide_unread) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = null;
         if (feed_id == 0) { //all articles
             c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
                                 " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
+                                (hide_unread ? " WHERE article.unread=1" : "")+
                                 " ORDER BY timestamp DESC",null);
         }
         else {
             c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
                     " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
                     " WHERE feed_id=?"+
+                    (hide_unread ? " AND article.unread=1" : "")+
                     " ORDER BY timestamp DESC", new String[] {String.valueOf(feed_id)});
         }
         if (c == null || !c.moveToFirst())
@@ -157,13 +159,15 @@ public class ThothDatabaseHelper
         return c;
     }
 
-    public Cursor getArticleCursorByTag(long tag_id) {
+    public Cursor getArticleCursorByTag(long tag_id, boolean hide_unread) {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = null;
         c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
                             " JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON "+Article.ARTICLE_TABLE_NAME+".feed_id="+Feed.FEEDTAG_TABLE_NAME+".feed_id "+
                             " JOIN "+Feed.FEED_TABLE_NAME+" ON "+Feed.FEED_TABLE_NAME+"._id="+Feed.FEEDTAG_TABLE_NAME+".feed_id "+
-                            " WHERE feedtag.tag_id=? ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
+                            " WHERE feedtag.tag_id=? "+
+                            (hide_unread ? " AND article.unread=1" : "")+
+                            "ORDER BY timestamp DESC", new String[] {String.valueOf(tag_id)});
         if (c == null || !c.moveToFirst()) {
             return null;
         }
