@@ -345,16 +345,6 @@ public class ThothMainActivity extends FragmentActivity
                 }
             });
             view.setBackgroundResource(is_expanded ? R.color.navigation_expanded_background : R.color.navigation_collapsed_background);
-//            right.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View view) {
-//                    if (mDrawerList.isGroupExpanded(groupPosition)) {
-//                        mDrawerList.collapseGroup(groupPosition);
-//                    } else {
-//                        mDrawerList.expandGroup(groupPosition);
-//                    }
-//                }
-//            });
         }
 
         @Override
@@ -374,12 +364,6 @@ public class ThothMainActivity extends FragmentActivity
 
             return null;
         }
-
-//        @Override
-//        public boolean areAllItemsEnabled() {
-//            return false;
-//        }
-
 
     }
 
