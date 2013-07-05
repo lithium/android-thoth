@@ -88,7 +88,7 @@ public class ArticleListFragment extends ListFragment
         }
         else {
             if (mFeedId < 1) {
-                getActivity().getActionBar().setTitle("All Feeds");
+                getActivity().getActionBar().setTitle(R.string.all_feeds);
             }
             mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
         }
@@ -360,7 +360,7 @@ public class ArticleListFragment extends ListFragment
             if (cursor.moveToFirst()) {
                 Tag tag = new Tag();
                 tag.hydrate(cursor);
-                getActivity().getActionBar().setTitle(tag.title);
+                getActivity().getActionBar().setTitle(tag.title.isEmpty() ? getString(R.string.unfiled) : tag.title);
             }
 
         }
