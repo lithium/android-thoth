@@ -311,14 +311,16 @@ public class ThothMainActivity extends FragmentActivity
                     mDrawerLayout.closeDrawers();
                 }
             });
+            view.setBackgroundResource(R.color.navigation_child_background);
         }
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor,isLastChild);
             final int groupPosition = cursor.getPosition();
+            boolean is_expanded = mDrawerList.isGroupExpanded(groupPosition);
 
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setImageResource(mDrawerList.isGroupExpanded(groupPosition) ? R.drawable.collapse : R.drawable.expand);
+            iv.setImageResource(is_expanded ? R.drawable.collapse : R.drawable.expand);
             if (groupPosition == 0) {
                 iv.setVisibility(View.INVISIBLE);
             } else {
@@ -340,6 +342,7 @@ public class ThothMainActivity extends FragmentActivity
                     mDrawerLayout.closeDrawers();
                 }
             });
+            view.setBackgroundResource(is_expanded ? R.color.navigation_expanded_background : R.color.navigation_collapsed_background);
 //            right.setOnClickListener(new View.OnClickListener() {
 //                @Override
 //                public void onClick(View view) {
