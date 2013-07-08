@@ -43,11 +43,27 @@ public class ThothMainActivity extends FragmentActivity
     private ImportFragment mImportFragment;
     private TextView mNoFeedsText;
 
+    private long mTagId = -1;
+    private long mFeedId = -1;
+    private long mArticleId = -1;
+    private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+
+    public enum ThothActivityState {
+        THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
+        THOTH_STATE_DETAIL, //ArticleFragment with article id plus ArticleListFragment state
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        } else {
+            String state = savedInstanceState.getString("thoth_state", null);
+            mActivityState = state != null ? ThothActivityState.valueOf(state) : ThothActivityState.THOTH_STATE_ALL_FEEDS;
+
+            mFeedId = savedInstanceState.getLong("thoth_feed_id", -1);
+            mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
+            mArticleId = savedInstanceState.getLong("thoth_article_id", -1);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -108,7 +124,22 @@ public class ThothMainActivity extends FragmentActivity
             mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
         else {
-            showArticleList();
+            switch (mActivityState) {
+                case THOTH_STATE_TAG:
+                    mArticleListFragment.setTag(mTagId);
+                    showArticleList();
+                    break;
+                case THOTH_STATE_FEED:
+                    mArticleListFragment.setFeed(mFeedId);
+                    showArticleList();
+                    break;
+                case THOTH_STATE_ALL_FEEDS:
+                    mArticleListFragment.setFeed(0);
+                    showArticleList();
+                    break;
+                case THOTH_STATE_DETAIL:
+                    break;
+            }
         }
 
 
@@ -318,6 +349,8 @@ public class ThothMainActivity extends FragmentActivity
                 @Override
                 public void onClick(View view) {
                     mArticleListFragment.setFeed(feed_id);
+                    mFeedId = feed_id;
+                    mActivityState = ThothActivityState.THOTH_STATE_FEED;
                     showArticleList();
                     mDrawerLayout.closeDrawers();
                 }
@@ -345,9 +378,12 @@ public class ThothMainActivity extends FragmentActivity
                 public void onClick(View view) {
                     if (groupPosition == 0) { // All feeds clicked
                         mArticleListFragment.setFeed(0);
+                        mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
                     }
                     else {
-                        mArticleListFragment.setTag(mDrawerAdapter.getGroupId(groupPosition));
+                        mTagId = mDrawerAdapter.getGroupId(groupPosition);
+                        mArticleListFragment.setTag(mTagId);
+                        mActivityState = ThothActivityState.THOTH_STATE_TAG;
                     }
                     showArticleList();
                     mDrawerLayout.closeDrawers();
@@ -378,6 +414,10 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
+        outState.putString("thoth_state", mActivityState.name());
+        outState.putLong("thoth_feed_id", mFeedId);
+        outState.putLong("thoth_tag_id", mTagId);
+        outState.putLong("thoth_article_id", mArticleId);
         super.onSaveInstanceState(outState);
     }
 /*
@@ -408,6 +448,11 @@ public class ThothMainActivity extends FragmentActivity
             mArticleFragment = new ArticleFragment();
         }
         mArticleFragment.setArticle(cursor, position);
+
+        mActivityState = ThothActivityState.THOTH_STATE_DETAIL;
+        cursor.moveToPosition(position);
+        mArticleId = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
+
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
         trans.commit();
