@@ -41,6 +41,7 @@ public class ThothMainActivity extends FragmentActivity
     private SQLiteDatabase mWritableDb;
     private DrawerItemClickListener mDrawerClickListener;
     private ImportFragment mImportFragment;
+    private TextView mNoFeedsText;
 
 
     @Override
@@ -57,12 +58,16 @@ public class ThothMainActivity extends FragmentActivity
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
 
+
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
         mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
 
         mDrawerAdapter = new ThothDrawerAdapter();
-        mDrawerList = (ExpandableListView)findViewById(R.id.navigation_drawer);
+        mDrawerList = (ExpandableListView)findViewById(R.id.navigation_list);
+        mNoFeedsText = new TextView(this);
+        mNoFeedsText.setText(R.string.empty_feeds_message);
+        mDrawerList.addHeaderView(mNoFeedsText);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerClickListener = new DrawerItemClickListener();
         mDrawerList.setOnGroupClickListener(mDrawerClickListener);
@@ -208,10 +213,12 @@ public class ThothMainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
-            mDrawerAdapter.changeCursor(cursor);
             if (cursor.getCount() < 2) {
                 mArticleListFragment.setNoFeeds(true);
             } else {
+                if (mNoFeedsText != null)
+                    mDrawerList.removeHeaderView(mNoFeedsText);
+                mDrawerAdapter.changeCursor(cursor);
                 mArticleListFragment.setNoFeeds(false);
             }
         }

@@ -85,6 +85,7 @@ public class ArticleListFragment extends ListFragment
                 activity.showSubscribe(null);
             }
         });
+        mNoFeedsText.setVisibility(mNoFeeds ? View.VISIBLE : View.GONE);
         mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
         Loader<Object> loader = mLoaderManager.getLoader(ARTICLE_LOADER_ID);
         mProgress.setVisibility(loader.isStarted() ? View.GONE : View.VISIBLE);
