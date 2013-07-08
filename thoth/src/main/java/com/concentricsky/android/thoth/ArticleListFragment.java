@@ -51,6 +51,7 @@ public class ArticleListFragment extends ListFragment
     private RefreshFeedsTask mRefreshTask;
     private boolean mHideUnread = false;
     private MenuItem mToggleMenuItem;
+    private boolean mPaused = false;
 
     public ArticleListFragment() {
     }
@@ -119,11 +120,16 @@ public class ArticleListFragment extends ListFragment
     public void onResume() {
         super.onResume();
         getActivity().invalidateOptionsMenu();
+        if (mPaused) {
+            mPaused = false;
+            mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+        }
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        mPaused = true;
     }
 
     @Override
