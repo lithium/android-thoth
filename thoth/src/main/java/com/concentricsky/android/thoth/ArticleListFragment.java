@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -55,6 +56,7 @@ public class ArticleListFragment extends ListFragment
     private boolean mPaused = false;
     private SharedPreferences mPreferences;
     private int mScrollPosition = -1;
+    private Handler mResumeHandler;
 
     public ArticleListFragment() {
     }
@@ -293,6 +295,14 @@ public class ArticleListFragment extends ListFragment
         return -1;
     }
 
+    public void resumeArticleDetail(Handler handler) {
+        mResumeHandler = handler;
+    }
+
+    public Cursor getCursor() {
+        return mAdapter.getCursor();
+    }
+
     private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
     {
         @Override
@@ -459,6 +469,14 @@ public class ArticleListFragment extends ListFragment
                 mProgress.setVisibility(View.GONE);
             if (mScrollPosition != -1)
                 mList.setSelectionFromTop(mScrollPosition, 0);
+
+
+            if (mResumeHandler != null) {
+                mResumeHandler.handleMessage(null);
+                mResumeHandler = null;
+            }
+
+
         }
 
         @Override

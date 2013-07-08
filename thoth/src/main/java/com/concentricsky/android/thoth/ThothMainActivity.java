@@ -8,6 +8,8 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
@@ -45,8 +47,8 @@ public class ThothMainActivity extends FragmentActivity
 
     private long mTagId = -1;
     private long mFeedId = -1;
-    private long mArticleId = -1;
     private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+    private int mArticlePosition= -1;
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -103,9 +105,9 @@ public class ThothMainActivity extends FragmentActivity
             String state = savedInstanceState.getString("thoth_state", null);
             mActivityState = state != null ? ThothActivityState.valueOf(state) : ThothActivityState.THOTH_STATE_ALL_FEEDS;
 
-            mFeedId = savedInstanceState.getLong("thoth_feed_id", -1);
+            mFeedId = savedInstanceState.getLong("thoth_feed_id", 0);
             mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
-            mArticleId = savedInstanceState.getLong("thoth_article_id", -1);
+            mArticlePosition = savedInstanceState.getInt("thoth_article_position", -1);
 
             int scrollTo = savedInstanceState.getInt("thoth_scroll_position", -1);
             mArticleListFragment.scrollToPosition(scrollTo);
@@ -143,6 +145,20 @@ public class ThothMainActivity extends FragmentActivity
                     showArticleList();
                     break;
                 case THOTH_STATE_DETAIL:
+                    if (mTagId != -1) {
+                        mArticleListFragment.setTag(mTagId);
+                    }
+                    else {
+                        mArticleListFragment.setFeed(mFeedId != -1 ? mFeedId : 0);
+                    }
+                    mArticleListFragment.resumeArticleDetail(new Handler() {
+                        @Override
+                        public void handleMessage(Message msg) {
+                            showArticle(mArticleListFragment.getCursor(), mArticlePosition, true);
+                        }
+                    });
+                    showArticleList();
+//                    showArticle(null, mArticlePosition);
                     break;
             }
         }
@@ -422,7 +438,7 @@ public class ThothMainActivity extends FragmentActivity
         outState.putString("thoth_state", mActivityState.name());
         outState.putLong("thoth_feed_id", mFeedId);
         outState.putLong("thoth_tag_id", mTagId);
-        outState.putLong("thoth_article_id", mArticleId);
+        outState.putInt("thoth_article_position", mArticlePosition);
         outState.putInt("thoth_scroll_position", mArticleListFragment.getScrollPosition());
         super.onSaveInstanceState(outState);
     }
@@ -450,18 +466,24 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showArticle(Cursor cursor, int position)
     {
+        showArticle(cursor,position,false);
+    }
+    public void showArticle(Cursor cursor, int position, boolean allow_state_loss)
+    {
         if (mArticleFragment == null) {
             mArticleFragment = new ArticleFragment();
         }
         mArticleFragment.setArticle(cursor, position);
 
         mActivityState = ThothActivityState.THOTH_STATE_DETAIL;
-        cursor.moveToPosition(position);
-        mArticleId = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
+        mArticlePosition = position;
 
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
-        trans.commit();
+        if (allow_state_loss)
+            trans.commitAllowingStateLoss();
+        else
+            trans.commit();
         invalidateOptionsMenu();
     }
 
