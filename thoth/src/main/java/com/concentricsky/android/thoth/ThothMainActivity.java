@@ -46,18 +46,19 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        if (savedInstanceState == null) {
+            requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        }
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
 
         setProgressBarIndeterminateVisibility(false);
-
-        setContentView(R.layout.activity_main);
 
         //set up action bar
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
-
 
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -67,7 +68,7 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_list);
         mNoFeedsText = new TextView(this);
         mNoFeedsText.setText(R.string.empty_feeds_message);
-        mDrawerList.addHeaderView(mNoFeedsText);
+//        mDrawerList.addHeaderView(mNoFeedsText);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerClickListener = new DrawerItemClickListener();
         mDrawerList.setOnGroupClickListener(mDrawerClickListener);
@@ -76,8 +77,10 @@ public class ThothMainActivity extends FragmentActivity
         mDrawerLayout.setDrawerListener(mDrawerToggle);
 
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
-        mLoaderManager =  getSupportLoaderManager();
-        mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
+        mLoaderManager = getSupportLoaderManager();
+        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
+            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
+        }
 
 
         //set up fragments
@@ -216,8 +219,7 @@ public class ThothMainActivity extends FragmentActivity
             if (cursor.getCount() < 2) {
                 mArticleListFragment.setNoFeeds(true);
             } else {
-                if (mNoFeedsText != null)
-                    mDrawerList.removeHeaderView(mNoFeedsText);
+//                mDrawerList.removeHeaderView(mNoFeedsText);
                 mDrawerAdapter.changeCursor(cursor);
                 mArticleListFragment.setNoFeeds(false);
             }
@@ -374,7 +376,11 @@ public class ThothMainActivity extends FragmentActivity
 
     }
 
-    /*
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+/*
      * Private Methods
      */
 
