@@ -9,7 +9,7 @@
     <string name="subscribe_link_prompt">Enter URL:</string>
     <string name="subscribe">Subscribe</string>
     <string name="search">Search</string>
-    <string name="tags">tags</string>
+    <string name="tags">Tags</string>
 
     <string name="time_ago_seconds">Seconds Ago</string>
     <string name="time_ago_minute">A Minute Ago</string>
@@ -32,5 +32,8 @@
     <string name="empty_feeds_message">There are no feeds.\n\nIn a browser use Share > Add to Pensive to search for feeds.\n\nOr click + to add a new feed.</string>
     <string name="all_read">All articles read.</string>
     <string name="action_manage_feeds">Manage feeds</string>
+    <string name="title">Title</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 </resources>

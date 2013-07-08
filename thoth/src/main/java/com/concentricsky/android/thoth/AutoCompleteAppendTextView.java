@@ -29,7 +29,11 @@ public class AutoCompleteAppendTextView extends AutoCompleteTextView {
         Editable current = getText();
         int st = current.toString().lastIndexOf(',');
         if (st == -1) {
-            setText(text+", ");
+            if (current.length() > 0) {
+                setText(current.toString().trim()+", "+text+", ");
+            }
+            else
+                setText(text+", ");
         } else {
             int en = current.length();
             current.replace(Math.min(st+2, en), en, text+", ");

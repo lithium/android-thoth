@@ -18,6 +18,7 @@ public class Feed {
     public String description;
     public long ttl = 900;
     public long timestamp;
+    public String tags_concat;
 
 
     public String[] tags;
@@ -82,11 +83,16 @@ public class Feed {
     public void hydrate(Cursor c)
     {
         this._id = c.getLong(c.getColumnIndexOrThrow("_id"));
-        this.url = c.getString(c.getColumnIndexOrThrow("url"));
-        this.link = c.getString(c.getColumnIndexOrThrow("link"));
         this.title = c.getString(c.getColumnIndexOrThrow("title"));
         this.description = c.getString(c.getColumnIndexOrThrow("description"));
+        this.link = c.getString(c.getColumnIndexOrThrow("link"));
+        this.url = c.getString(c.getColumnIndexOrThrow("url"));
         this.timestamp = c.getLong(c.getColumnIndexOrThrow("timestamp"));
+
+        int tags_concat_idx = c.getColumnIndex("tags");
+        if (tags_concat_idx != -1) {
+            this.tags_concat = c.getString(tags_concat_idx);
+        }
     }
 
     public boolean save(SQLiteDatabase db)

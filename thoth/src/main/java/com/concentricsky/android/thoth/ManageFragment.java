@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -16,8 +17,10 @@ import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CursorAdapter;
+import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.models.Feed;
 
 /**
  * Created by wiggins on 7/7/13.
@@ -32,7 +35,6 @@ public class ManageFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLoaderManager = getLoaderManager();
-//        mAdapter = new FeedCursorAdapter(getActivity());
         mAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_2, null,
                 new String[] {"title", "tags"},
                 new int[] {android.R.id.text1, android.R.id.text2},
@@ -84,20 +86,14 @@ public class ManageFragment extends ListFragment
         mAdapter.changeCursor(null);
     }
 
-
-    private static class FeedCursorAdapter extends CursorAdapter {
-        private FeedCursorAdapter(Context context) {
-            super(context, null, 0);
-        }
-
-        @Override
-        public View newView(Context context, Cursor cursor, ViewGroup viewGroup) {
-            return null;
-        }
-
-        @Override
-        public void bindView(View view, Context context, Cursor cursor) {
-
-        }
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        Feed feed = new Feed();
+        Cursor c = mAdapter.getCursor();
+        c.moveToPosition(position);
+        feed.hydrate(c);
+        FragmentTransaction trans = getFragmentManager().beginTransaction();
+        trans.replace(R.id.content_frame, new EditFeedFragment(feed), "current_fragment").addToBackStack("EditFeed");
+        trans.commit();
     }
 }
