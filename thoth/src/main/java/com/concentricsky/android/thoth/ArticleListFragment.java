@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
@@ -52,6 +53,7 @@ public class ArticleListFragment extends ListFragment
     private boolean mHideUnread = false;
     private MenuItem mToggleMenuItem;
     private boolean mPaused = false;
+    private SharedPreferences mPreferences;
 
     public ArticleListFragment() {
     }
@@ -69,10 +71,14 @@ public class ArticleListFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FragmentActivity activity = getActivity();
+
         mAdapter = new ArticleListAdapter(activity, null);
         mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
         load_feed();
+
+        mPreferences = activity.getSharedPreferences("preferences", 0);
+        mHideUnread = mPreferences.getBoolean("hideUnread", false);
     }
 
     @Override
@@ -97,6 +103,7 @@ public class ArticleListFragment extends ListFragment
         setListAdapter(mAdapter);
 //        load_feed();
 
+        mHideUnread = mPreferences.getBoolean("hideUnread", false);
         return root;
     }
 
@@ -217,15 +224,23 @@ public class ArticleListFragment extends ListFragment
                refresh_feeds();
                return true;
            case R.id.action_toggle_unread:
-               mHideUnread = !mHideUnread;
-               mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
-               mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+               setHideUnread(!mHideUnread);
                return true;
            case R.id.action_mark_as_read:
                return true;
        }
         return super.onOptionsItemSelected(item);
     }
+
+    private void setHideUnread(boolean hide_unread)
+    {
+        mHideUnread = hide_unread;
+        mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
+        mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+        mPreferences.edit().putBoolean("hideUnread", mHideUnread).commit();
+    }
+
+
 
     private void refresh_feeds() {
         mRefreshing = true;
