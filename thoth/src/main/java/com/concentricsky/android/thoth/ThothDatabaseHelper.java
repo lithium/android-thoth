@@ -134,7 +134,8 @@ public class ThothDatabaseHelper
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT feed.*,GROUP_CONCAT(tag.title) as tags FROM feed "+
                                 " JOIN feedtag ON feed_id=feed._id "+
-                                " JOIN tag ON tag._id=feedtag.tag_id GROUP BY feed._id", null);
+                                " JOIN tag ON tag._id=feedtag.tag_id GROUP BY feed._id "+
+                                " ORDER BY feed.title COLLATE NOCASE ASC", null);
         if (!c.moveToFirst())
             return null;
         return c;
@@ -143,7 +144,7 @@ public class ThothDatabaseHelper
     public Cursor getFeedCursor(long tag_id)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT "+Feed.FEED_TABLE_NAME+".* FROM "+Feed.FEED_TABLE_NAME+" JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=?", new String[] {String.valueOf(tag_id)});
+        Cursor c = db.rawQuery("SELECT "+Feed.FEED_TABLE_NAME+".* FROM "+Feed.FEED_TABLE_NAME+" JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=? ORDER BY title COLLATE NOCASE ASC", new String[] {String.valueOf(tag_id)});
         if (!c.moveToFirst())
             return null;
         return c;
