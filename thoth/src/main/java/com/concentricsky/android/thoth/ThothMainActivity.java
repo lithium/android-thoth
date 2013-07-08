@@ -57,13 +57,6 @@ public class ThothMainActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
-        } else {
-            String state = savedInstanceState.getString("thoth_state", null);
-            mActivityState = state != null ? ThothActivityState.valueOf(state) : ThothActivityState.THOTH_STATE_ALL_FEEDS;
-
-            mFeedId = savedInstanceState.getLong("thoth_feed_id", -1);
-            mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
-            mArticleId = savedInstanceState.getLong("thoth_article_id", -1);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
@@ -105,6 +98,18 @@ public class ThothMainActivity extends FragmentActivity
         mArticleListFragment = new ArticleListFragment();
         mSubscribeFragment = null; //create on demand
 
+
+        if (savedInstanceState != null) {
+            String state = savedInstanceState.getString("thoth_state", null);
+            mActivityState = state != null ? ThothActivityState.valueOf(state) : ThothActivityState.THOTH_STATE_ALL_FEEDS;
+
+            mFeedId = savedInstanceState.getLong("thoth_feed_id", -1);
+            mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
+            mArticleId = savedInstanceState.getLong("thoth_article_id", -1);
+
+            int scrollTo = savedInstanceState.getInt("thoth_scroll_position", -1);
+            mArticleListFragment.scrollToPosition(scrollTo);
+        }
 
 
         Intent intent = getIntent();
@@ -418,6 +423,7 @@ public class ThothMainActivity extends FragmentActivity
         outState.putLong("thoth_feed_id", mFeedId);
         outState.putLong("thoth_tag_id", mTagId);
         outState.putLong("thoth_article_id", mArticleId);
+        outState.putInt("thoth_scroll_position", mArticleListFragment.getScrollPosition());
         super.onSaveInstanceState(outState);
     }
 /*

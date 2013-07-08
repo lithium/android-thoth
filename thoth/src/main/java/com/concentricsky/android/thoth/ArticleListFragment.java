@@ -54,6 +54,7 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mToggleMenuItem;
     private boolean mPaused = false;
     private SharedPreferences mPreferences;
+    private int mScrollPosition = -1;
 
     public ArticleListFragment() {
     }
@@ -278,6 +279,20 @@ public class ArticleListFragment extends ListFragment
         }
     }
 
+    public void scrollToPosition(int position) {
+        mScrollPosition = position;
+        if (mList != null && mScrollPosition != -1) {
+            mList.setSelectionFromTop(position, 0);
+        }
+    }
+
+    public int getScrollPosition() {
+        if (mList != null) {
+            return mList.getFirstVisiblePosition();
+        }
+        return -1;
+    }
+
     private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
     {
         @Override
@@ -442,6 +457,8 @@ public class ArticleListFragment extends ListFragment
             mAdapter.changeCursor(cursor);
             if (mProgress != null)
                 mProgress.setVisibility(View.GONE);
+            if (mScrollPosition != -1)
+                mList.setSelectionFromTop(mScrollPosition, 0);
         }
 
         @Override
