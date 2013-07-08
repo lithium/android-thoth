@@ -31,5 +31,6 @@
     <string name="all_feeds">All Feeds</string>
     <string name="empty_feeds_message">There are no feeds.\n\nIn a browser use Share > Add to Pensive to search for feeds.\n\nOr click + to add a new feed.</string>
     <string name="all_read">All articles read.</string>
+    <string name="action_manage_feeds">Manage feeds</string>
 
 </resources>

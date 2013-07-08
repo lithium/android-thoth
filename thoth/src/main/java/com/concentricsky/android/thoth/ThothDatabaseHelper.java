@@ -129,6 +129,17 @@ public class ThothDatabaseHelper
         return c;
     }
 
+    public Cursor getManageFeedsCursor()
+    {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("SELECT feed._id,feed.title,GROUP_CONCAT(tag.title) as tags FROM feed "+
+                                " JOIN feedtag ON feed_id=feed._id "+
+                                " JOIN tag ON tag._id=feedtag.tag_id GROUP BY feed._id", null);
+        if (!c.moveToFirst())
+            return null;
+        return c;
+    }
+
     public Cursor getFeedCursor(long tag_id)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();

@@ -49,6 +49,7 @@ public class ThothMainActivity extends FragmentActivity
     private long mFeedId = -1;
     private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
     private int mArticlePosition= -1;
+    private ManageFragment mManageFragment;
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -208,6 +209,11 @@ public class ThothMainActivity extends FragmentActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        if (item.getItemId() == R.id.action_manage_feeds) {
+            showManageFeeds();
             return true;
         }
 
@@ -496,6 +502,17 @@ public class ThothMainActivity extends FragmentActivity
         mImportFragment.setZipfileUri(uri);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mImportFragment, "current_fragment").addToBackStack("Import");
+        trans.commit();
+        invalidateOptionsMenu();
+    }
+
+    public void showManageFeeds()
+    {
+        if (mManageFragment == null) {
+            mManageFragment = new ManageFragment();
+        }
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, mManageFragment, "current_fragment").addToBackStack("Manage");
         trans.commit();
         invalidateOptionsMenu();
     }
