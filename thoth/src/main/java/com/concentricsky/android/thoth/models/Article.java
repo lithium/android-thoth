@@ -25,7 +25,7 @@ public class Article implements Serializable
     public int unread=1;
     public String feed_title;
 
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 11;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -51,15 +51,10 @@ public class Article implements Serializable
     public static void createDatabase(SQLiteDatabase db)
     {
         db.execSQL(ARTICLE_TABLE_CREATE);
-        db.execSQL("CREATE TRIGGER update_unread_counts UPDATE OF unread ON "+ARTICLE_TABLE_NAME+" BEGIN "+
-                                "UPDATE "+Feed.FEED_TABLE_NAME+" SET unread=unread-old.unread WHERE _id=old.feed_id;"+
-//                                "UPDATE "+Tag.TAG_TABLE_NAME+" SET unread=unread-old.unread WHERE tag.feed_id=old.feed_id;"+
-                            "END;");
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {
         db.execSQL(ARTICLE_TABLE_DROP);
-        db.execSQL("DROP TRIGGER IF EXISTS update_unread_counts;");
         createDatabase(db);
     }
 

@@ -24,9 +24,10 @@ public class Feed {
     public String[] tags;
     public ArrayList<Article> articles;
 
-    public static final int DATABASE_VERSION = 6;
+    public static final int DATABASE_VERSION = 8;
 
     public static final String FEED_TABLE_NAME = "feed";
+    public static final String FEED_VIEW_NAME = "feedview";
     public static final String FEED_TABLE_CREATE =
             "CREATE TABLE " + FEED_TABLE_NAME + " (" +
                     "_id INTEGER PRIMARY KEY,"+
@@ -35,9 +36,10 @@ public class Feed {
                     "title TEXT,"+
                     "description TEXT,"+
                     "ttl INTEGER,"+
-                    "timestamp INTEGER,"+
-                    "unread INTEGER);";
-    public static final String FEED_TABLE_DROP = "DROP TABLE IF EXISTS "+FEED_TABLE_NAME+";";
+                    "timestamp INTEGER);";
+    public static final String FEED_VIEW_CREATE = "CREATE VIEW IF NOT EXISTS "+FEED_VIEW_NAME+" AS "+
+            "SELECT feed.*,(select count(*) from article where unread=1 and feed_id=feed._id) as unread FROM "+FEED_TABLE_NAME+"; ";
+    public static final String FEED_TABLE_DROP = "DROP TABLE IF EXISTS "+FEED_TABLE_NAME+"; DROP VIEW IF EXISTS "+FEED_VIEW_NAME+";";
     public static final String FEED_TABLE_INSERT = "INSERT INTO " + FEED_TABLE_NAME + " (" +
             "url,"+
             "link,"+
@@ -72,6 +74,7 @@ public class Feed {
     {
         db.execSQL(FEED_TABLE_CREATE);
         db.execSQL(FEEDTAG_TABLE_CREATE);
+        db.execSQL(FEED_VIEW_CREATE);
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {
@@ -112,14 +115,14 @@ public class Feed {
                 return false;
             };
 
-            SQLiteStatement stmt = db.compileStatement("UPDATE "+Feed.FEED_TABLE_NAME+" SET unread=(SELECT COUNT(_id) FROM "+Article.ARTICLE_TABLE_NAME+" WHERE unread=1 AND feed_id=?) WHERE _id=?");
-            stmt.bindLong(1, this._id);
-            stmt.bindLong(2, this._id);
-            stmt.executeUpdateDelete();
-
-            stmt = db.compileStatement("UPDATE tag SET unread=(SELECT SUM(unread) FROM feed JOIN feedtag ON feed._id=feed_id WHERE tag_id=tag._id) WHERE _id IN (SELECT tag_id FROM feedtag WHERE feed_id=?)");
-            stmt.bindLong(1, this._id);
-            stmt.executeUpdateDelete();
+//            SQLiteStatement stmt = db.compileStatement("UPDATE "+Feed.FEED_TABLE_NAME+" SET unread=(SELECT COUNT(_id) FROM "+Article.ARTICLE_TABLE_NAME+" WHERE unread=1 AND feed_id=?) WHERE _id=?");
+//            stmt.bindLong(1, this._id);
+//            stmt.bindLong(2, this._id);
+//            stmt.executeUpdateDelete();
+//
+//            stmt = db.compileStatement("UPDATE tag SET unread=(SELECT SUM(unread) FROM feed JOIN feedtag ON feed._id=feed_id WHERE tag_id=tag._id) WHERE _id IN (SELECT tag_id FROM feedtag WHERE feed_id=?)");
+//            stmt.bindLong(1, this._id);
+//            stmt.executeUpdateDelete();
         }
         else {
             Cursor c = db.rawQuery("SELECT _id FROM "+FEED_TABLE_NAME+ " WHERE url=?", new String[] {this.url});
