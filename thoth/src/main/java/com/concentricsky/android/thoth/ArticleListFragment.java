@@ -51,7 +51,7 @@ public class ArticleListFragment extends ListFragment
     private boolean mNoFeeds=false;
     private ListView mList;
     private RefreshFeedsTask mRefreshTask;
-    private boolean mHideUnread = false;
+    private boolean mHideRead = false;
     private MenuItem mToggleMenuItem;
     private boolean mPaused = false;
     private SharedPreferences mPreferences;
@@ -81,7 +81,7 @@ public class ArticleListFragment extends ListFragment
         load_feed();
 
         mPreferences = activity.getSharedPreferences("preferences", 0);
-        mHideUnread = mPreferences.getBoolean("hideUnread", false);
+        mHideRead = mPreferences.getBoolean("hideUnread", false);
     }
 
     @Override
@@ -106,7 +106,7 @@ public class ArticleListFragment extends ListFragment
         setListAdapter(mAdapter);
 //        load_feed();
 
-        mHideUnread = mPreferences.getBoolean("hideUnread", false);
+        mHideRead = mPreferences.getBoolean("hideUnread", false);
         return root;
     }
 
@@ -210,7 +210,7 @@ public class ArticleListFragment extends ListFragment
 
         mToggleMenuItem = menu.findItem(R.id.action_toggle_unread);
         mToggleMenuItem.setVisible(true);
-        mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
+        mToggleMenuItem.setTitle(mHideRead ? R.string.action_show_read : R.string.action_hide_read);
 
         menu.findItem(R.id.action_mark_as_read).setVisible(true);
     }
@@ -227,7 +227,7 @@ public class ArticleListFragment extends ListFragment
                refresh_feeds();
                return true;
            case R.id.action_toggle_unread:
-               setHideUnread(!mHideUnread);
+               setHideRead(!mHideRead);
                return true;
            case R.id.action_mark_as_read:
                return true;
@@ -235,12 +235,12 @@ public class ArticleListFragment extends ListFragment
         return super.onOptionsItemSelected(item);
     }
 
-    private void setHideUnread(boolean hide_unread)
+    private void setHideRead(boolean hide_read)
     {
-        mHideUnread = hide_unread;
-        mToggleMenuItem.setTitle(mHideUnread ? R.string.action_show_unread : R.string.action_hide_unread);
+        mHideRead = hide_read;
+        mToggleMenuItem.setTitle(mHideRead ? R.string.action_show_read : R.string.action_hide_read);
         mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-        mPreferences.edit().putBoolean("hideUnread", mHideUnread).commit();
+        mPreferences.edit().putBoolean("hideUnread", mHideRead).commit();
     }
 
 
@@ -454,9 +454,9 @@ public class ArticleListFragment extends ListFragment
                 @Override
                 public Cursor loadInBackground() {
                     if (mFeedId != -1)
-                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideUnread);
+                        return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideRead);
                     if (mTagId != -1)
-                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideUnread);
+                        return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideRead);
                     return null;
                 }
             };

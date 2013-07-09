@@ -34,7 +34,7 @@
           android:showAsAction="never"
             />
     <item android:id="@+id/action_toggle_unread"
-          android:title="@string/action_hide_unread"
+          android:title="@string/action_hide_read"
           android:orderInCategory="100"
           android:showAsAction="never"
           />

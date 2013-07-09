@@ -25,8 +25,8 @@
     <string name="share_with_label">Add to Pensive</string>
     <string name="unfiled">Unfiled</string>
 
-    <string name="action_show_unread">Show unread</string>
-    <string name="action_hide_unread">Hide unread</string>
+    <string name="action_show_read">Show read</string>
+    <string name="action_hide_read">Hide read</string>
     <string name="action_mark_as_read">Mark all as read</string>
     <string name="all_feeds">All Feeds</string>
     <string name="empty_feeds_message">There are no feeds.\n\nIn a browser use Share > Add to Pensive to search for feeds.\n\nOr click + to add a new feed.</string>
