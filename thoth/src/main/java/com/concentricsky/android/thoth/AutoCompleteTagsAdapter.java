@@ -1,7 +1,6 @@
 package com.concentricsky.android.thoth;
 
 import android.*;
-import android.R;
 import android.content.Context;
 import android.database.Cursor;
 import android.widget.SimpleCursorAdapter;
@@ -11,7 +10,7 @@ import android.widget.SimpleCursorAdapter;
  */
 public class AutoCompleteTagsAdapter extends SimpleCursorAdapter implements SimpleCursorAdapter.CursorToStringConverter {
     public AutoCompleteTagsAdapter(Context context) {
-        super(context, R.layout.simple_list_item_1, null, new String[] {"title"}, new int[] {android.R.id.text1}, 0);
+        super(context, android.R.layout.simple_list_item_1, null, new String[] {"title"}, new int[] {android.R.id.text1}, 0);
 //        setCursorToStringConverter(this);
     }
 
