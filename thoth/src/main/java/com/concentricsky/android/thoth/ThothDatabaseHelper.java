@@ -72,6 +72,10 @@ public class ThothDatabaseHelper
             Feed.createDatabase(sqLiteDatabase);
             Article.createDatabase(sqLiteDatabase);
 
+            Tag.createView(sqLiteDatabase);
+            Feed.createView(sqLiteDatabase);
+
+
         }
 
         @Override

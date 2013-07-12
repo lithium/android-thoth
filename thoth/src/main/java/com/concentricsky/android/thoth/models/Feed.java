@@ -74,6 +74,9 @@ public class Feed {
     {
         db.execSQL(FEED_TABLE_CREATE);
         db.execSQL(FEEDTAG_TABLE_CREATE);
+    }
+    public static void createView(SQLiteDatabase db)
+    {
         db.execSQL(FEED_VIEW_CREATE);
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)

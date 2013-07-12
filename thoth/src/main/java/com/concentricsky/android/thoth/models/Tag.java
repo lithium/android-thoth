@@ -31,13 +31,16 @@ public class Tag {
     public static void createDatabase(SQLiteDatabase db)
     {
         db.execSQL(TAG_TABLE_CREATE);
-        db.execSQL(TAG_VIEW_CREATE);
         db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (1,0,?)", new String[] {"All Feeds"});
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {
         db.execSQL(TAG_TABLE_DROP);
         createDatabase(db);
+    }
+    public static void createView(SQLiteDatabase db)
+    {
+        db.execSQL(TAG_VIEW_CREATE);
     }
 
 
