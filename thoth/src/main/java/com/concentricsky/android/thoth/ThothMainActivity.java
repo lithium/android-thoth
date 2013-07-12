@@ -297,7 +297,7 @@ public class ThothMainActivity extends FragmentActivity
         if (loader_id == TAG_LOADER_ID) { //tag cursor
             mDrawerAdapter.changeCursor(null);
         } else {
-            mDrawerAdapter.setChildrenCursor(loader_id, null);
+//            mDrawerAdapter.setChildrenCursor(loader_id, null);
         }
     }
 
