@@ -43,7 +43,6 @@ public class ThothMainActivity extends FragmentActivity
     private SQLiteDatabase mWritableDb;
     private DrawerItemClickListener mDrawerClickListener;
     private ImportFragment mImportFragment;
-    private TextView mNoFeedsText;
 
     private long mTagId = -1;
     private long mFeedId = -1;
@@ -78,9 +77,6 @@ public class ThothMainActivity extends FragmentActivity
 
         mDrawerAdapter = new ThothDrawerAdapter();
         mDrawerList = (ExpandableListView)findViewById(R.id.navigation_list);
-        mNoFeedsText = new TextView(this);
-        mNoFeedsText.setText(R.string.empty_feeds_message);
-//        mDrawerList.addHeaderView(mNoFeedsText);
         mDrawerList.setAdapter(mDrawerAdapter);
         mDrawerClickListener = new DrawerItemClickListener();
         mDrawerList.setOnGroupClickListener(mDrawerClickListener);
@@ -276,10 +272,15 @@ public class ThothMainActivity extends FragmentActivity
         if (loader_id == TAG_LOADER_ID) { //tag cursor
             if (cursor.getCount() < 2) {
                 mArticleListFragment.setNoFeeds(true);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                mActionBar.setHomeButtonEnabled(false);
+                mActionBar.setDisplayHomeAsUpEnabled(false);
             } else {
-//                mDrawerList.removeHeaderView(mNoFeedsText);
-                mDrawerAdapter.changeCursor(cursor);
                 mArticleListFragment.setNoFeeds(false);
+                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                mActionBar.setHomeButtonEnabled(true);
+                mActionBar.setDisplayHomeAsUpEnabled(true);
+                mDrawerAdapter.changeCursor(cursor);
             }
         }
         else {
@@ -305,6 +306,18 @@ public class ThothMainActivity extends FragmentActivity
     public void onBackStackChanged() {
         if (mSharing && mFragmentManager.getBackStackEntryCount() == 0)
             finish();
+
+
+        Cursor c = mDrawerAdapter.getCursor();
+        if (c != null && c.getCount() > 1) {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            mActionBar.setHomeButtonEnabled(true);
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+        } else {
+            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            mActionBar.setHomeButtonEnabled(false);
+            mActionBar.setDisplayHomeAsUpEnabled(false);
+        }
     }
 
 
