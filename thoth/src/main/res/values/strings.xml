@@ -37,5 +37,7 @@
     <string name="save">Save</string>
     <string name="edit_feed">Edit Feed</string>
     <string name="delete_feed">Delete Feed</string>
+    <string name="deleting">Deleting...</string>
+    <string name="please_wait">Please wait.</string>
 
 </resources>

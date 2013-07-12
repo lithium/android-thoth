@@ -3,9 +3,11 @@ package com.concentricsky.android.thoth;
 import android.*;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -72,6 +74,7 @@ public class ManageFragment extends ListFragment
     {
         private ArrayList<Integer> mActivePositions;
         private MenuItem mEditMenuItem;
+        private ProgressDialog mProgress;
 
 
         public ManageMultiChoiceListener()
@@ -117,10 +120,10 @@ public class ManageFragment extends ListFragment
 
         @Override
         public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
-            Iterator<Integer> iterator = mActivePositions.iterator();
 
             switch (menuItem.getItemId()) {
                 case R.id.action_edit:
+                    Iterator<Integer> iterator = mActivePositions.iterator();
                     if (iterator.hasNext()) {
                         Integer pos = iterator.next();
                         edit_feed_at(pos);
@@ -128,10 +131,7 @@ public class ManageFragment extends ListFragment
                     actionMode.finish();
                     return true;
                 case R.id.action_delete:
-                    while (iterator.hasNext()) {
-                        Integer pos = iterator.next();
-                    }
-                    mAdapter.notifyDataSetChanged();
+                    deleteSelected();
                     actionMode.finish();
                     return true;
             }
@@ -140,6 +140,39 @@ public class ManageFragment extends ListFragment
 
         @Override
         public void onDestroyActionMode(ActionMode actionMode) {
+        }
+
+        private void deleteSelected() {
+            AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
+                @Override
+                protected void onPreExecute() {
+                    mProgress = new ProgressDialog(getActivity());
+                    mProgress.setTitle(getString(R.string.deleting));
+                    mProgress.setMessage(getString(R.string.please_wait));
+                    mProgress.setCancelable(false);
+                    mProgress.setIndeterminate(true);
+                    mProgress.show();
+                }
+
+                @Override
+                protected void onPostExecute(Void aVoid) {
+                    mProgress.hide();
+                    mProgress = null;
+                    mLoaderManager.restartLoader(LOADER_FEEDS, null, ManageFragment.this);
+                }
+
+                @Override
+                protected Void doInBackground(Void... voids) {
+                    Iterator<Integer> iterator = mActivePositions.iterator();
+                    while (iterator.hasNext()) {
+                        Integer pos = iterator.next();
+                        Feed feed = get_feed_at(pos);
+                        feed.delete(ThothDatabaseHelper.getInstance().getWritableDatabase());
+                    }
+                    return null;
+                }
+            };
+            asyncTask.execute();
         }
     }
 
