@@ -98,6 +98,16 @@ public class Feed {
         }
     }
 
+    public boolean delete(SQLiteDatabase db)
+    {
+        if (db.isReadOnly())
+            return false;
+
+        SQLiteStatement stmt = db.compileStatement("DELETE FROM "+Feed.FEED_TABLE_NAME+" WHERE _id=?");
+        stmt.bindLong(1, this._id);
+        return stmt.executeUpdateDelete() > 0;
+    }
+
     public boolean save(SQLiteDatabase db)
     {
         if (db.isReadOnly())
