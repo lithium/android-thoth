@@ -1,8 +1,7 @@
 package com.concentricsky.android.thoth;
 
 import android.app.Activity;
-import android.content.Context;
-import android.content.SharedPreferences;
+import android.content.*;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -32,7 +31,8 @@ import java.util.Vector;
  * Created by wiggins on 5/17/13.
  */
 public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface, Response.Listener<Boolean>, Response.ErrorListener {
+                                 implements ThothFragmentInterface
+{
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
 
@@ -43,14 +43,12 @@ public class ArticleListFragment extends ListFragment
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
     private static final int TAG_LOADER_ID=-4;
-    private RequestQueue mRequestQueue;
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
     private TextView mNoFeedsText;
     private ProgressBar mProgress;
     private boolean mNoFeeds=false;
     private ListView mList;
-    private RefreshFeedsTask mRefreshTask;
     private boolean mHideRead = false;
     private MenuItem mToggleMenuItem;
     private boolean mPaused = false;
@@ -72,9 +70,7 @@ public class ArticleListFragment extends ListFragment
         FragmentActivity activity = getActivity();
 
         mAdapter = new ArticleListAdapter(activity, null);
-        mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
-//        load_feed();
 
         mPreferences = activity.getSharedPreferences("preferences", 0);
         mHideRead = mPreferences.getBoolean("hideUnread", false);
@@ -111,6 +107,11 @@ public class ArticleListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
         load_feed();
 
+        SyncResponseReceiver receiver = new SyncResponseReceiver();
+        IntentFilter filter = new IntentFilter(RefreshFeedIntentService.FEED_REFRESHED);
+        filter.addCategory(Intent.CATEGORY_DEFAULT);
+        getActivity().registerReceiver(receiver, filter);
+
     }
 
     @Override
@@ -144,9 +145,6 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onDestroyView() {
         mLoaderManager.destroyLoader(FEED_LOADER_ID);
-        mRequestQueue.stop();
-        if (mRefreshTask != null)
-            mRefreshTask.cancel(true);
         super.onDestroyView();
     }
 
@@ -180,7 +178,6 @@ public class ArticleListFragment extends ListFragment
 
         mLoaderManager.initLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
         if (mTagId > 0) {
-            refresh_task_execute();
             mLoaderManager.restartLoader(TAG_LOADER_ID, null, new TagLoader(mTagId));
         }
         else {
@@ -190,16 +187,6 @@ public class ArticleListFragment extends ListFragment
             mLoaderManager.initLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
         }
     }
-
-    private void refresh_task_execute()
-    {
-        if (mRefreshTask != null)
-            return;
-
-        mRefreshTask = new RefreshFeedsTask();
-        mRefreshTask.execute(mTagId);
-    }
-
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
@@ -253,27 +240,23 @@ public class ArticleListFragment extends ListFragment
         activity.setProgressBarIndeterminateVisibility(true);
         mRefreshMenuItem.setVisible(false);
 
-        if (mFeedId > 0) {
-            mLoaderManager.restartLoader(FEED_LOADER_ID, null, new FeedLoader(mFeedId));
-        }
-        else
-        {
-            refresh_task_execute();
-        }
+        Intent intent = new Intent(activity, RefreshFeedIntentService.class);
+        intent.putExtra("feed_id", mFeedId);
+        intent.putExtra("tag_id", mTagId);
+        activity.startService(intent);
     }
 
+    public class SyncResponseReceiver extends BroadcastReceiver {
 
-    @Override
-    public void onResponse(Boolean response) {
-        mRefreshing = false;
-        mRefreshMenuItem.setVisible(true);
-        getActivity().setProgressBarIndeterminateVisibility(false);
-        mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-    }
-
-    @Override
-    public void onErrorResponse(VolleyError error) {
-        Log.e(TAG, "Volley error: " + error);
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mRefreshing = false;
+            Activity activity = getActivity();
+            activity.setProgressBarIndeterminateVisibility(false);
+            mRefreshMenuItem.setVisible(true);
+            mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+            return;
+        }
     }
 
     public void setNoFeeds(boolean has_none) {
@@ -316,75 +299,6 @@ public class ArticleListFragment extends ListFragment
         return mAdapter.getCursor();
     }
 
-    private class RefreshFeedsTask extends AsyncTask<Long, Void, Void>
-    {
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            mRefreshing = false;
-            if (mRefreshMenuItem != null)
-                mRefreshMenuItem.setVisible(true);
-            getActivity().setProgressBarIndeterminateVisibility(false);
-            mRefreshTask = null;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            mRefreshing = true;
-            if (mRefreshMenuItem != null)
-                mRefreshMenuItem.setVisible(false);
-            getActivity().setProgressBarIndeterminateVisibility(true);
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            mAdapter.notifyDataSetChanged();
-        }
-
-        @Override
-        protected Void doInBackground(Long... tag_ids) {
-            Vector<UpdateFeedRequest> requests = new Vector<UpdateFeedRequest>();
-
-            for (long tag_id : tag_ids) {
-                Cursor cursor = null;
-                if (tag_id == 0) {
-                    cursor = ThothDatabaseHelper.getInstance().getAllFeedsCursor();
-                } else {
-                    cursor = ThothDatabaseHelper.getInstance().getFeedCursor(tag_id);
-                }
-                if (cursor != null && cursor.moveToFirst()) {
-                    int id_idx = cursor.getColumnIndexOrThrow("_id");
-                    for (; !cursor.isAfterLast(); cursor.moveToNext()) {
-                        Feed feed = new Feed();
-                        feed.hydrate( cursor );
-                        UpdateFeedRequest request = UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, null, null);
-                        if (request != null)
-                            requests.add(request);
-                    }
-                }
-            }
-
-            int completed = 0;
-            while (requests.size() > 0) {
-                Iterator<UpdateFeedRequest> it = requests.iterator();
-                while (it.hasNext()) {
-                    UpdateFeedRequest request = it.next();
-                    if (request.hasHadResponseDelivered()) {
-                        it.remove();
-                        publishProgress();
-                    }
-                }
-
-                synchronized (this) {
-                    try { this.wait(500); } catch (InterruptedException e) { }
-                }
-            }
-
-            return null;
-        }
-
-    }
-
-
     private class FeedLoader implements LoaderManager.LoaderCallbacks<Cursor>
     {
         private long _feed_id;
@@ -409,9 +323,6 @@ public class ArticleListFragment extends ListFragment
                 feed.hydrate(cursor);
 
                 getActivity().getActionBar().setTitle( feed.title );
-                UpdateFeedRequest.queue_if_needed(mRequestQueue, feed, ArticleListFragment.this, ArticleListFragment.this);
-
-//                refresh_feeds();
             }
         }
         @Override

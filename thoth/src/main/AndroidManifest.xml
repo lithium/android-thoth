@@ -40,6 +40,9 @@
             </intent-filter>
         </activity>
 
+        <service android:enabled="true" android:name="com.concentricsky.android.thoth.RefreshFeedIntentService" />
+
     </application>
+
 
 </manifest>
