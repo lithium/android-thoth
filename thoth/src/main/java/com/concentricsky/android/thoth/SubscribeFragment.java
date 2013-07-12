@@ -141,7 +141,8 @@ public class SubscribeFragment extends Fragment
     public void onResponse(Feed response) {
         if (response.title == null) { // only found a feed url, re-scrape
             Log.d(TAG, "Feed URL found: " + response.url);
-            mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
+            if (mRequestQueue != null)
+                mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
         }
         else {
             // feed found
