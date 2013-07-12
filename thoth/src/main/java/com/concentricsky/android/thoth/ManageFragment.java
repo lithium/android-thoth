@@ -12,15 +12,17 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.View;
-import android.view.ViewGroup;
+import android.util.SparseIntArray;
+import android.view.*;
+import android.widget.AbsListView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Feed;
+
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * Created by wiggins on 7/7/13.
@@ -35,18 +37,20 @@ public class ManageFragment extends ListFragment
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mLoaderManager = getLoaderManager();
-        mAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_2, null,
+        mAdapter = new SimpleCursorAdapter(getActivity(), android.R.layout.simple_list_item_activated_2, null,
                 new String[] {"title", "tags"},
                 new int[] {android.R.id.text1, android.R.id.text2},
                 0);
 
     }
 
-
-
-
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+        int i;
+        for (i=0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setVisible(false);
+        }
 
     }
 
@@ -57,6 +61,86 @@ public class ManageFragment extends ListFragment
         setListAdapter(mAdapter);
         mLoaderManager.restartLoader(LOADER_FEEDS, null, this);
         getActivity().getActionBar().setTitle(R.string.action_manage_feeds);
+
+        final ListView listView = getListView();
+        listView.setChoiceMode(AbsListView.CHOICE_MODE_MULTIPLE_MODAL);
+        listView.setMultiChoiceModeListener(new ManageMultiChoiceListener());
+
+    }
+
+    private class ManageMultiChoiceListener implements AbsListView.MultiChoiceModeListener
+    {
+        private ArrayList<Integer> mActivePositions;
+        private MenuItem mEditMenuItem;
+
+
+        public ManageMultiChoiceListener()
+        {
+            mActivePositions = new ArrayList<Integer>();
+        }
+
+        @Override
+        public void onItemCheckedStateChanged(ActionMode actionMode, int i, long l, boolean b) {
+            View childAt = getListView().getChildAt(i);
+            if (childAt != null)
+                childAt.setActivated(b);
+            if (b) {
+                mActivePositions.add(i);
+            }
+            else {
+                if (mActivePositions.contains(i))
+                    mActivePositions.remove(i);
+            }
+
+            if (mActivePositions.size() > 1) {
+                mEditMenuItem.setVisible(false);
+            }
+            else {
+                mEditMenuItem.setVisible(true);
+            }
+
+        }
+
+        @Override
+        public boolean onCreateActionMode(ActionMode actionMode, Menu menu) {
+            MenuInflater inflater = actionMode.getMenuInflater();
+            inflater.inflate(R.menu.manage_context, menu);
+            mEditMenuItem = menu.findItem(R.id.action_edit);
+            return true;
+        }
+
+        @Override
+        public boolean onPrepareActionMode(ActionMode actionMode, Menu menu) {
+            mActivePositions.clear();
+            return false;
+        }
+
+        @Override
+        public boolean onActionItemClicked(ActionMode actionMode, MenuItem menuItem) {
+            Iterator<Integer> iterator = mActivePositions.iterator();
+
+            switch (menuItem.getItemId()) {
+                case R.id.action_edit:
+                    if (iterator.hasNext()) {
+                        Integer pos = iterator.next();
+                        edit_feed_at(pos);
+                    }
+                    actionMode.finish();
+                    return true;
+                case R.id.action_delete:
+                    while (iterator.hasNext()) {
+                        Integer pos = iterator.next();
+                    }
+                    mAdapter.notifyDataSetChanged();
+                    actionMode.finish();
+                    return true;
+            }
+            return false;
+        }
+
+        @Override
+        public void onDestroyActionMode(ActionMode actionMode) {
+        }
     }
 
     private void popBackStack()
@@ -64,6 +148,8 @@ public class ManageFragment extends ListFragment
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
         activity.getFragmentManager().popBackStack("Manage", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+
+
     }
 
     @Override
@@ -88,12 +174,20 @@ public class ManageFragment extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
+        edit_feed_at(position);
+    }
+
+    private Feed get_feed_at(int position) {
         Feed feed = new Feed();
         Cursor c = mAdapter.getCursor();
         c.moveToPosition(position);
         feed.hydrate(c);
+        return feed;
+    }
+
+    private void edit_feed_at(int position) {
         FragmentTransaction trans = getFragmentManager().beginTransaction();
-        trans.replace(R.id.content_frame, new EditFeedFragment(feed), "current_fragment").addToBackStack("EditFeed");
+        trans.replace(R.id.content_frame, new EditFeedFragment(get_feed_at(position)), "current_fragment").addToBackStack("EditFeed");
         trans.commit();
     }
 }

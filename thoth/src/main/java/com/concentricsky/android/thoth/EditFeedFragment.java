@@ -6,9 +6,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
+import android.view.*;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -19,13 +17,16 @@ import com.concentricsky.android.thoth.models.Feed;
 /**
  * Created by wiggins on 7/7/13.
  */
-public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class EditFeedFragment extends Fragment
+                                implements LoaderManager.LoaderCallbacks<Cursor>,ThothFragmentInterface
+{
     private static final int LOADER_TAGS = 1;
     private final Feed mFeed;
     private AutoCompleteTagsAdapter mAdapter;
     private View mButtonContainer;
     private ProgressBar mProgress;
     private AutoCompleteAppendTextView mFeedTags;
+    private EditText mTitleText;
 
     public EditFeedFragment(Feed feed) {
         mFeed = feed;
@@ -35,6 +36,7 @@ public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCa
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mAdapter = new AutoCompleteTagsAdapter(getActivity());
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -44,8 +46,8 @@ public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCa
         TextView tv = (TextView) root.findViewById(R.id.original_title);
         tv.setText(mFeed.title);
 
-        EditText title = (EditText) root.findViewById(R.id.title);
-        title.setText(mFeed.title);
+        mTitleText = (EditText) root.findViewById(R.id.title);
+        mTitleText.setText(mFeed.title);
 
         mFeedTags = (AutoCompleteAppendTextView) root.findViewById(R.id.tags);
         if (mFeed.tags_concat != null)
@@ -78,6 +80,7 @@ public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCa
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
+                mFeed.title = mTitleText.getText().toString();
                 mFeed.tags = mFeedTags.getText().toString().split(",");
                 mFeed.save(ThothDatabaseHelper.getInstance().getWritableDatabase());
                 return null;
@@ -96,6 +99,7 @@ public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCa
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         getLoaderManager().restartLoader(LOADER_TAGS, null, this);
+        getActivity().getActionBar().setTitle(R.string.edit_feed);
     }
 
     @Override
@@ -117,5 +121,27 @@ public class EditFeedFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoaderReset(Loader<Cursor> cursorLoader) {
         mAdapter.changeCursor(null);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.fragment_editfeed, menu);
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+        menu.findItem(R.id.action_manage_feeds).setVisible(false);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_save:
+                saveFeed();
+                return true;
+
+        }
+        return false;
     }
 }
