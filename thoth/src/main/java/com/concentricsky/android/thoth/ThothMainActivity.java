@@ -131,15 +131,12 @@ public class ThothMainActivity extends FragmentActivity
             switch (mActivityState) {
                 case THOTH_STATE_TAG:
                     mArticleListFragment.setTag(mTagId);
-                    showArticleList();
                     break;
                 case THOTH_STATE_FEED:
                     mArticleListFragment.setFeed(mFeedId);
-                    showArticleList();
                     break;
                 case THOTH_STATE_ALL_FEEDS:
                     mArticleListFragment.setFeed(0);
-                    showArticleList();
                     break;
                 case THOTH_STATE_DETAIL:
                     if (mTagId != -1) {
@@ -154,10 +151,10 @@ public class ThothMainActivity extends FragmentActivity
                             showArticle(mArticleListFragment.getCursor(), mArticlePosition, true);
                         }
                     });
-                    showArticleList();
 //                    showArticle(null, mArticlePosition);
                     break;
             }
+            showArticleList(false);
         }
 
 
@@ -271,12 +268,14 @@ public class ThothMainActivity extends FragmentActivity
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
             if (cursor.getCount() < 2) {
-                mArticleListFragment.setNoFeeds(true);
+                if (mArticleListFragment != null)
+                    mArticleListFragment.setNoFeeds(true);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 mActionBar.setHomeButtonEnabled(false);
                 mActionBar.setDisplayHomeAsUpEnabled(false);
             } else {
-                mArticleListFragment.setNoFeeds(false);
+                if (mArticleListFragment != null)
+                    mArticleListFragment.setNoFeeds(false);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
                 mActionBar.setHomeButtonEnabled(true);
                 mActionBar.setDisplayHomeAsUpEnabled(true);
@@ -388,10 +387,11 @@ public class ThothMainActivity extends FragmentActivity
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    mArticleListFragment = new ArticleListFragment();
                     mArticleListFragment.setFeed(feed_id);
                     mFeedId = feed_id;
                     mActivityState = ThothActivityState.THOTH_STATE_FEED;
-                    showArticleList();
+                    showArticleList(true);
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -416,6 +416,7 @@ public class ThothMainActivity extends FragmentActivity
             left.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+                    mArticleListFragment = new ArticleListFragment();
                     if (groupPosition == 0) { // All feeds clicked
                         mArticleListFragment.setFeed(0);
                         mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
@@ -425,7 +426,7 @@ public class ThothMainActivity extends FragmentActivity
                         mArticleListFragment.setTag(mTagId);
                         mActivityState = ThothActivityState.THOTH_STATE_TAG;
                     }
-                    showArticleList();
+                    showArticleList(true);
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -474,9 +475,13 @@ public class ThothMainActivity extends FragmentActivity
      * Private Methods
      */
 
-    public void showArticleList()
+    public void showArticleList(boolean add_to_back_stack)
     {
-        mFragmentManager.beginTransaction().replace(R.id.content_frame, mArticleListFragment, "current_fragment").commit();
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, mArticleListFragment, "current_fragment");
+        if (add_to_back_stack)
+            trans.addToBackStack("ArticleList");
+        trans.commit();
         invalidateOptionsMenu();
     }
 

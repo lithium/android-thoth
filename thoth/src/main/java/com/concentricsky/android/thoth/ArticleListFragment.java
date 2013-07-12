@@ -37,8 +37,8 @@ public class ArticleListFragment extends ListFragment
     private LoaderManager mLoaderManager;
 
     private ArticleListAdapter mAdapter;
-    private long mFeedId;
-    private long mTagId;
+    private long mFeedId=-1;
+    private long mTagId=-1;
 
     private static final int FEED_LOADER_ID=-2;
     private static final int ARTICLE_LOADER_ID=-3;
@@ -65,13 +65,6 @@ public class ArticleListFragment extends ListFragment
     }
 
 
-    @Override
-    public void onListItemClick(ListView l, View v, int position, long id) {
-        ThothMainActivity activity = (ThothMainActivity) getActivity();
-        Cursor cursor = mAdapter.getCursor();
-        activity.showArticle(cursor, position);
-    }
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -81,7 +74,7 @@ public class ArticleListFragment extends ListFragment
         mAdapter = new ArticleListAdapter(activity, null);
         mRequestQueue = Volley.newRequestQueue(activity);
         mLoaderManager = activity.getSupportLoaderManager();
-        load_feed();
+//        load_feed();
 
         mPreferences = activity.getSharedPreferences("preferences", 0);
         mHideRead = mPreferences.getBoolean("hideUnread", false);
@@ -100,14 +93,13 @@ public class ArticleListFragment extends ListFragment
         });
         mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
         Loader<Object> loader = mLoaderManager.getLoader(ARTICLE_LOADER_ID);
-        mProgress.setVisibility(loader.isStarted() ? View.GONE : View.VISIBLE);
+        mProgress.setVisibility(loader == null || loader.isStarted() ? View.GONE : View.VISIBLE);
 
         mList = (ListView)root.findViewById(android.R.id.list);
         mEmpty = (View)root.findViewById(android.R.id.empty);
 
 
         setListAdapter(mAdapter);
-//        load_feed();
 
         mHideRead = mPreferences.getBoolean("hideUnread", false);
 
@@ -117,6 +109,8 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        load_feed();
+
     }
 
     @Override
@@ -566,4 +560,12 @@ public class ArticleListFragment extends ListFragment
             }
         }
     }
+
+    @Override
+    public void onListItemClick(ListView l, View v, int position, long id) {
+        ThothMainActivity activity = (ThothMainActivity) getActivity();
+        Cursor cursor = mAdapter.getCursor();
+        activity.showArticle(cursor, position);
+    }
+
 }
