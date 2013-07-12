@@ -9,7 +9,6 @@ import android.support.v4.content.Loader;
 import android.view.*;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Feed;
@@ -24,7 +23,6 @@ public class EditFeedFragment extends Fragment
     private final Feed mFeed;
     private AutoCompleteTagsAdapter mAdapter;
     private View mButtonContainer;
-    private ProgressBar mProgress;
     private AutoCompleteAppendTextView mFeedTags;
     private EditText mTitleText;
     private MenuItem mSaveItem;
@@ -56,8 +54,6 @@ public class EditFeedFragment extends Fragment
             mFeedTags.setText(mFeed.tags_concat);
         mFeedTags.setAdapter(mAdapter);
 
-
-        mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
         mButtonContainer = root.findViewById(R.id.button_container);
         Button submit = (Button) root.findViewById(R.id.submit);
         submit.setOnClickListener(new View.OnClickListener() {
@@ -77,8 +73,6 @@ public class EditFeedFragment extends Fragment
     }
 
     private void saveFeed() {
-        mButtonContainer.setVisibility(View.GONE);
-        mProgress.setVisibility(View.VISIBLE);
         AsyncTask<Void, Void, Void> asyncTask = new AsyncTask<Void, Void, Void>() {
             @Override
             protected Void doInBackground(Void... voids) {
@@ -89,8 +83,16 @@ public class EditFeedFragment extends Fragment
             }
 
             @Override
-            protected void onPostExecute(Void aVoid) {
+            protected void onPreExecute() {
+                getActivity().setProgressBarIndeterminateVisibility(true);
+                mButtonContainer.setVisibility(View.GONE);
+                mDeleteItem.setVisible(false);
+                mSaveItem.setVisible(false);
+            }
 
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                getActivity().setProgressBarIndeterminateVisibility(false);
                 getFragmentManager().popBackStack();
             }
         };
