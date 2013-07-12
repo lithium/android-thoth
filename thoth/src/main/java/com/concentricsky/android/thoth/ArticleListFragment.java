@@ -57,6 +57,9 @@ public class ArticleListFragment extends ListFragment
     private SharedPreferences mPreferences;
     private int mScrollPosition = -1;
     private Handler mResumeHandler;
+    private MenuItem mMarkAsReadMenuItem;
+    private MenuItem mManageFeedsMenuItem;
+    private View mEmpty;
 
     public ArticleListFragment() {
     }
@@ -95,18 +98,19 @@ public class ArticleListFragment extends ListFragment
                 activity.showSubscribe(null);
             }
         });
-        mNoFeedsText.setVisibility(mNoFeeds ? View.VISIBLE : View.GONE);
         mProgress = (ProgressBar)root.findViewById(android.R.id.progress);
         Loader<Object> loader = mLoaderManager.getLoader(ARTICLE_LOADER_ID);
         mProgress.setVisibility(loader.isStarted() ? View.GONE : View.VISIBLE);
 
         mList = (ListView)root.findViewById(android.R.id.list);
+        mEmpty = (View)root.findViewById(android.R.id.empty);
 
 
         setListAdapter(mAdapter);
 //        load_feed();
 
         mHideRead = mPreferences.getBoolean("hideUnread", false);
+
         return root;
     }
 
@@ -134,6 +138,7 @@ public class ArticleListFragment extends ListFragment
             mPaused = false;
             mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
         }
+        setNoFeeds(mNoFeeds);
     }
 
     @Override
@@ -206,13 +211,16 @@ public class ArticleListFragment extends ListFragment
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
         menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
         mRefreshMenuItem = menu.findItem(R.id.action_refresh);
-        mRefreshMenuItem.setVisible(mRefreshing ? false : !drawer_open);
+        mRefreshMenuItem.setVisible(mRefreshing || mNoFeeds ? false : !drawer_open);
 
         mToggleMenuItem = menu.findItem(R.id.action_toggle_unread);
         mToggleMenuItem.setVisible(true);
         mToggleMenuItem.setTitle(mHideRead ? R.string.action_show_read : R.string.action_hide_read);
 
-        menu.findItem(R.id.action_mark_as_read).setVisible(true);
+        mMarkAsReadMenuItem = menu.findItem(R.id.action_mark_as_read);
+        mManageFeedsMenuItem = menu.findItem(R.id.action_manage_feeds);
+        mMarkAsReadMenuItem.setVisible(mNoFeeds ? false : true);
+        mManageFeedsMenuItem.setVisible(mNoFeeds ? false : true);
     }
 
     @Override
@@ -278,6 +286,17 @@ public class ArticleListFragment extends ListFragment
         mNoFeeds = has_none;
         if (mNoFeedsText != null) {
             mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
+        }
+        if (mManageFeedsMenuItem != null)
+            mManageFeedsMenuItem.setVisible(mNoFeeds ? false : true);
+        if (mMarkAsReadMenuItem != null)
+            mMarkAsReadMenuItem.setVisible(mNoFeeds ? false : true);
+        if (mRefreshMenuItem != null)
+            mRefreshMenuItem.setVisible(mNoFeeds ? false : true);
+
+        if (mEmpty != null) {
+            if (mNoFeeds)
+                mEmpty.setVisibility(View.GONE);
         }
     }
 
