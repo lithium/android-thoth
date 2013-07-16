@@ -2,6 +2,7 @@ package com.concentricsky.android.thoth;
 
 import android.app.Activity;
 import android.content.*;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.support.v4.app.FragmentActivity;
@@ -21,6 +22,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
+import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
 
@@ -58,6 +60,7 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mMarkAsReadMenuItem;
     private MenuItem mManageFeedsMenuItem;
     private View mEmpty;
+    private AsyncTask<Void, Integer, Void> mTask;
 
     public ArticleListFragment() {
     }
@@ -140,6 +143,8 @@ public class ArticleListFragment extends ListFragment
     public void onPause() {
         super.onPause();
         mPaused = true;
+        if (mTask != null)
+            mTask.cancel(true);
     }
 
     @Override
@@ -219,11 +224,61 @@ public class ArticleListFragment extends ListFragment
                setHideRead(!mHideRead);
                return true;
            case R.id.action_mark_as_read:
-               return true;
-           case R.id.action_about:
+               markAllAsRead();
                return true;
        }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void markAllAsRead() {
+        if (mTask != null)
+            return;
+
+        mTask = new AsyncTask<Void, Integer, Void>() {
+            @Override
+            protected void onPreExecute() {
+                mProgress.setVisibility(View.VISIBLE);
+                mProgress.setIndeterminate(false);
+            }
+
+            @Override
+            protected void onPostExecute(Void aVoid) {
+                mProgress.setVisibility(View.GONE);
+                mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+                mTask = null;
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                mProgress.setProgress(values[values.length - 1]);
+            }
+
+            @Override
+            protected Void doInBackground(Void... voids) {
+                Cursor cursor = mAdapter.getCursor();
+                if (cursor != null) {
+                    int max = cursor.getCount();
+                    mProgress.setMax(max);
+                    int id_idx = cursor.getColumnIndex("_id");
+                    int unread_idx = cursor.getColumnIndex("unread");
+                    SQLiteDatabase db = ThothDatabaseHelper.getInstance().getWritableDatabase();
+                    int i;
+                    for (i=0; i < max; i++) {
+                        cursor.moveToPosition(i);
+                        long id = cursor.getLong(id_idx);
+                        long unread = cursor.getInt(unread_idx);
+                        if (unread == 1) {
+                            Article.markAsRead(db, id);
+                        }
+                        publishProgress(i);
+                    }
+                }
+                return null;
+            }
+        };
+        mTask.execute();
+
+
     }
 
     private void setHideRead(boolean hide_read)

@@ -133,4 +133,12 @@ public class Article implements Serializable
         };
         task.execute(this);
     }
+
+    static public boolean markAsRead(SQLiteDatabase db, long article_id) {
+        if (db.isReadOnly())
+            return false;
+        SQLiteStatement stmt = db.compileStatement("UPDATE " + ARTICLE_TABLE_NAME + " SET unread=0 WHERE _id=?");
+        stmt.bindLong(1, article_id);
+        return stmt.executeUpdateDelete() == 1;
+    }
 }
