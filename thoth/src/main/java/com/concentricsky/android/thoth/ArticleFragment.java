@@ -31,6 +31,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private int mPosition;
     private Cursor mCursor;
     private ShareActionProvider mShareActionProvider;
+    private boolean mInitializedHack=false;
 
 
     public ArticleFragment()
@@ -119,6 +120,12 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             return;
         mAdapter.changeCursor(mCursor);
         mViewPager.setCurrentItem(mPosition, true);
+        if (!mInitializedHack && mPosition == 0) {
+            // HACK: this is needed to fix THOT-37. onPageSelected isnt called for the first page the first time.
+            // see: http://stackoverflow.com/questions/16074058/onpageselected-doesnt-work-for-first-page
+            mInitializedHack = true;
+            onPageSelected(0);
+        }
 
     }
 
