@@ -95,7 +95,7 @@ public class ArticleListFragment extends ListFragment
         mProgress.setVisibility(loader == null || loader.isStarted() ? View.GONE : View.VISIBLE);
 
         mList = (ListView)root.findViewById(android.R.id.list);
-        mEmpty = (View)root.findViewById(android.R.id.empty);
+        mEmpty = (View)root.findViewById(R.id.empty);
 
 
         setListAdapter(mAdapter);
@@ -450,6 +450,10 @@ public class ArticleListFragment extends ListFragment
                 mProgress.setVisibility(View.GONE);
             if (mScrollPosition != -1)
                 mList.setSelectionFromTop(mScrollPosition, 0);
+
+            if (mEmpty != null) {
+                mEmpty.setVisibility((cursor == null || cursor.getCount() < 1) ? View.VISIBLE : View.GONE);
+            }
 
 
             if (mResumeHandler != null) {
