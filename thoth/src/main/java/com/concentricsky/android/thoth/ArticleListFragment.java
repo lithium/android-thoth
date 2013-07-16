@@ -220,6 +220,8 @@ public class ArticleListFragment extends ListFragment
                return true;
            case R.id.action_mark_as_read:
                return true;
+           case R.id.action_about:
+               return true;
        }
         return super.onOptionsItemSelected(item);
     }

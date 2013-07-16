@@ -25,13 +25,13 @@
     <string name="share_with_label">Add to Pensive</string>
     <string name="unfiled">Unfiled</string>
 
-    <string name="action_show_read">Show read</string>
-    <string name="action_hide_read">Hide read</string>
+    <string name="action_show_read">Show all</string>
+    <string name="action_hide_read">Show only unread</string>
     <string name="action_mark_as_read">Mark all as read</string>
     <string name="all_feeds">All Feeds</string>
     <string name="empty_feeds_message">There are no feeds.\n\nIn a browser use Share > Add to Pensive to search for feeds.\n\nOr click + to add a new feed.</string>
     <string name="all_read">All articles read.</string>
-    <string name="action_manage_feeds">Manage feeds</string>
+    <string name="action_manage_feeds">Manage Feeds</string>
     <string name="title">Title</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -39,5 +39,7 @@
     <string name="delete_feed">Delete Feed</string>
     <string name="deleting">Deleting...</string>
     <string name="please_wait">Please wait.</string>
+    <string name="action_about">About Pensive</string>
+    <string name="about_text">Pensive Reader\n\n\nConcentric Sky\n\nCode: <b>Wiggins</b>\nDesign: <b>Jeremy Aasum</b></string>
 
 </resources>

@@ -205,8 +205,14 @@ public class ThothMainActivity extends FragmentActivity
             return true;
         }
 
-        if (item.getItemId() == R.id.action_manage_feeds) {
+        int itemId = item.getItemId();
+        if (itemId == R.id.action_manage_feeds) {
             showManageFeeds();
+            return true;
+        }
+        else
+        if (itemId == R.id.action_about) {
+            showAboutDialog();
             return true;
         }
 
@@ -217,6 +223,7 @@ public class ThothMainActivity extends FragmentActivity
 
         return super.onOptionsItemSelected(item);
     }
+
 
 
     /*
@@ -544,4 +551,8 @@ public class ThothMainActivity extends FragmentActivity
         invalidateOptionsMenu();
     }
 
+    private void showAboutDialog() {
+        AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
+        aboutDialogFragment.show(getSupportFragmentManager(), "About");
+    }
 }
