@@ -452,7 +452,7 @@ public class ArticleListFragment extends ListFragment
                 mList.setSelectionFromTop(mScrollPosition, 0);
 
             if (mEmpty != null) {
-                mEmpty.setVisibility((cursor == null || cursor.getCount() < 1) ? View.VISIBLE : View.GONE);
+                mEmpty.setVisibility(!mNoFeeds && (cursor == null || cursor.getCount() < 1) ? View.VISIBLE : View.GONE);
             }
 
 
