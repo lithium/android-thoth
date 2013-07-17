@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -38,6 +39,7 @@ public class ImportFragment extends ListFragment
     private ContentResolver mContentResolver;
     private ScanZipfileTask mScanningTask;
     private FeedResultAdapter mAdapter;
+    private ProgressBar mProgressBar;
 
 
     public ImportFragment() {
@@ -53,12 +55,12 @@ public class ImportFragment extends ListFragment
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_import, container, false);
 
+        mProgressBar = (ProgressBar) root.findViewById(android.R.id.progress);
+
         ListView list = (ListView) root.findViewById(android.R.id.list);
-//        mAdapter = new ArrayAdapter<Feed>(getActivity(), android.R.layout.simple_list_item_2, android.R.id.text1);
         mAdapter = new FeedResultAdapter(getActivity());
         list.setAdapter(mAdapter);
 
-//        return super.onCreateView(inflater, container, savedInstanceState);
         scan_zipfile();
         return root;
     }
@@ -109,19 +111,19 @@ public class ImportFragment extends ListFragment
     }
 
     private class ScanZipfileTask extends AsyncTask<Uri, AddFeedHelper, Void> {
+        private int mMax=-1;
+
         @Override
         protected void onProgressUpdate(AddFeedHelper... helpers) {
-//            super.onProgressUpdate(values);
+            if (mMax!=-1) {
+                mProgressBar.setMax(mMax);
+                mMax=-1;
+            }
+
             for (AddFeedHelper helper : helpers) {
                 mAdapter.add(helper);
                 mAdapter.notifyDataSetChanged();
             }
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-            popBackStack();
         }
 
         @Override
@@ -130,6 +132,7 @@ public class ImportFragment extends ListFragment
                 InputStream zip = mContentResolver.openInputStream(mUri);
 
                 ArrayList<Feed> feeds = mDbHelper.importTakeoutZip(zip);
+                mMax = feeds.size();
 
                 if (feeds != null) {
                     for (Feed feed : feeds) {
@@ -139,7 +142,6 @@ public class ImportFragment extends ListFragment
                 }
             } catch (IOException e) {
                 popBackStack();
-//                e.printStackTrace();
             }
 
             return null;
@@ -166,7 +168,7 @@ public class ImportFragment extends ListFragment
     {
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
-        activity.getFragmentManager().popBackStack("Import", FragmentManager.POP_BACK_STACK_INCLUSIVE);
+        getFragmentManager().popBackStack();
     }
 
     @Override
@@ -199,6 +201,7 @@ public class ImportFragment extends ListFragment
                 response.asyncSave(mDbHelper.getWritableDatabase());
                 mStatus = AddHelperStatus.STATUS_FOUND;
                 mAdapter.notifyDataSetChanged();
+                increment_progress();
             }
         }
 
@@ -209,7 +212,15 @@ public class ImportFragment extends ListFragment
 
             mStatus = AddHelperStatus.STATUS_ERROR;
             mAdapter.notifyDataSetChanged();
+            increment_progress();
+        }
 
+        private void increment_progress()
+        {
+            mProgressBar.setProgress(mProgressBar.getProgress()+1);
+            if (mProgressBar.getProgress() >= mProgressBar.getMax()) {
+                popBackStack();
+            }
         }
     }
 }
