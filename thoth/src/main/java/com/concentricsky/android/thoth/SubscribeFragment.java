@@ -45,6 +45,8 @@ public class SubscribeFragment extends Fragment
     private FeedResultAdapter mResultsAdapter;
     private ListView mResultsList;
     private AsyncTask<Void, Integer, Void> mTask;
+    private ViewGroup mSaveProgress;
+    private ViewGroup mContent;
 
     public SubscribeFragment() {
 
@@ -95,6 +97,8 @@ public class SubscribeFragment extends Fragment
                 search_url();
             }
         });
+        mContent = (ViewGroup)mResultsView.findViewById(android.R.id.content);
+        mSaveProgress = (ViewGroup)mResultsView.findViewById(R.id.save_progress);
 
 
 
@@ -132,6 +136,24 @@ public class SubscribeFragment extends Fragment
 
     private void save_feeds() {
         mTask = new AsyncTask<Void, Integer, Void>() {
+            public ProgressBar _progress;
+
+
+            @Override
+            protected void onPreExecute() {
+                mSaveProgress.setVisibility(View.VISIBLE);
+                mContent.setVisibility(View.GONE);
+
+                _progress = (ProgressBar)mSaveProgress.findViewById(android.R.id.secondaryProgress);
+                ArrayList<Feed> feeds = mResultsAdapter.getItems();
+                _progress.setMax(feeds.size());
+            }
+
+            @Override
+            protected void onProgressUpdate(Integer... values) {
+                _progress.setProgress(values[values.length-1]);
+            }
+
             @Override
             protected void onPostExecute(Void aVoid) {
                 getFragmentManager().popBackStack();
@@ -142,8 +164,10 @@ public class SubscribeFragment extends Fragment
                 ArrayList<Feed> feeds = mResultsAdapter.getItems();
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 if (feeds != null) {
+                    int i=0;
                     for (Feed feed : feeds) {
                         feed.save(db);
+                        publishProgress(++i);
                     }
                 }
                 return null;

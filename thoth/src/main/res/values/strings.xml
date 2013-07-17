@@ -41,5 +41,6 @@
     <string name="please_wait">Please wait.</string>
     <string name="action_about">About Pensive</string>
     <string name="about_text">Pensive Reader\n\n\nConcentric Sky\n\nCode: <b>Wiggins</b>\nDesign: <b>Jeremy Aasum</b></string>
+    <string name="saving_feeds">Saving feeds...</string>
 
 </resources>
