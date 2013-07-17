@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <LinearLayout android:id="@android:id/content"
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent">
+
+        <RelativeLayout
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                >
+
+            <Button android:id="@android:id/button1"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="@string/subscribe"
+                    />
+            <com.concentricsky.android.thoth.AutoCompleteAppendTextView
+                    android:id="@+id/feed_tags"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:layout_toLeftOf="@android:id/button1"
+                    android:hint="@string/tags"
+                    />
+        </RelativeLayout>
+
+        <ListView android:id="@android:id/list"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"/>
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/save_progress"
+                  android:orientation="vertical"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:visibility="gone"
+            >
+        <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="@string/saving_feeds"
+                android:gravity="center"
+                />
+        <ProgressBar android:id="@android:id/secondaryProgress"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center"
+                  android:indeterminate="false"
+                  style="?android:attr/progressBarStyleLarge"
+                />
+    </LinearLayout>
+
+</LinearLayout>

@@ -11,7 +11,7 @@ public class Tag {
     public long _id;
     public String title;
 
-    public static final int DATABASE_VERSION = 9;
+    public static final int DATABASE_VERSION = 10;
 
     public static final String TAG_TABLE_NAME = "tag";
     public static final String TAG_VIEW_NAME = "tagview";
@@ -32,6 +32,7 @@ public class Tag {
     {
         db.execSQL(TAG_TABLE_CREATE);
         db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (1,0,?)", new String[] {"All Feeds"});
+        db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (2,100,?)", new String[] {"Unfiled"});
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {
