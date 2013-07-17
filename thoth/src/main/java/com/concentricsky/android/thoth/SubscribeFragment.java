@@ -66,6 +66,7 @@ public class SubscribeFragment extends Fragment
         super.onResume();
         mLinkText.setText(mUrl == null ? "" : mUrl);
         mFeedTags.setText("");
+        mInputManager.showSoftInput(mLinkText, InputMethodManager.SHOW_IMPLICIT);
     }
 
     @Override
@@ -77,6 +78,7 @@ public class SubscribeFragment extends Fragment
             @Override
             public boolean onEditorAction(TextView textView, int actionid, KeyEvent keyEvent) {
                 switch (actionid) {
+                    case EditorInfo.IME_ACTION_NEXT:
                     case EditorInfo.IME_ACTION_DONE:
                         search_url();
                         return true;
@@ -84,6 +86,8 @@ public class SubscribeFragment extends Fragment
                 return false;
             }
         });
+        mLinkText.requestFocus();
+
         mSubmitButton = (Button)root.findViewById(R.id.subscribe_submit);
         mConfirmButton = (Button)root.findViewById(R.id.subscribe_confirm);
         mDetailView = root.findViewById(R.id.subscribe_feed_detail);
