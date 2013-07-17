@@ -150,3 +150,8 @@ div#thoth-content pre {
 div#thoth-content pre code {
   padding-right: 12%;
 }
+
+div#thoth-content img {
+    max-width: 100%;
+    height: auto;
+}

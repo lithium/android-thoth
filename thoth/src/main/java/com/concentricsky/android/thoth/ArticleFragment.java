@@ -183,7 +183,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             WebSettings settings = mWebView.getSettings();
             settings.setJavaScriptEnabled(true);
             settings.setPluginState(WebSettings.PluginState.ON);
-            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+
+//            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.NORMAL);
+
             settings.setRenderPriority(WebSettings.RenderPriority.HIGH);
             settings.setAppCachePath(getActivity().getCacheDir().toString());
             settings.setAppCacheEnabled(true);
@@ -225,23 +228,27 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                     return false;
                 }
             });
-            StringBuilder builder = new StringBuilder("<head><link rel=\"stylesheet\" type=\"text/css\" href=\"file:///android_asset/css/articledetail.css\" /></head>"+
-                    "<body><h1 id=\"thoth-title\"><a href=\"")
-                    .append(article.link)
-                    .append("\">")
-                    .append(article.title)
-                    .append("</a></h1>");
-            if (article.timestamp != null) {
-                builder.append("<p id=\"thoth-metadata\"><span class=\"feed-name\">")
-                        .append(article.feed_title)
-                        .append("</span> / <span class=\"timestamp\">")
-                        .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
-                        .append("</span></p>");
+            if (article != null) {
+                StringBuilder builder = new StringBuilder("<head>"+
+                        "<meta name=\"viewport\" width=\"initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no\"/>"+
+                        "<link rel=\"stylesheet\" type=\"text/css\" href=\"file:///android_asset/css/articledetail.css\" /></head>"+
+                        "<body><h1 id=\"thoth-title\"><a href=\"")
+                        .append(article.link)
+                        .append("\">")
+                        .append(article.title)
+                        .append("</a></h1>");
+                if (article.timestamp != null) {
+                    builder.append("<p id=\"thoth-metadata\"><span class=\"feed-name\">")
+                            .append(article.feed_title)
+                            .append("</span> / <span class=\"timestamp\">")
+                            .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
+                            .append("</span></p>");
+                }
+                builder.append("<div id=\"thoth-content\">")
+                        .append(article.description)
+                        .append("</div></body>");
+                mWebView.loadDataWithBaseURL("http://www.youtube.com", builder.toString(), "text/html", "UTF-8", null);
             }
-            builder.append("<div id=\"thoth-content\">")
-                    .append(article.description)
-                    .append("</div></body>");
-            mWebView.loadDataWithBaseURL("http://www.youtube.com", builder.toString(), "text/html", "UTF-8", null);
             container.addView(page);
 
 
