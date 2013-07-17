@@ -126,6 +126,9 @@ public class SubscribeFragment extends Fragment
             public void onClick(View view) {
                 Feed feed = (Feed) mResultsAdapter.getItem(0);
                 feed.tags = mFeedTags.getText().toString().split(",");
+                if (feed.tags == null || feed.tags.length < 0 || feed.tags[0] == null || feed.tags[0].isEmpty()) {
+                    feed.tags = new String [] {getString(R.string.unfiled)};
+                }
 
                 save_feeds();
             }

@@ -157,7 +157,10 @@ public class Feed {
             db.execSQL("DELETE FROM "+FEEDTAG_TABLE_NAME+ " WHERE feed_id=?", new String[] {String.valueOf(this._id)});
             //getorcreate tags and add feed to them
             for (String tag_name : this.tags) {
-                Tag tag = Tag.getOrCreate(db, tag_name.trim());
+                tag_name = tag_name.trim();
+                if (tag_name.isEmpty())
+                    continue;
+                Tag tag = Tag.getOrCreate(db, tag_name);
 
                 SQLiteStatement feedtag_insert = db.compileStatement(FEEDTAG_TABLE_INSERT);
                 feedtag_insert.bindLong(1, this._id);
