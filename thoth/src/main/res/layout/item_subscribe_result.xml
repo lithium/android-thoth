@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/subscribe_feed_detail"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:paddingTop="?android:attr/listPreferredItemPaddingLeft"
+              android:paddingBottom="?android:attr/listPreferredItemPaddingLeft"
+            >
+
+        <CheckBox android:id="@android:id/checkbox"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_gravity="center_vertical"
+                  />
+
+        <LinearLayout android:orientation="vertical"
+                      android:layout_height="wrap_content"
+                      android:layout_width="wrap_content"
+                      >
+
+            <TextView android:id="@+id/feed_title"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceLarge"
+                      android:textStyle="bold"
+                    />
+            <TextView android:id="@+id/feed_description"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceSmall"
+                      android:textColor="?android:attr/textColorHint"
+                    />
+            <TextView android:id="@+id/feed_link"
+                      android:layout_width="fill_parent"
+                      android:layout_height="wrap_content"
+                      android:textAppearance="?android:attr/textAppearanceSmall"
+                      android:textColor="?android:attr/textColorHint"
+                    />
+        </LinearLayout>
+
+</LinearLayout>
