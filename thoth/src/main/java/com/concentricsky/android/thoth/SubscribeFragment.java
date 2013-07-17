@@ -163,6 +163,24 @@ public class SubscribeFragment extends Fragment
         return false;
     }
 
+    public void setUrl(String url) {
+        mUrl = url;
+        if (mUrl != null && !mUrl.startsWith("http://")) {
+            mUrl = "http://"+mUrl;
+        }
+        scan_url();
+    }
+
+    private void scan_url() {
+        if (mUrl == null || mRequestQueue == null || mLinkText == null) { // we havent attached yet...
+            return;
+        }
+        mLinkText.setText(mUrl);
+        mRequestQueue.add(new SubscribeToFeedRequest(mUrl, SubscribeFragment.this, SubscribeFragment.this));
+        mProgress.setVisibility(View.VISIBLE);
+        mDetailView.setVisibility(View.INVISIBLE);
+    }
+
     @Override
     public void onResponse(Feed response) {
         if (response.title == null) { // only found a feed url, re-scrape
@@ -192,21 +210,4 @@ public class SubscribeFragment extends Fragment
     }
 
 
-    public void setUrl(String url) {
-        mUrl = url;
-        if (mUrl != null && !mUrl.startsWith("http://")) {
-            mUrl = "http://"+mUrl;
-        }
-        scan_url();
-    }
-
-    private void scan_url() {
-        if (mUrl == null || mRequestQueue == null || mLinkText == null) { // we havent attached yet...
-            return;
-        }
-        mLinkText.setText(mUrl);
-        mRequestQueue.add(new SubscribeToFeedRequest(mUrl, SubscribeFragment.this, SubscribeFragment.this));
-        mProgress.setVisibility(View.VISIBLE);
-        mDetailView.setVisibility(View.INVISIBLE);
-    }
 }
