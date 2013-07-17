@@ -1,12 +1,15 @@
 package com.concentricsky.android.thoth;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.*;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.android.volley.*;
 import com.android.volley.toolbox.Volley;
@@ -36,6 +39,7 @@ public class SubscribeFragment extends Fragment
     private ProgressBar mProgress;
     private TextView mError;
     private String mUrl;
+    private InputMethodManager mInputManager;
 
     public SubscribeFragment() {
 
@@ -46,6 +50,7 @@ public class SubscribeFragment extends Fragment
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         mRequestQueue = Volley.newRequestQueue(activity);
+        mInputManager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 
     }
 
@@ -68,6 +73,17 @@ public class SubscribeFragment extends Fragment
         View root = inflater.inflate(R.layout.fragment_subscribe, container, false);
 
         mLinkText = (EditText)root.findViewById(R.id.subscribe_link);
+        mLinkText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView textView, int actionid, KeyEvent keyEvent) {
+                switch (actionid) {
+                    case EditorInfo.IME_ACTION_DONE:
+                        search_url();
+                        return true;
+                }
+                return false;
+            }
+        });
         mSubmitButton = (Button)root.findViewById(R.id.subscribe_submit);
         mConfirmButton = (Button)root.findViewById(R.id.subscribe_confirm);
         mDetailView = root.findViewById(R.id.subscribe_feed_detail);
@@ -77,6 +93,7 @@ public class SubscribeFragment extends Fragment
 
 
         mFeedTitle = (TextView)root.findViewById(R.id.feed_title);
+
         mFeedDescription = (TextView)root.findViewById(R.id.feed_description);
         mFeedLink = (TextView)root.findViewById(R.id.feed_link);
 
@@ -97,7 +114,7 @@ public class SubscribeFragment extends Fragment
         mSubmitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                setUrl(mLinkText.getText().toString());
+                search_url();
             }
 
         });
@@ -120,6 +137,11 @@ public class SubscribeFragment extends Fragment
 
         scan_url(); // run scan if already have url
         return root;
+    }
+
+    private void search_url() {
+        setUrl(mLinkText.getText().toString());
+        mInputManager.hideSoftInputFromWindow(mLinkText.getWindowToken(), 0);
     }
 
     private void popBackStack()
