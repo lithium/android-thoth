@@ -92,18 +92,22 @@ public class ImportFragment extends ListFragment
             TextView text2 = (TextView) view.findViewById(android.R.id.text2);
             AddFeedHelper item = getItem(position);
             text1.setText(item.mFeed.title);
+            Context context = getContext();
             switch (item.mStatus) {
+                case STATUS_DUPLICATE:
+                    text2.setText(context.getString(R.string.import_status_duplicate));
+                    break;
                 case STATUS_SEARCHING:
-                    text2.setText("Searching...");
+                    text2.setText(context.getString(R.string.import_status_searching));
                     break;
                 case STATUS_FOUND:
                     if (item.mFeed.tags != null)
-                        text2.setText("Added to: "+TextUtils.join(",", item.mFeed.tags)+".");
+                        text2.setText(context.getString(R.string.import_status_added_to)+TextUtils.join(",", item.mFeed.tags));
                     else
-                        text2.setText("Added.");
+                        text2.setText(context.getString(R.string.import_status_added));
                     break;
                 case STATUS_ERROR:
-                    text2.setText("Error parsing feed.");
+                    text2.setText(context.getString(R.string.import_status_error));
                     break;
             }
             return view;
@@ -120,9 +124,11 @@ public class ImportFragment extends ListFragment
                 mMax=-1;
             }
 
-            for (AddFeedHelper helper : helpers) {
-                mAdapter.add(helper);
-                mAdapter.notifyDataSetChanged();
+            if (helpers != null) {
+                for (AddFeedHelper helper : helpers) {
+                    mAdapter.add(helper);
+                    mAdapter.notifyDataSetChanged();
+                }
             }
         }
 
@@ -198,15 +204,21 @@ public class ImportFragment extends ListFragment
     }
 
 
-    private enum AddHelperStatus { STATUS_SEARCHING, STATUS_FOUND, STATUS_ERROR };
+    private enum AddHelperStatus { STATUS_SEARCHING, STATUS_FOUND, STATUS_DUPLICATE, STATUS_ERROR };
     private class AddFeedHelper implements Response.Listener<Feed>, Response.ErrorListener {
         private Feed mFeed;
         private AddHelperStatus mStatus;
 
         public AddFeedHelper(Feed f) {
             mFeed = f;
-            mStatus = AddHelperStatus.STATUS_SEARCHING;
-            mRequestQueue.add(new SubscribeToFeedRequest(mFeed.url, this, this));
+            if (!mDbHelper.doesFeedExist(mFeed.url)) {
+                mRequestQueue.add(new SubscribeToFeedRequest(mFeed.url, this, this));
+                mStatus = AddHelperStatus.STATUS_SEARCHING;
+            }
+            else {
+                increment_progress();
+                mStatus = AddHelperStatus.STATUS_DUPLICATE;
+            }
         }
 
         @Override
@@ -214,7 +226,7 @@ public class ImportFragment extends ListFragment
             if (mRequestQueue == null)
                 return;
 
-            if (response.title == null) {//
+            if (response.title == null) {
                 mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
             }
             else {
@@ -236,12 +248,13 @@ public class ImportFragment extends ListFragment
             increment_progress();
         }
 
-        private void increment_progress()
-        {
-            mProgressBar.setProgress(mProgressBar.getProgress()+1);
-            if (mProgressBar.getProgress() >= mProgressBar.getMax()) {
-                popBackStack();
-            }
+    }
+
+    private void increment_progress()
+    {
+        mProgressBar.setProgress(mProgressBar.getProgress()+1);
+        if (mProgressBar.getProgress() >= mProgressBar.getMax()) {
+            popBackStack();
         }
     }
 }

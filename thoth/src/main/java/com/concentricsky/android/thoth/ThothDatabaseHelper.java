@@ -61,6 +61,7 @@ public class ThothDatabaseHelper
 
 
 
+
     private class ThothOpenHelper extends SQLiteOpenHelper {
 
         public ThothOpenHelper(Context context) {
@@ -197,7 +198,11 @@ public class ThothDatabaseHelper
         return c;
     }
 
-
+    public boolean doesFeedExist(String url) {
+        SQLiteDatabase db = mOpenHelper.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + Feed.FEED_TABLE_NAME + " WHERE url=?", new String[]{url});
+        return (cursor.getCount() > 0);
+    }
 
 //
 //    public long addFeed(String link, String title, long[] tags)
