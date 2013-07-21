@@ -23,8 +23,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.concentricsky.android.thoth.models.Feed;
 
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 /**
@@ -129,18 +128,28 @@ public class ImportFragment extends ListFragment
         @Override
         protected Void doInBackground(Uri... uris) {
             try {
-                InputStream zip = mContentResolver.openInputStream(mUri);
+                InputStream file = mContentResolver.openInputStream(mUri);
 
-                ArrayList<Feed> feeds = mDbHelper.importTakeoutZip(zip);
-                mMax = feeds.size();
+                ArrayList<Feed> feeds = null;
+                feeds = mDbHelper.importTakeoutZip(file);
+                file.close();
+                if (feeds == null) {
+                    feeds =  OpmlParser.parse(new InputStreamReader(mContentResolver.openInputStream(mUri)));
+                }
 
                 if (feeds != null) {
+                    mMax = feeds.size();
                     for (Feed feed : feeds) {
                         AddFeedHelper helper = new AddFeedHelper(feed);
                         publishProgress(helper);
                     }
                 }
+                else {
+                    // no feeds found in import...
+                    popBackStack();
+                }
             } catch (IOException e) {
+                e.printStackTrace();
                 popBackStack();
             }
 

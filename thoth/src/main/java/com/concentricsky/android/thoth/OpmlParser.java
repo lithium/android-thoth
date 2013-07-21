@@ -7,6 +7,8 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;
 
@@ -19,10 +21,14 @@ public class OpmlParser {
 
     public static ArrayList<Feed> parse(String data)
     {
+        return OpmlParser.parse(new StringReader(data));
+    }
+    public static ArrayList<Feed> parse(Reader reader)
+    {
         try {
             XmlPullParserFactory factory = XmlPullParserFactory.newInstance();
             XmlPullParser xpp = factory.newPullParser();
-            xpp.setInput(new StringReader(data));
+            xpp.setInput(reader);
             int eventType = xpp.getEventType();
 
             String lastText = null;

@@ -33,10 +33,17 @@
                 <data android:mimeType="application/atom*" />
             </intent-filter>
 
-            <intent-filter android:label="Import to thoth">
+            <intent-filter android:label="@string/add_to_thoth">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
                 <data android:mimeType="application/zip"/>
+                <data android:mimeType="application/xml"/>
+            </intent-filter>
+
+            <intent-filter android:label="@string/add_to_thoth">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:mimeType="text/xml"/>
             </intent-filter>
         </activity>
 
