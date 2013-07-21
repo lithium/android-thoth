@@ -62,7 +62,7 @@ public class AutoSuggestTagsView extends AutoCompleteTextView {
                 setText(text+", ");
         } else {
             int en = current.length();
-            current.replace(Math.min(st+2, en), en, text+", ");
+            current.replace(Math.min(st+1, en), en, " "+text+", ");
         }
         setSelection(getText().length());
     }

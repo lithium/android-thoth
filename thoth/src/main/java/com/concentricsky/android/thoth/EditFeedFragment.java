@@ -17,11 +17,10 @@ import com.concentricsky.android.thoth.models.Feed;
  * Created by wiggins on 7/7/13.
  */
 public class EditFeedFragment extends Fragment
-                                implements LoaderManager.LoaderCallbacks<Cursor>,ThothFragmentInterface
+                                implements ThothFragmentInterface
 {
     private static final int LOADER_TAGS = 1;
     private final Feed mFeed;
-    private AutoCompleteTagsAdapter mAdapter;
     private View mButtonContainer;
     private AutoSuggestTagsView mFeedTags;
     private EditText mTitleText;
@@ -35,7 +34,6 @@ public class EditFeedFragment extends Fragment
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mAdapter = new AutoCompleteTagsAdapter(getActivity());
         setHasOptionsMenu(true);
     }
 
@@ -51,8 +49,7 @@ public class EditFeedFragment extends Fragment
 
         mFeedTags = (AutoSuggestTagsView) root.findViewById(R.id.tags);
         if (mFeed.tags_concat != null)
-            mFeedTags.setText(mFeed.tags_concat);
-        mFeedTags.setAdapter(mAdapter);
+            mFeedTags.setText(mFeed.tags_concat+",");
 
         mButtonContainer = root.findViewById(R.id.button_container);
         Button submit = (Button) root.findViewById(R.id.submit);
@@ -128,29 +125,7 @@ public class EditFeedFragment extends Fragment
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getLoaderManager().restartLoader(LOADER_TAGS, null, this);
         getActivity().getActionBar().setTitle(R.string.edit_feed);
-    }
-
-    @Override
-    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
-        return new SimpleCursorLoader(getActivity()) {
-            @Override
-            public Cursor loadInBackground() {
-                return ThothDatabaseHelper.getInstance().getTagCursor();
-            }
-        };
-    }
-
-    @Override
-    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-        mAdapter.changeCursor(cursor);
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<Cursor> cursorLoader) {
-        mAdapter.changeCursor(null);
     }
 
     @Override
