@@ -302,6 +302,9 @@ public class ArticleListFragment extends ListFragment
         @Override
         public void onReceive(Context context, Intent intent) {
             Activity activity = getActivity();
+            if (activity == null) {
+                return;
+            }
             String action = intent.getAction();
 
             if (RefreshFeedIntentService.ALL_FEEDS_SYNCED.equals(action)) {
