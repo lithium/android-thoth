@@ -11,23 +11,15 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.*;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
-
-import java.util.Iterator;
-import java.util.Vector;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -111,7 +103,8 @@ public class ArticleListFragment extends ListFragment
         load_feed();
 
         SyncResponseReceiver receiver = new SyncResponseReceiver();
-        IntentFilter filter = new IntentFilter(RefreshFeedIntentService.FEED_REFRESHED);
+        IntentFilter filter = new IntentFilter(RefreshFeedIntentService.ALL_FEEDS_SYNCED);
+        filter.addAction(RefreshFeedIntentService.FEED_SYNCED);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
         getActivity().registerReceiver(receiver, filter);
 
@@ -295,6 +288,7 @@ public class ArticleListFragment extends ListFragment
         mRefreshing = true;
         Activity activity = getActivity();
         activity.setProgressBarIndeterminateVisibility(true);
+        activity.setProgressBarVisibility(true);
         mRefreshMenuItem.setVisible(false);
 
         Intent intent = new Intent(activity, RefreshFeedIntentService.class);
@@ -307,12 +301,23 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            mRefreshing = false;
             Activity activity = getActivity();
-            activity.setProgressBarIndeterminateVisibility(false);
-            mRefreshMenuItem.setVisible(true);
-            mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
-            return;
+            String action = intent.getAction();
+
+            if (RefreshFeedIntentService.ALL_FEEDS_SYNCED.equals(action)) {
+                mRefreshing = false;
+                activity.setProgressBarIndeterminateVisibility(false);
+                activity.setProgressBarVisibility(false);
+                mRefreshMenuItem.setVisible(true);
+                mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+            }
+            else
+            if (RefreshFeedIntentService.FEED_SYNCED.equals(action)) {
+                int progress = intent.getIntExtra("progress",50);
+                progress = (int)(10000*((float)progress/100));
+                activity.setProgress(progress);
+                mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+            }
         }
     }
 

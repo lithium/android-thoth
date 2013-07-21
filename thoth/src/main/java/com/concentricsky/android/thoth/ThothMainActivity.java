@@ -59,6 +59,7 @@ public class ThothMainActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+            requestWindowFeature(Window.FEATURE_PROGRESS);
         }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);

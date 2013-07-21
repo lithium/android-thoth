@@ -14,7 +14,8 @@ import java.util.Vector;
  * Created by wiggins on 7/11/13.
  */
 public class RefreshFeedIntentService extends IntentService {
-    public static final String FEED_REFRESHED = "com.concentricsky.android.intent.action.FEED_REFRESHED";
+    public static final String ALL_FEEDS_SYNCED = "com.concentricsky.android.intent.action.ALL_FEEDS_SYNCED";
+    public static final String FEED_SYNCED = "com.concentricsky.android.intent.action.FEED_SYNCED";
 
     public RefreshFeedIntentService() {
         super("PensiveSyncIntentService");
@@ -46,13 +47,20 @@ public class RefreshFeedIntentService extends IntentService {
 
         // wait for all the volley requests to complete
         int completed = 0;
+        int max = requests.size();
         while (requests.size() > 0) {
             Iterator<UpdateFeedRequest> it = requests.iterator();
             while (it.hasNext()) {
                 UpdateFeedRequest request = it.next();
                 if (request.hasHadResponseDelivered()) {
                     it.remove();
-//                    publishProgress();
+
+                    Intent broadcast = new Intent();
+                    broadcast.setAction(FEED_SYNCED);
+                    broadcast.addCategory(Intent.CATEGORY_DEFAULT);
+                    int progress = (int)((++completed/(float)max)*100);
+                    broadcast.putExtra("progress", progress);
+                    sendBroadcast(broadcast);
                 }
             }
 
@@ -63,7 +71,7 @@ public class RefreshFeedIntentService extends IntentService {
 
 
         Intent broadcast = new Intent();
-        broadcast.setAction(FEED_REFRESHED);
+        broadcast.setAction(ALL_FEEDS_SYNCED);
         broadcast.addCategory(Intent.CATEGORY_DEFAULT);
         broadcast.putExtra("feed_id", feed_id);
         broadcast.putExtra("tag_id", tag_id);
