@@ -108,17 +108,6 @@ public class SubscribeFragment extends Fragment
         mResultsList.setAdapter(mResultsAdapter);
 
         mFeedTags = (AutoCompleteTextView)mResultsView.findViewById(R.id.feed_tags);
-        Cursor cursor = mDbHelper.getTagCursor();
-        SimpleCursorAdapter adapter = new SimpleCursorAdapter(getActivity(),
-                                            android.R.layout.simple_list_item_1,
-                                            cursor, new String[] {"title"}, new int[] {android.R.id.text1}, 0);
-        adapter.setCursorToStringConverter(new SimpleCursorAdapter.CursorToStringConverter() {
-            @Override
-            public CharSequence convertToString(Cursor cursor) {
-                return cursor.getString(cursor.getColumnIndexOrThrow("title"));
-            }
-        });
-        mFeedTags.setAdapter(adapter);
 
         mConfirmButton = (Button)mResultsView.findViewById(android.R.id.button1);
         mConfirmButton.setOnClickListener(new View.OnClickListener() {

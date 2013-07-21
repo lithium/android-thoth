@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteStatement;
 import com.concentricsky.android.thoth.models.Article;
 import com.concentricsky.android.thoth.models.Feed;
 import com.concentricsky.android.thoth.models.Tag;
@@ -115,10 +116,16 @@ public class ThothDatabaseHelper
     }
 
 
-    public Cursor getTagCursor()
+    public Cursor getTagCursor() {
+        return getTagCursor(null, false);
+    }
+    public Cursor getTagCursor(String like, boolean hide_internal)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " ORDER BY ordering,title COLLATE NOCASE ASC", null);
+        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE "+
+                               (hide_internal ? " ordering=99 " : " ordering=ordering ")+
+                               (like != null ? " AND title LIKE '%"+like+"%'" : "")+
+                               " ORDER BY ordering,title COLLATE NOCASE ASC", null);
         if (!c.moveToFirst())
             return null;
         return c;

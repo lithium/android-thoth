@@ -23,7 +23,7 @@ public class EditFeedFragment extends Fragment
     private final Feed mFeed;
     private AutoCompleteTagsAdapter mAdapter;
     private View mButtonContainer;
-    private AutoCompleteAppendTextView mFeedTags;
+    private AutoSuggestTagsView mFeedTags;
     private EditText mTitleText;
     private MenuItem mSaveItem;
     private MenuItem mDeleteItem;
@@ -49,7 +49,7 @@ public class EditFeedFragment extends Fragment
         mTitleText = (EditText) root.findViewById(R.id.title);
         mTitleText.setText(mFeed.title);
 
-        mFeedTags = (AutoCompleteAppendTextView) root.findViewById(R.id.tags);
+        mFeedTags = (AutoSuggestTagsView) root.findViewById(R.id.tags);
         if (mFeed.tags_concat != null)
             mFeedTags.setText(mFeed.tags_concat);
         mFeedTags.setAdapter(mAdapter);
