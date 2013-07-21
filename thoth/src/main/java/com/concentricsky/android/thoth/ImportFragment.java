@@ -6,7 +6,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -24,6 +23,8 @@ import com.android.volley.toolbox.Volley;
 import com.concentricsky.android.thoth.models.Feed;
 
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -128,13 +129,23 @@ public class ImportFragment extends ListFragment
         @Override
         protected Void doInBackground(Uri... uris) {
             try {
-                InputStream file = mContentResolver.openInputStream(mUri);
-
                 ArrayList<Feed> feeds = null;
-                feeds = mDbHelper.importTakeoutZip(file);
-                file.close();
-                if (feeds == null) {
-                    feeds =  OpmlParser.parse(new InputStreamReader(mContentResolver.openInputStream(mUri)));
+
+
+                if (mUri.getScheme().startsWith("http")) {
+                    URL url = new URL(mUri.toString());
+                    HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                    BufferedInputStream stream = new BufferedInputStream(conn.getInputStream());
+                    feeds = OpmlParser.parse(new InputStreamReader(stream));
+                }
+                else {
+                    InputStream file = mContentResolver.openInputStream(mUri);
+                    feeds = mDbHelper.importTakeoutZip(file);
+                    file.close();
+
+                    if (feeds == null) {
+                        feeds = OpmlParser.parse(new InputStreamReader(mContentResolver.openInputStream(mUri)));
+                    }
                 }
 
                 if (feeds != null) {
@@ -148,6 +159,7 @@ public class ImportFragment extends ListFragment
                     // no feeds found in import...
                     popBackStack();
                 }
+
             } catch (IOException e) {
                 e.printStackTrace();
                 popBackStack();

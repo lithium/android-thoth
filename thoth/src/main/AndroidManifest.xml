@@ -43,8 +43,24 @@
             <intent-filter android:label="@string/add_to_thoth">
                 <action android:name="android.intent.action.VIEW"/>
                 <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
                 <data android:mimeType="text/xml"/>
+                <data android:mimeType="application/rss+xml"/>
+                <data android:mimeType="application/atom+xml"/>
+                <data android:mimeType="application/xml"/>
             </intent-filter>
+
+            <intent-filter android:label="@string/add_to_thoth">
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="http"/>
+                <data android:host="*"/>
+                <data android:pathPattern=".*\\.xml"/>
+                <data android:pathPattern=".*\\.rss"/>
+            </intent-filter>
+
+
         </activity>
 
         <service android:enabled="true" android:name="com.concentricsky.android.thoth.RefreshFeedIntentService" />
