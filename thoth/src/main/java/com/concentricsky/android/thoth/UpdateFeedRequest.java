@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.util.Log;
 import com.android.volley.*;
 import com.android.volley.toolbox.HttpHeaderParser;
 import com.concentricsky.android.thoth.models.Feed;
@@ -13,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 public class UpdateFeedRequest extends Request<Boolean> {
 
 
-    private static final boolean DEBUG_ALWAYS_QUEUE_FEED_REFRESH = false;
+    private static final boolean DEBUG_ALWAYS_QUEUE_FEED_REFRESH = true;
     private final Response.Listener<Boolean> mListener;
     private final Feed mFeed;
 
@@ -44,7 +45,8 @@ public class UpdateFeedRequest extends Request<Boolean> {
     protected Response<Boolean> parseNetworkResponse(NetworkResponse response) {
         String parsed;
         try {
-            parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+//            parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+            parsed = new String(response.data, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             parsed = new String(response.data);
         }

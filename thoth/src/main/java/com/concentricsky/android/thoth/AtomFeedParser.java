@@ -8,6 +8,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
@@ -52,7 +53,7 @@ public class AtomFeedParser {
             }
 
 
-            xpp.setInput(new StringReader(data));
+            xpp.setInput(new StringReader(new String(data.getBytes("UTF-8"))));
             int eventType = xpp.getEventType();
 
             while (eventType != XmlPullParser.END_DOCUMENT) {

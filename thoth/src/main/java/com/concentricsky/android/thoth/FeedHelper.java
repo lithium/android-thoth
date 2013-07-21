@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.util.Log;
 import com.concentricsky.android.thoth.models.Feed;
 
 import java.util.regex.Matcher;
@@ -30,6 +31,7 @@ public class FeedHelper {
     public static Feed attemptToParseAtom(Feed feed, String data)
     {
         AtomFeedParser parser = new AtomFeedParser();
+        Log.d("THOTH", data);
         return parser.parse(feed, data);
     }
 

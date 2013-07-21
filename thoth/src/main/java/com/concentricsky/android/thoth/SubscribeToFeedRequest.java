@@ -1,5 +1,6 @@
 package com.concentricsky.android.thoth;
 
+import android.util.Log;
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
 import com.android.volley.Request;
@@ -29,7 +30,8 @@ class SubscribeToFeedRequest extends Request<Feed> {
     protected Response<Feed> parseNetworkResponse(NetworkResponse response) {
         String parsed;
         try {
-            parsed = new String(response.data, HttpHeaderParser.parseCharset(response.headers));
+//            String charset = HttpHeaderParser.parseCharset(response.headers);
+            parsed = new String(response.data, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             parsed = new String(response.data);
         }
