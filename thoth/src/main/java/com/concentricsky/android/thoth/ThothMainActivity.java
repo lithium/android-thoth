@@ -14,12 +14,18 @@ import android.support.v4.app.*;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.TextUtils;
 import android.util.SparseIntArray;
 import android.view.*;
 import android.widget.ExpandableListView;
 import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
+import com.android.volley.RequestQueue;
+import com.android.volley.toolbox.DiskBasedCache;
+import com.android.volley.toolbox.ImageLoader;
+import com.android.volley.toolbox.NetworkImageView;
+import com.android.volley.toolbox.Volley;
 import com.codeslap.gist.SimpleCursorLoader;
 
 
@@ -49,6 +55,8 @@ public class ThothMainActivity extends FragmentActivity
     private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
     private int mArticlePosition= -1;
     private ManageFragment mManageFragment;
+    private RequestQueue mRequestQueue;
+    private ImageLoader mImageLoader;
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -90,6 +98,9 @@ public class ThothMainActivity extends FragmentActivity
         if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
             mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
         }
+
+        mRequestQueue = Volley.newRequestQueue(this);
+        mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
 
 
         //set up fragments
@@ -404,10 +415,21 @@ public class ThothMainActivity extends FragmentActivity
                 }
             });
             view.setBackgroundResource(R.color.navigation_child_background);
+
+            NetworkImageView icon = (NetworkImageView) view.findViewById(android.R.id.icon1);
+            icon.setDefaultImageResId(R.drawable.rss_default);
+            icon.setErrorImageResId(R.drawable.rss_default);
+            String link = cursor.getString(cursor.getColumnIndexOrThrow("link"));
+            if (!TextUtils.isEmpty(link)) {
+                icon.setImageUrl(link+"/favicon.ico", mImageLoader);
+            }
+            else {
+                icon.setImageUrl(null, mImageLoader);
+            }
         }
         @Override
         protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
-            bindView(view,context,cursor,isLastChild);
+            bindView(view, context, cursor, isLastChild);
             final int groupPosition = cursor.getPosition();
             boolean is_expanded = mDrawerList.isGroupExpanded(groupPosition);
 
