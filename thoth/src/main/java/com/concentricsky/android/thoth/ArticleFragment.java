@@ -139,8 +139,11 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onPageSelected(int i) {
         Article a = (Article) mAdapter.getArticle(i);
         if (a != null) {
-            if (a.unread == 1)
+            if (a.unread == 1) {
                 a.asyncSave(ThothDatabaseHelper.getInstance().getWritableDatabase());
+                ThothMainActivity activity = (ThothMainActivity)getActivity();
+                activity.reloadTags();
+            }
 
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);

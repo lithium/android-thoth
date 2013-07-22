@@ -301,7 +301,7 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public void onReceive(Context context, Intent intent) {
-            Activity activity = getActivity();
+            ThothMainActivity activity = (ThothMainActivity)getActivity();
             if (activity == null) {
                 return;
             }
@@ -321,6 +321,7 @@ public class ArticleListFragment extends ListFragment
                 activity.setProgress(progress);
                 mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
             }
+            activity.reloadTags();
         }
     }
 
