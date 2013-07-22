@@ -14,7 +14,7 @@ import java.io.UnsupportedEncodingException;
 public class UpdateFeedRequest extends Request<Boolean> {
 
 
-    private static final boolean DEBUG_ALWAYS_QUEUE_FEED_REFRESH = true;
+    private static final boolean DEBUG_ALWAYS_QUEUE_FEED_REFRESH = false;
     private final Response.Listener<Boolean> mListener;
     private final Feed mFeed;
 
