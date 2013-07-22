@@ -286,7 +286,7 @@ public class ThothMainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
-            if (cursor.getCount() < 2) {
+            if (cursor.getCount() < 3) {
                 if (mArticleListFragment != null)
                     mArticleListFragment.setNoFeeds(true);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
