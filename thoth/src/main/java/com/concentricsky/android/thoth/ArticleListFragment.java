@@ -57,6 +57,17 @@ public class ArticleListFragment extends ListFragment
     public ArticleListFragment() {
     }
 
+    public static ArticleListFragment newInstance(long feed_id, long tag_id) {
+        ArticleListFragment fragment = new ArticleListFragment();
+
+        Bundle args = new Bundle();
+        args.putLong("feed_id", feed_id);
+        args.putLong("tag_id", tag_id);
+        fragment.setArguments(args);
+
+        return fragment;
+    }
+
 
 
     @Override
@@ -69,6 +80,16 @@ public class ArticleListFragment extends ListFragment
 
         mPreferences = activity.getSharedPreferences("preferences", 0);
         mHideRead = mPreferences.getBoolean("hideUnread", false);
+
+        Bundle args = getArguments();
+        if (args != null) {
+            long feed_id = args.getLong("feed_id", -1);
+            if (feed_id != -1)
+                setFeed(feed_id);
+            long tag_id = args.getLong("tag_id", -1);
+            if (tag_id != -1)
+                setTag(tag_id);
+        }
     }
 
     @Override

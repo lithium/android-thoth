@@ -57,6 +57,7 @@ public class ThothMainActivity extends FragmentActivity
     private ManageFragment mManageFragment;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
+    private int mScrollTo=-1;
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -106,7 +107,7 @@ public class ThothMainActivity extends FragmentActivity
         //set up fragments
         mFragmentManager = getSupportFragmentManager();
         mFragmentManager.addOnBackStackChangedListener(this);
-        mArticleListFragment = new ArticleListFragment();
+//        mArticleListFragment = new ArticleListFragment();
         mSubscribeFragment = null; //create on demand
 
 
@@ -118,8 +119,7 @@ public class ThothMainActivity extends FragmentActivity
             mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
             mArticlePosition = savedInstanceState.getInt("thoth_article_position", -1);
 
-            int scrollTo = savedInstanceState.getInt("thoth_scroll_position", -1);
-            mArticleListFragment.scrollToPosition(scrollTo);
+            mScrollTo = savedInstanceState.getInt("thoth_scroll_position", -1);
         }
 
 
@@ -142,20 +142,23 @@ public class ThothMainActivity extends FragmentActivity
         else {
             switch (mActivityState) {
                 case THOTH_STATE_TAG:
-                    mArticleListFragment.setTag(mTagId);
+                    mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
                     break;
                 case THOTH_STATE_FEED:
-                    mArticleListFragment.setFeed(mFeedId);
+                    mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
                     break;
                 case THOTH_STATE_ALL_FEEDS:
-                    mArticleListFragment.setFeed(0);
+                    mFeedId = 0;
+                    mArticleListFragment = ArticleListFragment.newInstance(0, -1);
                     break;
                 case THOTH_STATE_DETAIL:
                     if (mTagId != -1) {
-                        mArticleListFragment.setTag(mTagId);
+                        mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
                     }
                     else {
-                        mArticleListFragment.setFeed(mFeedId != -1 ? mFeedId : 0);
+                        if (mFeedId == -1)
+                            mFeedId = 0;
+                        mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
                     }
                     mArticleListFragment.resumeArticleDetail(new Handler() {
                         @Override
@@ -163,7 +166,6 @@ public class ThothMainActivity extends FragmentActivity
                             showArticle(mArticleListFragment.getCursor(), mArticlePosition, true);
                         }
                     });
-//                    showArticle(null, mArticlePosition);
                     break;
             }
             showArticleList(false);
@@ -405,11 +407,12 @@ public class ThothMainActivity extends FragmentActivity
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mArticleListFragment = new ArticleListFragment();
-                    mArticleListFragment.setFeed(feed_id);
-                    mFeedId = feed_id;
-                    mActivityState = ThothActivityState.THOTH_STATE_FEED;
-                    showArticleList(true);
+                    if (feed_id != mFeedId) {
+                        mArticleListFragment = ArticleListFragment.newInstance(feed_id, -1);
+                        mFeedId = feed_id;
+                        mActivityState = ThothActivityState.THOTH_STATE_FEED;
+                        showArticleList(true);
+                    }
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -445,17 +448,23 @@ public class ThothMainActivity extends FragmentActivity
             left.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    mArticleListFragment = new ArticleListFragment();
                     if (groupPosition == 0) { // All feeds clicked
-                        mArticleListFragment.setFeed(0);
-                        mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+                        if (mFeedId != 0) {
+                            mFeedId = 0;
+                            mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
+                            showArticleList(true);
+                            mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+                        }
                     }
                     else {
-                        mTagId = mDrawerAdapter.getGroupId(groupPosition);
-                        mArticleListFragment.setTag(mTagId);
-                        mActivityState = ThothActivityState.THOTH_STATE_TAG;
+                        long tag_id = mDrawerAdapter.getGroupId(groupPosition);
+                        if (mTagId != tag_id) {
+                            mTagId = tag_id;
+                            mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
+                            showArticleList(true);
+                            mActivityState = ThothActivityState.THOTH_STATE_TAG;
+                        }
                     }
-                    showArticleList(true);
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -506,6 +515,10 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showArticleList(boolean add_to_back_stack)
     {
+        if (mScrollTo != -1) {
+            mArticleListFragment.scrollToPosition(mScrollTo);
+            mScrollTo = -1;
+        }
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mArticleListFragment, "current_fragment");
         if (add_to_back_stack)
