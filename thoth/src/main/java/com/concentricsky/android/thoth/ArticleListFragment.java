@@ -159,6 +159,7 @@ public class ArticleListFragment extends ListFragment
         mPaused = true;
         if (mTask != null)
             mTask.cancel(true);
+        mScrollPosition = getScrollPosition();
     }
 
     @Override
