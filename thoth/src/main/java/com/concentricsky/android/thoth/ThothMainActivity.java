@@ -112,7 +112,10 @@ public class ThothMainActivity extends FragmentActivity
         AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
         accountManager.addAccountExplicitly(newAccount, null, null);
         ContentResolver contentResolver = getContentResolver();
-        contentResolver.addPeriodicSync(newAccount, getString(R.string.sync_provider_authority), new Bundle(), 15*60*1000); // 15 minutes
+        String authority = getString(R.string.sync_provider_authority);
+        contentResolver.addPeriodicSync(newAccount, authority, new Bundle(), 900); // 15 minutes
+        contentResolver.setIsSyncable(newAccount, authority, 1);
+        contentResolver.setSyncAutomatically(newAccount, authority, true);
 
 
 
