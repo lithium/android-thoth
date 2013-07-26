@@ -37,7 +37,7 @@ public class UpdateFeedRequest extends Request<Boolean> {
         super(Method.GET, feed.url, errorListener);
         mFeed = feed;
         mListener = listener;
-        setRetryPolicy(new DefaultRetryPolicy(3000, 1, 1));
+        setRetryPolicy(new DefaultRetryPolicy(1000, 1, 1));
     }
 
 

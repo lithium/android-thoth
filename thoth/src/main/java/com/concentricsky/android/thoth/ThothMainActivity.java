@@ -1,6 +1,9 @@
 package com.concentricsky.android.thoth;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.app.ActionBar;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
@@ -102,6 +105,15 @@ public class ThothMainActivity extends FragmentActivity
 
         mRequestQueue = Volley.newRequestQueue(this);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
+
+
+        //set up sync adapter
+        Account newAccount = new Account(getString(R.string.app_name), getString(R.string.sync_account_type));
+        AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
+        accountManager.addAccountExplicitly(newAccount, null, null);
+        ContentResolver contentResolver = getContentResolver();
+        contentResolver.addPeriodicSync(newAccount, getString(R.string.sync_provider_authority), new Bundle(), 15*60*1000); // 15 minutes
+
 
 
         //set up fragments
