@@ -336,8 +336,10 @@ public class ArticleListFragment extends ListFragment
                 mRefreshing = false;
                 activity.setProgressBarIndeterminateVisibility(false);
                 activity.setProgressBarVisibility(false);
-                mRefreshMenuItem.setVisible(true);
-                mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
+                if (mRefreshMenuItem != null)
+                    mRefreshMenuItem.setVisible(true);
+                if (mLoaderManager != null)
+                    mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
             }
             else
             if (RefreshFeedIntentService.FEED_SYNCED.equals(action)) {
