@@ -145,8 +145,8 @@ public class ThothDatabaseHelper
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT feed.*,GROUP_CONCAT(tag.title) as tags FROM feed "+
-                                " JOIN feedtag ON feed_id=feed._id "+
-                                " JOIN tag ON tag._id=feedtag.tag_id GROUP BY feed._id "+
+                                " LEFT OUTER JOIN feedtag ON feed_id=feed._id "+
+                                " LEFT OUTER JOIN tag ON tag._id=feedtag.tag_id GROUP BY feed._id "+
                                 " ORDER BY feed.title COLLATE NOCASE ASC", null);
         if (!c.moveToFirst())
             return null;
