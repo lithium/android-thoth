@@ -108,21 +108,20 @@ public class ThothMainActivity extends FragmentActivity
 
 
         //set up sync adapter
-        Account newAccount = new Account(getString(R.string.app_name), getString(R.string.sync_account_type));
-        AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
-        accountManager.addAccountExplicitly(newAccount, null, null);
         ContentResolver contentResolver = getContentResolver();
+        AccountManager accountManager = (AccountManager) getSystemService(ACCOUNT_SERVICE);
         String authority = getString(R.string.sync_provider_authority);
+        Account newAccount = new Account(getString(R.string.app_name), getString(R.string.sync_account_type));
+        if (accountManager.addAccountExplicitly(newAccount, null, null)) {
+            contentResolver.setIsSyncable(newAccount, authority, 1);
+        }
         contentResolver.addPeriodicSync(newAccount, authority, new Bundle(), 900); // 15 minutes
-        contentResolver.setIsSyncable(newAccount, authority, 1);
         contentResolver.setSyncAutomatically(newAccount, authority, true);
-
 
 
         //set up fragments
         mFragmentManager = getSupportFragmentManager();
         mFragmentManager.addOnBackStackChangedListener(this);
-//        mArticleListFragment = new ArticleListFragment();
         mSubscribeFragment = null; //create on demand
 
 
