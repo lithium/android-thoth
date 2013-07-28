@@ -128,6 +128,7 @@ public class SubscribeFragment extends Fragment
     }
 
     private void save_feeds() {
+        final String[] tags = mFeedTags.getText().toString().split(",");
         mTask = new AsyncTask<Void, Integer, Void>() {
             public ProgressBar _progress;
 
@@ -140,6 +141,8 @@ public class SubscribeFragment extends Fragment
                 _progress = (ProgressBar)mSaveProgress.findViewById(android.R.id.secondaryProgress);
                 ArrayList<Feed> feeds = mResultsAdapter.getItems();
                 _progress.setMax(feeds.size());
+
+
             }
 
             @Override
@@ -161,6 +164,11 @@ public class SubscribeFragment extends Fragment
                 if (feeds != null) {
                     int i=0;
                     for (Feed feed : feeds) {
+                        if (tags == null || tags.length < 0 || tags[0] == null || tags[0].isEmpty()) {
+                            feed.tags = new String [] {getString(R.string.unfiled)};
+                        } else {
+                            feed.tags = tags;
+                        }
                         feed.save(db);
                         publishProgress(++i);
                     }
@@ -211,7 +219,7 @@ public class SubscribeFragment extends Fragment
 
     public void setUrl(String url) {
         mUrl = url;
-        if (mUrl != null && !mUrl.startsWith("http://")) {
+        if (mUrl != null && !mUrl.startsWith("http")) {
             mUrl = "http://"+mUrl;
         }
         scan_url();
@@ -305,8 +313,7 @@ public class SubscribeFragment extends Fragment
                     }
                 }
             });
-            mCheckedItems.add(position);
-            cb.setChecked(true);
+            cb.setChecked(mCheckedItems.contains(position));
 
             tv = (TextView)root.findViewById(R.id.feed_title);
             tv.setText(feed.title);
@@ -332,6 +339,7 @@ public class SubscribeFragment extends Fragment
         public void addResult(Feed response) {
             if (mResults == null) {
                 mResults = new ArrayList<Feed>();
+                mCheckedItems.add(0);
             }
             mResults.add(response);
             notifyDataSetChanged();
