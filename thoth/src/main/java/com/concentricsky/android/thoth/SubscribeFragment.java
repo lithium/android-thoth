@@ -250,6 +250,7 @@ public class SubscribeFragment extends Fragment
         }
         else {
             mViewSwitcher.setDisplayedChild(1);
+            mInputManager.hideSoftInputFromWindow(mLinkText.getWindowToken(), 0);
             mResultsAdapter.addResult(response);
         }
     }
