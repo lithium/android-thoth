@@ -169,7 +169,7 @@ public class ThothDatabaseHelper
             c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
                                 " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
                                 (hide_unread ? " WHERE article.unread=1" : "")+
-                                " ORDER BY timestamp DESC",null);
+                                " ORDER BY timestamp DESC LIMIT 200",null);
         }
         else {
             c = db.rawQuery("SELECT "+Article.ARTICLE_TABLE_NAME+".*,feed.title as feed_title FROM "+Article.ARTICLE_TABLE_NAME+
