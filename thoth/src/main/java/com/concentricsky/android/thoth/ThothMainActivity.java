@@ -591,6 +591,7 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showManageFeeds()
     {
+        mDrawerLayout.closeDrawers();
         if (mManageFragment == null) {
             mManageFragment = new ManageFragment();
         }
