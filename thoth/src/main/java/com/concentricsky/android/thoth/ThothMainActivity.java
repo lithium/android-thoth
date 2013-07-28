@@ -68,6 +68,14 @@ public class ThothMainActivity extends FragmentActivity
     };
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
+            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
+        }
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         if (savedInstanceState == null) {
             requestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
@@ -99,9 +107,9 @@ public class ThothMainActivity extends FragmentActivity
 
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
         mLoaderManager = getSupportLoaderManager();
-        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
-            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
-        }
+//        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
+//            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
+//        }
 
         mRequestQueue = Volley.newRequestQueue(this);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
@@ -302,7 +310,7 @@ public class ThothMainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
-            if (cursor.getCount() < 3) {
+            if (cursor == null || cursor.getCount() < 2) {
                 if (mArticleListFragment != null)
                     mArticleListFragment.setNoFeeds(true);
                 mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);

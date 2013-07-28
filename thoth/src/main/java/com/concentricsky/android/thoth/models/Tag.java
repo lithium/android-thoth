@@ -11,7 +11,7 @@ public class Tag {
     public long _id;
     public String title;
 
-    public static final int DATABASE_VERSION = 10;
+    public static final int DATABASE_VERSION = 12;
 
     public static final String TAG_TABLE_NAME = "tag";
     public static final String TAG_VIEW_NAME = "tagview";
@@ -21,10 +21,11 @@ public class Tag {
                     "title TEXT,"+
                     "ordering INTEGER default 99);";
     public static final String TAG_VIEW_CREATE =  "CREATE VIEW IF NOT EXISTS "+TAG_VIEW_NAME+" AS "+
-            "SELECT tag.*,(select count(*) from article where article.unread=1 and feed_id in (select feed_id from feedtag where tag_id=tag._id)) as unread"+
+            "SELECT tag.*,(select count(*) from feedtag where tag_id=tag._id) as feed_count, (select count(*) from article where article.unread=1 and feed_id in (select feed_id from feedtag where tag_id=tag._id)) as unread"+
             " FROM "+TAG_TABLE_NAME+";";
     public static final String TAG_TABLE_INSERT = "INSERT INTO " +TAG_TABLE_NAME + " (title) VALUES (?);";
-    public static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+"; DROP VIEW IF EXISTS "+TAG_VIEW_NAME+";";
+    public static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+";";
+    public static final String TAG_VIEW_DROP = "DROP VIEW IF EXISTS "+TAG_VIEW_NAME+";";
 
 
 
@@ -37,6 +38,7 @@ public class Tag {
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {
         db.execSQL(TAG_TABLE_DROP);
+        db.execSQL(TAG_VIEW_DROP);
         createDatabase(db);
     }
     public static void createView(SQLiteDatabase db)

@@ -123,8 +123,8 @@ public class ThothDatabaseHelper
     public Cursor getTagCursor(String like, boolean hide_internal)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE "+
-                               (hide_internal ? " ordering=99 " : " ordering=ordering ")+
+        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE (ordering=0 OR feed_count > 0) "+
+                               (hide_internal ? " AND ordering=99 " : "")+
                                (like != null ? " AND title LIKE '%"+like+"%'" : "")+
                                " ORDER BY ordering,title COLLATE NOCASE ASC", null);
         if (!c.moveToFirst())
