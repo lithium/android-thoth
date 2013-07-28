@@ -78,7 +78,13 @@ public class EditFeedFragment extends Fragment
             @Override
             protected Void doInBackground(Void... voids) {
                 mFeed.title = mTitleText.getText().toString();
-                mFeed.tags = mFeedTags.getText().toString().split(",");
+
+                String unfiled = getString(R.string.unfiled);
+                String tags = mFeedTags.getText().toString();
+                mFeed.tags = tags.replaceAll(unfiled+",", "").split(",");
+                if (mFeed.tags == null || mFeed.tags.length < 0 || mFeed.tags[0] == null || mFeed.tags[0].isEmpty()) {
+                    mFeed.tags = new String [] {unfiled};
+                }
                 mFeed.save(ThothDatabaseHelper.getInstance().getWritableDatabase());
                 return null;
             }
