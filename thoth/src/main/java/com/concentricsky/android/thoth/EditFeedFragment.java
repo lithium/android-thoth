@@ -129,8 +129,9 @@ public class EditFeedFragment extends Fragment
     @Override
     public void onPause() {
         super.onPause();
-        mInputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
-
+        ThothMainActivity activity = (ThothMainActivity)getActivity();
+        mInputManager.hideSoftInputFromWindow(activity.getCurrentFocus().getWindowToken(), 0);
+        activity.reloadTags();
     }
 
     @Override

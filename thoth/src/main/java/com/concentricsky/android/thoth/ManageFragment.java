@@ -176,13 +176,11 @@ public class ManageFragment extends ListFragment
         }
     }
 
-    private void popBackStack()
-    {
+    @Override
+    public void onPause() {
+        super.onPause();
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
-        activity.getFragmentManager().popBackStack("Manage", FragmentManager.POP_BACK_STACK_INCLUSIVE);
-
-
     }
 
     @Override
