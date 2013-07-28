@@ -18,6 +18,7 @@ import com.android.volley.toolbox.Volley;
 import com.concentricsky.android.thoth.models.Feed;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Created by wiggins on 5/17/13.
@@ -155,7 +156,7 @@ public class SubscribeFragment extends Fragment
 
             @Override
             protected Void doInBackground(Void... voids) {
-                ArrayList<Feed> feeds = mResultsAdapter.getItems();
+                Feed[] feeds = mResultsAdapter.getCheckedItems();
                 SQLiteDatabase db = mDbHelper.getWritableDatabase();
                 if (feeds != null) {
                     int i=0;
@@ -223,20 +224,25 @@ public class SubscribeFragment extends Fragment
         mLinkText.setText(mUrl);
         mRequestQueue.add(new SubscribeToFeedRequest(mUrl, SubscribeFragment.this, SubscribeFragment.this));
         mProgress.setVisibility(View.VISIBLE);
+        mError.setText("");
     }
 
     @Override
     public void onResponse(Feed response) {
-        if (response.title == null) { // only found a feed url, re-scrape
-            Log.d(TAG, "Feed URL found: " + response.url);
-            if (mRequestQueue != null)
-                mRequestQueue.add(new SubscribeToFeedRequest(response.url, this, this));
+        if (mRequestQueue == null) {
+            return;
+        }
+
+        if (response.url == null) { // only found feed urls, re-submit each for scraping
+            for (String url : response.tags) {
+                Feed f = new Feed();
+                f.url = url;
+                mRequestQueue.add(new SubscribeToFeedRequest(url, this, this));
+            }
         }
         else {
-            mViewSwitcher.showNext();
-            ArrayList<Feed> feeds = new ArrayList<Feed>();
-            feeds.add(response);
-            mResultsAdapter.changeResults(feeds);
+            mViewSwitcher.setDisplayedChild(1);
+            mResultsAdapter.addResult(response);
         }
     }
 
@@ -254,10 +260,12 @@ public class SubscribeFragment extends Fragment
     {
         private final LayoutInflater mInflater;
         private ArrayList<Feed> mResults;
+        private HashSet<Integer> mCheckedItems;
 
         public FeedResultAdapter(Context context)
         {
             mInflater = LayoutInflater.from(context);
+            mCheckedItems = new HashSet<Integer>();
         }
 
         @Override
@@ -275,19 +283,29 @@ public class SubscribeFragment extends Fragment
             return i;
         }
 
+
         @Override
         public View getView(int i, View view, ViewGroup viewGroup) {
             final View root = mInflater.inflate(R.layout.item_subscribe_result, viewGroup, false);
             Feed feed = (Feed)getItem(i);
             TextView tv;
+            final int position = i;
+
 
             CheckBox cb = (CheckBox)root.findViewById(android.R.id.checkbox);
             cb.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                    root.setBackgroundResource(b ? R.color.unread_background : R.color.read_background);
+                    if (b) {
+                        root.setBackgroundResource(R.color.unread_background);
+                        mCheckedItems.add(position);
+                    } else {
+                        root.setBackgroundResource(R.color.read_background);
+                        mCheckedItems.remove(position);
+                    }
                 }
             });
+            mCheckedItems.add(position);
             cb.setChecked(true);
 
             tv = (TextView)root.findViewById(R.id.feed_title);
@@ -297,7 +315,7 @@ public class SubscribeFragment extends Fragment
             tv.setText(feed.description);
 
             tv = (TextView)root.findViewById(R.id.feed_link);
-            tv.setText(feed.link);
+            tv.setText(feed.url);
 
             return root;
         }
@@ -309,6 +327,25 @@ public class SubscribeFragment extends Fragment
 
         public ArrayList<Feed> getItems() {
             return mResults;
+        }
+
+        public void addResult(Feed response) {
+            if (mResults == null) {
+                mResults = new ArrayList<Feed>();
+            }
+            mResults.add(response);
+            notifyDataSetChanged();
+        }
+
+        public Feed[] getCheckedItems() {
+            Feed[] out = new Feed[mCheckedItems.size()];
+            int i,o=0;
+            for (i=0; i < mResults.size(); i++) {
+                if (mCheckedItems.contains(i)) {
+                    out[o++] = mResults.get(i);
+                }
+            }
+            return out;
         }
     }
 }

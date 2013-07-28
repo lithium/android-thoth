@@ -3,6 +3,7 @@ package com.concentricsky.android.thoth;
 import android.util.Log;
 import com.concentricsky.android.thoth.models.Feed;
 
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,34 +36,43 @@ public class FeedHelper {
         return parser.parse(feed, data);
     }
 
-    public static String scanHtmlForFeedUrl(String root, String data)
+    public static String[] scanHtmlForFeedUrl(String root, String data)
     {
-        Pattern rss_re = Pattern.compile("<link (.*type=\"application/rss\\+xml\".*)>");
-        Pattern atom_re = Pattern.compile("<link (.*type=\"application/atom\\+xml\".*)>");
+        Pattern feed_re = Pattern.compile("<link ([^>]*type=\"application/(?:rss|atom)\\+xml\"[^>]*)>");
         Pattern href_re = Pattern.compile("href=\"([^\"]+)\"");
+        ArrayList<String> out = new ArrayList<String>();
 
-        Matcher m;
+//        Matcher m;
         boolean found=false;
 
-        m = rss_re.matcher(data);
-        found = m.find();
-        if (!found) {
-            m = atom_re.matcher(data);
-            found = m.find();
-        }
+//        m = rss_re.matcher(data);
+//        found = m.find();
+//        if (!found) {
+//            m = atom_re.matcher(data);
+//            found = m.find();
+//        }
 
-        if (found) {
+        Matcher m = feed_re.matcher(data);
+//        if (found) {
+        while (m.find()) {
             Matcher m2 = href_re.matcher(m.group(1));
             if (m2.find()) {
                 String href = m2.group(1);
                 if (href.startsWith("http")) {
-                    return href;
+                    out.add(href);
+//                    return href;
                 }
-                return (root.endsWith("/") ? root : root+'/')+href;
+                else {
+//                return (root.endsWith("/") ? root : root+'/')+href;
+                    out.add((root.endsWith("/") ? root : root+'/')+href);
+                }
             }
         }
+        if (out.size() < 1)
+            return null;
 
-
-        return null;
+        String[] ret = new String[out.size()];
+        out.toArray(ret);
+        return ret;
     }
 }

@@ -38,10 +38,12 @@ class SubscribeToFeedRequest extends Request<Feed> {
         Feed feed = null;
 
         if (response.headers.containsKey("Content-Type") && response.headers.get("Content-Type").startsWith("text/html")) {
-            String feed_url = FeedHelper.scanHtmlForFeedUrl(mUrl, parsed);
-            if (feed_url != null) {
+//            String feed_url = FeedHelper.scanHtmlForFeedUrl(mUrl, parsed);
+            String[] feed_urls = FeedHelper.scanHtmlForFeedUrl(mUrl, parsed);
+            if (feed_urls != null) {
                 feed = new Feed();
-                feed.url = feed_url;
+                feed.tags = feed_urls;
+                feed.url = null;
                 feed.title = null; // indicate this still needs to be scraped
                 return Response.success(feed, HttpHeaderParser.parseCacheHeaders(response));
             }
