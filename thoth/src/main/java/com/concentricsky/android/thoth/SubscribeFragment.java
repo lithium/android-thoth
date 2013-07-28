@@ -188,6 +188,11 @@ public class SubscribeFragment extends Fragment
         mRequestQueue = null;
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mInputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+    }
 
     private void search_url() {
         setUrl(mLinkText.getText().toString());

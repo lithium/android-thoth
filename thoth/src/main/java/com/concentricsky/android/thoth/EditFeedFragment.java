@@ -1,12 +1,15 @@
 package com.concentricsky.android.thoth;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +29,7 @@ public class EditFeedFragment extends Fragment
     private EditText mTitleText;
     private MenuItem mSaveItem;
     private MenuItem mDeleteItem;
+    private InputMethodManager mInputManager;
 
     public EditFeedFragment(Feed feed) {
         mFeed = feed;
@@ -123,9 +127,20 @@ public class EditFeedFragment extends Fragment
     }
 
     @Override
+    public void onPause() {
+        super.onPause();
+        mInputManager.hideSoftInputFromWindow(getActivity().getCurrentFocus().getWindowToken(), 0);
+
+    }
+
+    @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        getActivity().getActionBar().setTitle(R.string.edit_feed);
+
+        FragmentActivity activity = getActivity();
+        activity.getActionBar().setTitle(R.string.edit_feed);
+
+        mInputManager = (InputMethodManager)activity.getSystemService(Context.INPUT_METHOD_SERVICE);
     }
 
     @Override
@@ -153,4 +168,5 @@ public class EditFeedFragment extends Fragment
         }
         return false;
     }
+
 }
