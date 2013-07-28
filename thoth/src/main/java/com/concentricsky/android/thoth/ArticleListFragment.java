@@ -261,6 +261,9 @@ public class ArticleListFragment extends ListFragment
                 mProgress.setVisibility(View.GONE);
                 mLoaderManager.restartLoader(ARTICLE_LOADER_ID, null, new ArticleCursorLoader());
                 mTask = null;
+
+                ThothMainActivity activity = (ThothMainActivity)getActivity();
+                activity.reloadTags();
             }
 
             @Override

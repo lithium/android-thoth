@@ -148,6 +148,8 @@ public class SubscribeFragment extends Fragment
 
             @Override
             protected void onPostExecute(Void aVoid) {
+                ThothMainActivity activity = (ThothMainActivity)getActivity();
+                activity.reloadTags();
                 getFragmentManager().popBackStack();
             }
 
