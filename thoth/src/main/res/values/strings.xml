@@ -40,8 +40,9 @@
     <string name="deleting">Deleting...</string>
     <string name="please_wait">Please wait.</string>
     <string name="action_about">About Pensive</string>
-    <string name="about_text">Pensive was designed and engineered in Eugene, Oregon by <a href="http://concentricsky.com">Concentric Sky, Inc</a>.</string>
+    <string name="about_text">Pensive is a product of <a href="http://concentricsky.com">Concentric Sky, Inc</a>.</string>
     <string name="about_credits">Engineered by Wiggins\n Designed by Jeremy AAsum</string>
+    <string name="about_contact">Suggestions? <a href="mailto:hello@concentricsky.com">Send us an email</a>.</string>
     <string name="saving_feeds">Saving feeds...</string>
     <string name="add_to_thoth">Add to Pensive</string>
     <string name="import_status_duplicate">Duplicate.</string>

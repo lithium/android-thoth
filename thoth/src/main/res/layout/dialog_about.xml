@@ -41,6 +41,14 @@
             android:layout_marginBottom="20dp"
             />
 
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            android:text="@string/about_contact"
+            android:gravity="center"
+            android:layout_marginBottom="20dp"
+            />
+
         <ImageView
                 android:layout_height="30dp"
                 android:layout_width="wrap_content"
