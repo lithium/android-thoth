@@ -29,7 +29,7 @@
     <string name="action_hide_read">Show only unread</string>
     <string name="action_mark_as_read">Mark all as read</string>
     <string name="all_feeds">All Feeds</string>
-    <string name="empty_feeds_message">There are no feeds.\n\nIn a browser use Share > Add to Pensive to search for feeds.\n\nOr click + to add a new feed.</string>
+    <string name="empty_feeds_message">No feeds yet.\n\nIn a browser share to Pensive to search for feeds, or add a feed by tapping + at the top.</string>
     <string name="all_read">All articles read.</string>
     <string name="action_manage_feeds">Manage Feeds</string>
     <string name="title">Title</string>
@@ -41,7 +41,6 @@
     <string name="please_wait">Please wait.</string>
     <string name="action_about">About Pensive</string>
     <string name="about_text">Pensive is a product of <a href="http://concentricsky.com">Concentric Sky, Inc</a>.</string>
-    <string name="about_credits">Engineered by Wiggins\n Designed by Jeremy AAsum</string>
     <string name="about_contact">Suggestions? <a href="mailto:hello@concentricsky.com">Send us an email</a>.</string>
     <string name="saving_feeds">Saving feeds...</string>
     <string name="add_to_thoth">Add to Pensive</string>

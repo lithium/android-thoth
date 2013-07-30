@@ -30,15 +30,7 @@
             android:layout_width="match_parent"
             android:text="@string/about_text"
             android:gravity="center"
-            android:layout_marginBottom="20dp"
-            />
-
-        <TextView
-            android:layout_height="wrap_content"
-            android:layout_width="match_parent"
-            android:text="@string/about_credits"
-            android:gravity="center"
-            android:layout_marginBottom="20dp"
+            android:layout_marginBottom="10dp"
             />
 
         <TextView
@@ -50,12 +42,20 @@
             />
 
         <ImageView
+            android:layout_height="1dp"
+            android:layout_width="match_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:background="@color/border"
+            ></ImageView>
+
+        <ImageView
                 android:layout_height="30dp"
                 android:layout_width="wrap_content"
                 android:src="@drawable/csky_logo"
                 android:layout_gravity="center"
                 android:layout_marginTop="20dp"
-                android:layout_marginBottom="40dp"
+                android:layout_marginBottom="30dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 />
