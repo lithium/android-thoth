@@ -37,26 +37,30 @@
                   android:layout_height="match_parent"/>
     </LinearLayout>
 
-    <LinearLayout android:id="@+id/save_progress"
-                  android:orientation="vertical"
+    <RelativeLayout android:id="@+id/save_progress"
                   android:layout_width="match_parent"
                   android:layout_height="match_parent"
                   android:visibility="gone"
             >
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:text="@string/saving_feeds"
-                android:gravity="center"
-                />
-        <ProgressBar android:id="@android:id/secondaryProgress"
-                  android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:layout_gravity="center"
-                  android:indeterminate="false"
-                  style="?android:attr/progressBarStyleLarge"
-                />
-    </LinearLayout>
+        <LinearLayout android:orientation="vertical"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_centerInParent="true"
+                      >
+            <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/saving_feeds"
+                    android:gravity="center"
+                    />
+            <ProgressBar android:id="@android:id/secondaryProgress"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_centerInParent="true"
+                      android:indeterminate="false"
+                      style="?android:attr/progressBarStyleLarge"
+                    />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>
