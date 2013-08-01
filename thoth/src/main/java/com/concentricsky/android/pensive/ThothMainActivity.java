@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -25,7 +25,6 @@ import android.widget.ImageView;
 import android.widget.SimpleCursorTreeAdapter;
 import android.widget.TextView;
 import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.DiskBasedCache;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.android.volley.toolbox.Volley;

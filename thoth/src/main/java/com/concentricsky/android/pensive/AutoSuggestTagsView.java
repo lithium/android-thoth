@@ -1,6 +1,5 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
-import android.*;
 import android.content.Context;
 import android.database.Cursor;
 import android.text.Editable;

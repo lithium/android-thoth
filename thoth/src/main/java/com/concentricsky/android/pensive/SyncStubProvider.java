@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

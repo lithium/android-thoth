@@ -1,13 +1,11 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.util.Log;
 import android.view.*;
 import android.view.inputmethod.EditorInfo;
@@ -15,7 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.*;
 import com.android.volley.*;
 import com.android.volley.toolbox.Volley;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.util.ArrayList;
 import java.util.HashSet;

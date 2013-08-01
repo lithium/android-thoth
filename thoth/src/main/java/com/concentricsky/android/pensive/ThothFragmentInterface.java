@@ -1,6 +1,5 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
-import android.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 

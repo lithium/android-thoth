@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.app.Activity;
 import android.content.*;
@@ -17,9 +17,9 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.models.Article;
-import com.concentricsky.android.thoth.models.Feed;
-import com.concentricsky.android.thoth.models.Tag;
+import com.concentricsky.android.pensive.models.Article;
+import com.concentricsky.android.pensive.models.Feed;
+import com.concentricsky.android.pensive.models.Tag;
 
 /**
  * Created by wiggins on 5/17/13.

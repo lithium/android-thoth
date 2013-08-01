@@ -1,11 +1,11 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.app.IntentService;
 import android.content.Intent;
 import android.database.Cursor;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.util.Iterator;
 import java.util.Vector;

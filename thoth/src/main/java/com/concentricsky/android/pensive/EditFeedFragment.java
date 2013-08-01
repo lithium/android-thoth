@@ -1,20 +1,16 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.content.Context;
-import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 /**
  * Created by wiggins on 7/7/13.

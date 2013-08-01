@@ -21,7 +21,7 @@
                     android:layout_alignParentRight="true"
                     android:text="@string/subscribe"
                     />
-            <com.concentricsky.android.thoth.AutoSuggestTagsView
+            <com.concentricsky.android.pensive.AutoSuggestTagsView
                     android:id="@+id/feed_tags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

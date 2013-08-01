@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,7 +14,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.ShareActionProvider;
-import com.concentricsky.android.thoth.models.Article;
+import com.concentricsky.android.pensive.models.Article;
 
 /**
  * Created by wiggins on 5/23/13.
@@ -235,19 +235,19 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                 StringBuilder builder = new StringBuilder("<head>"+
                         "<meta name=\"viewport\" width=\"initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no\"/>"+
                         "<link rel=\"stylesheet\" type=\"text/css\" href=\"file:///android_asset/css/articledetail.css\" /></head>"+
-                        "<body><h1 id=\"thoth-title\"><a href=\"")
+                        "<body><h1 id=\"pensive-title\"><a href=\"")
                         .append(article.link)
                         .append("\">")
                         .append(article.title)
                         .append("</a></h1>");
                 if (article.timestamp != null) {
-                    builder.append("<p id=\"thoth-metadata\"><span class=\"feed-name\">")
+                    builder.append("<p id=\"pensive-metadata\"><span class=\"feed-name\">")
                             .append(article.feed_title)
                             .append("</span> / <span class=\"timestamp\">")
                             .append(DateUtils.fuzzyTimestamp(getActivity(), article.timestamp.getTime()))
                             .append("</span></p>");
                 }
-                builder.append("<div id=\"thoth-content\">")
+                builder.append("<div id=\"pensive-content\">")
                         .append(article.description)
                         .append("</div></body>");
                 mWebView.loadDataWithBaseURL("http://www.youtube.com", builder.toString(), "text/html", "UTF-8", null);

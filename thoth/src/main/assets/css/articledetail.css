@@ -58,21 +58,21 @@ body {
     color: #58585b;
     line-height: 1.5em;
 }
-h1#thoth-title {
+h1#pensive-title {
     font-size: 28px;
     line-height: 1.2em;
     padding: 8% 10% 0 10%;
     font-weight: 200;
 }
-h1#thoth-title a:link,
-h1#thoth-title a:visited,
-h1#thoth-title a:hover,
-h1#thoth-title a:visited {
+h1#pensive-title a:link,
+h1#pensive-title a:visited,
+h1#pensive-title a:hover,
+h1#pensive-title a:visited {
     text-decoration: none;
     display: block;
     color: #58585b;
 }
-p#thoth-metadata {
+p#pensive-metadata {
     display: block;
     margin: 0;
     color: #777777;
@@ -80,64 +80,64 @@ p#thoth-metadata {
     margin: 0 10% 5% 10%;
     border-bottom: 1px solid #efefef;
 }
-div#thoth-content{
+div#pensive-content{
     padding: 0 10% 5% 10%;
     position: relative;
 }
-div#thoth-content a, div#thoth-content a:visited {
+div#pensive-content a, div#pensive-content a:visited {
     color: #000
 }
-div#thoth-content em {
+div#pensive-content em {
     font-style: italic;
 }
-div#thoth-content strong {
+div#pensive-content strong {
     font-weight: bold;
 }
-div#thoth-content p,
-div#thoth-content ol,
-div#thoth-content ul,
-div#thoth-content table,
-div#thoth-content pre,
-div#thoth-content blockquote {
+div#pensive-content p,
+div#pensive-content ol,
+div#pensive-content ul,
+div#pensive-content table,
+div#pensive-content pre,
+div#pensive-content blockquote {
     display: block;
     margin-bottom: 1em;
 }
-div#thoth-content h1,
-div#thoth-content h2 {
+div#pensive-content h1,
+div#pensive-content h2 {
     font-size: 1.618em;
     margin-bottom: .618em;
     line-height: 1.2em;
     margin-top: .381em;
 }
-div#thoth-content h3,
-div#thoth-content h4,
-div#thoth-content h5,
-div#thoth-content h6 {
+div#pensive-content h3,
+div#pensive-content h4,
+div#pensive-content h5,
+div#pensive-content h6 {
     font-weight: bold;
     margin-bottom: 1em;
     font-size: 1em;
     margin-top: .381em;
 }
-div#thoth-content ul, div#thoth-content ol {
+div#pensive-content ul, div#pensive-content ol {
     padding-left: 1.2em;
 }
-div#thoth-content ul li, div#thoth-content ol li {
+div#pensive-content ul li, div#pensive-content ol li {
     margin-bottom: .5em;
 }
-div#thoth-content ul li {
+div#pensive-content ul li {
     list-style: outside disc;
 }
-div#thoth-content ol li {
+div#pensive-content ol li {
     list-style: outside decimal;
 }
-div#thoth-content blockquote {
+div#pensive-content blockquote {
     padding-left: 1.2em;
     border-left: 1px solid #efefef;
 }
-div#thoth-content cite {
+div#pensive-content cite {
     font-style: italic;
 }
-div#thoth-content pre {
+div#pensive-content pre {
   margin-left: -12% !important;
   margin-right: -12% !important;
   background: #efefef;
@@ -148,15 +148,15 @@ div#thoth-content pre {
   overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
 }
-div#thoth-content pre code {
+div#pensive-content pre code {
   padding-right: 12%;
 }
 
-div#thoth-content img {
+div#pensive-content img {
     max-width: 100%;
     height: auto;
 }
-div#thoth-content iframe {
+div#pensive-content iframe {
     max-width: 100%;
     height: auto;
 }

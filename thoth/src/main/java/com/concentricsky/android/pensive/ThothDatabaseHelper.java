@@ -1,13 +1,12 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.database.sqlite.SQLiteStatement;
-import com.concentricsky.android.thoth.models.Article;
-import com.concentricsky.android.thoth.models.Feed;
-import com.concentricsky.android.thoth.models.Tag;
+import com.concentricsky.android.pensive.models.Article;
+import com.concentricsky.android.pensive.models.Feed;
+import com.concentricsky.android.pensive.models.Tag;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -56,7 +55,7 @@ public class ThothDatabaseHelper
 
 
 
-    private static final String DATABASE_NAME = "thoth.db";
+    private static final String DATABASE_NAME = "pensive.db";
     private static final int DATABASE_VERSION = Tag.DATABASE_VERSION + Feed.DATABASE_VERSION + Article.DATABASE_VERSION;
 
 

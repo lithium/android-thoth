@@ -1,13 +1,12 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.util.Log;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
 import java.util.ArrayList;

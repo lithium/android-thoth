@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.app.Activity;
 import android.content.ContentResolver;
@@ -20,7 +20,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.io.*;
 import java.net.HttpURLConnection;

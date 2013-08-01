@@ -1,7 +1,7 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.util.Log;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.util.ArrayList;
 import java.util.regex.Matcher;

@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.accounts.AbstractAccountAuthenticator;
 import android.accounts.Account;

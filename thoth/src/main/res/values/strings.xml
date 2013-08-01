@@ -50,6 +50,6 @@
     <string name="import_status_added_to">Added to:</string>
     <string name="import_status_error">Error parsing feed.</string>
     <string name="sync_account_type">pensive.concentricsky.com</string>
-    <string name="sync_provider_authority">com.concentricsky.android.thoth.provider</string>
+    <string name="sync_provider_authority">com.concentricsky.android.pensive.provider</string>
 
 </resources>

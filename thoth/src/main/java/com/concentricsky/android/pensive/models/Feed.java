@@ -1,4 +1,4 @@
-package com.concentricsky.android.thoth.models;
+package com.concentricsky.android.pensive.models;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;

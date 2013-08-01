@@ -1,8 +1,6 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
 import android.content.Context;
-
-import java.text.MessageFormat;
 
 /**
  * Created by wiggins on 6/5/13.

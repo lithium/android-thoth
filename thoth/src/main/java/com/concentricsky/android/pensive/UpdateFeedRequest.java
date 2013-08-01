@@ -1,9 +1,8 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
-import android.util.Log;
 import com.android.volley.*;
 import com.android.volley.toolbox.HttpHeaderParser;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.io.UnsupportedEncodingException;
 

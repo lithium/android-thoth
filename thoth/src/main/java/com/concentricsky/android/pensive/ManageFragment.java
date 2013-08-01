@@ -1,27 +1,20 @@
-package com.concentricsky.android.thoth;
+package com.concentricsky.android.pensive;
 
-import android.*;
-import android.app.Activity;
-import android.app.Fragment;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.content.Intent;
 import android.database.Cursor;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
-import android.util.SparseIntArray;
 import android.view.*;
 import android.widget.AbsListView;
 import android.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import com.codeslap.gist.SimpleCursorLoader;
-import com.concentricsky.android.thoth.models.Feed;
+import com.concentricsky.android.pensive.models.Feed;
 
 import java.util.ArrayList;
 import java.util.Iterator;
