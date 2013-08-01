@@ -63,6 +63,7 @@ public class SubscribeFragment extends Fragment
     }
 
 
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mViewSwitcher = (ViewSwitcher)inflater.inflate(R.layout.fragment_subscribe, container, false);
@@ -125,6 +126,12 @@ public class SubscribeFragment extends Fragment
         });
 
         return mViewSwitcher;
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        getActivity().getActionBar().setTitle(R.string.subscribe);
     }
 
     private void save_feeds() {
@@ -211,6 +218,11 @@ public class SubscribeFragment extends Fragment
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+        int i;
+        for (i=0; i < menu.size(); i++) {
+            MenuItem item = menu.getItem(i);
+            item.setVisible(false);
+        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

@@ -228,9 +228,12 @@ public class ThothMainActivity extends FragmentActivity
     public boolean onPrepareOptionsMenu(Menu menu) {
         boolean is_open = mDrawerLayout.isDrawerOpen(mDrawerList);
 
-        ThothFragmentInterface frag = getCurrentFragment();
-        if (frag != null) {
-            frag.onPrepareOptionsMenu(menu, is_open);
+        try {
+            ThothFragmentInterface frag = getCurrentFragment();
+            if (frag != null) {
+                frag.onPrepareOptionsMenu(menu, is_open);
+            }
+        } catch (java.lang.ClassCastException e) {
         }
 
         return super.onPrepareOptionsMenu(menu);
@@ -558,9 +561,7 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showSubscribe(String url)
     {
-        if (mSubscribeFragment == null) {
-            mSubscribeFragment = new SubscribeFragment();
-        }
+        mSubscribeFragment = new SubscribeFragment();
         mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         mSubscribeFragment.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
@@ -595,9 +596,7 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showImport(Uri uri)
     {
-        if (mImportFragment == null) {
-            mImportFragment = new ImportFragment();
-        }
+        mImportFragment = new ImportFragment();
         mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         mImportFragment.setZipfileUri(uri);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
@@ -609,9 +608,7 @@ public class ThothMainActivity extends FragmentActivity
     public void showManageFeeds()
     {
         mDrawerLayout.closeDrawers();
-        if (mManageFragment == null) {
-            mManageFragment = new ManageFragment();
-        }
+        mManageFragment = new ManageFragment();
         mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mManageFragment, "current_fragment").addToBackStack("Manage");
