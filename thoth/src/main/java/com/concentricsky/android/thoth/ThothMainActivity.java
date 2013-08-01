@@ -65,6 +65,7 @@ public class ThothMainActivity extends FragmentActivity
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
         THOTH_STATE_DETAIL, //ArticleFragment with article id plus ArticleListFragment state
+        THOTH_STATE_DISREGARD,
     };
 
     @Override
@@ -434,6 +435,8 @@ public class ThothMainActivity extends FragmentActivity
                         mFeedId = feed_id;
                         mActivityState = ThothActivityState.THOTH_STATE_FEED;
                         showArticleList(true);
+                    } else if (mActivityState != ThothActivityState.THOTH_STATE_FEED) {
+                        getSupportFragmentManager().popBackStack();
                     }
                     mDrawerLayout.closeDrawers();
                 }
@@ -476,6 +479,8 @@ public class ThothMainActivity extends FragmentActivity
                             mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
                             showArticleList(true);
                             mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+                        } else if (mActivityState != ThothActivityState.THOTH_STATE_ALL_FEEDS) {
+                            getSupportFragmentManager().popBackStack();
                         }
                     }
                     else {
@@ -485,6 +490,8 @@ public class ThothMainActivity extends FragmentActivity
                             mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
                             showArticleList(true);
                             mActivityState = ThothActivityState.THOTH_STATE_TAG;
+                        } else if (mActivityState != ThothActivityState.THOTH_STATE_TAG) {
+                            getSupportFragmentManager().popBackStack();
                         }
                     }
                     mDrawerLayout.closeDrawers();
@@ -554,6 +561,7 @@ public class ThothMainActivity extends FragmentActivity
         if (mSubscribeFragment == null) {
             mSubscribeFragment = new SubscribeFragment();
         }
+        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         mSubscribeFragment.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack("Subscribe");
@@ -590,6 +598,7 @@ public class ThothMainActivity extends FragmentActivity
         if (mImportFragment == null) {
             mImportFragment = new ImportFragment();
         }
+        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         mImportFragment.setZipfileUri(uri);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mImportFragment, "current_fragment").addToBackStack("Import");
@@ -603,6 +612,7 @@ public class ThothMainActivity extends FragmentActivity
         if (mManageFragment == null) {
             mManageFragment = new ManageFragment();
         }
+        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, mManageFragment, "current_fragment").addToBackStack("Manage");
         trans.commit();
