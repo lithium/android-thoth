@@ -15,7 +15,7 @@
 
     <ExpandableListView
         android:id="@+id/navigation_list"
-        android:layout_width="270dp"
+        android:layout_width="300dp"
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:choiceMode="singleChoice"

@@ -463,7 +463,7 @@ public class ThothMainActivity extends FragmentActivity
             boolean is_expanded = mDrawerList.isGroupExpanded(groupPosition);
 
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setImageResource(is_expanded ? R.drawable.collapse : R.drawable.expand);
+            iv.setImageResource(is_expanded ? R.drawable.expand : R.drawable.collapse);
             if (groupPosition == 0) {
                 iv.setVisibility(View.INVISIBLE);
             } else {
