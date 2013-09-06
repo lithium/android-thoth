@@ -140,7 +140,6 @@ public class AtomFeedParser {
                                         break;
                                     }
                                     else {
-                                        Log.v("foo", "foo");
 
                                     }
                                 }
