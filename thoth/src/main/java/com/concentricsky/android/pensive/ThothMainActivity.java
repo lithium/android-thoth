@@ -192,7 +192,7 @@ public class ThothMainActivity extends FragmentActivity
                     break;
             }
             showArticleList(false);
-            
+
             SharedPreferences prefs = getSharedPreferences("preferences", 0);
             if (!prefs.getBoolean("userUnderstandsDrawer", false)) {
                 mDrawerLayout.openDrawer(GravityCompat.START);

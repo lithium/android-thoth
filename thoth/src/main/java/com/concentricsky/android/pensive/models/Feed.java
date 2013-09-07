@@ -108,7 +108,17 @@ public class Feed {
 
         SQLiteStatement stmt = db.compileStatement("DELETE FROM "+Feed.FEED_TABLE_NAME+" WHERE _id=?");
         stmt.bindLong(1, this._id);
-        return stmt.executeUpdateDelete() > 0;
+        boolean ret = stmt.executeUpdateDelete() > 0;
+
+        stmt = db.compileStatement("DELETE FROM "+Feed.FEEDTAG_TABLE_NAME+" WHERE feed_id=?");
+        stmt.bindLong(1, this._id);
+        ret = ret && stmt.executeUpdateDelete() > 0;
+
+        stmt = db.compileStatement("DELETE FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=?");
+        stmt.bindLong(1, this._id);
+        ret = ret && stmt.executeUpdateDelete() > 0;
+
+        return ret;
     }
 
     public boolean save(SQLiteDatabase db)
