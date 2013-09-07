@@ -28,11 +28,13 @@
 
 
     <!-- menu -->
+    <!--
     <item android:id="@+id/action_manage_feeds"
           android:title="@string/action_manage_feeds"
           android:orderInCategory="1"
           android:showAsAction="never"
             />
+            -->
     <item android:id="@+id/action_toggle_unread"
           android:title="@string/action_hide_read"
           android:orderInCategory="100"

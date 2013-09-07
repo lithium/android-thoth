@@ -50,7 +50,6 @@ public class ArticleListFragment extends ListFragment
     private int mScrollPosition = -1;
     private Handler mResumeHandler;
     private MenuItem mMarkAsReadMenuItem;
-    private MenuItem mManageFeedsMenuItem;
     private View mEmpty;
     private AsyncTask<Void, Integer, Void> mTask;
 
@@ -219,9 +218,7 @@ public class ArticleListFragment extends ListFragment
         mToggleMenuItem.setTitle(mHideRead ? R.string.action_show_read : R.string.action_hide_read);
 
         mMarkAsReadMenuItem = menu.findItem(R.id.action_mark_as_read);
-        mManageFeedsMenuItem = menu.findItem(R.id.action_manage_feeds);
         mMarkAsReadMenuItem.setVisible(mNoFeeds ? false : true);
-        mManageFeedsMenuItem.setVisible(mNoFeeds ? false : true);
     }
 
     @Override
@@ -357,8 +354,7 @@ public class ArticleListFragment extends ListFragment
         if (mNoFeedsText != null) {
             mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
         }
-        if (mManageFeedsMenuItem != null)
-            mManageFeedsMenuItem.setVisible(mNoFeeds ? false : true);
+
         if (mMarkAsReadMenuItem != null)
             mMarkAsReadMenuItem.setVisible(mNoFeeds ? false : true);
         if (mRefreshMenuItem != null)

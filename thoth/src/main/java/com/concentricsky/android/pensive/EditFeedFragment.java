@@ -156,7 +156,6 @@ public class EditFeedFragment extends Fragment
 
     @Override
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        menu.findItem(R.id.action_manage_feeds).setVisible(false);
     }
 
     @Override

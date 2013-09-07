@@ -8,6 +8,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Bundle;
@@ -60,6 +62,7 @@ public class ThothMainActivity extends FragmentActivity
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
     private int mScrollTo=-1;
+    private boolean mNoFeeds=false;
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -107,9 +110,6 @@ public class ThothMainActivity extends FragmentActivity
 
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
         mLoaderManager = getSupportLoaderManager();
-//        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
-//            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
-//        }
 
         mRequestQueue = Volley.newRequestQueue(this);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
@@ -245,11 +245,6 @@ public class ThothMainActivity extends FragmentActivity
         }
 
         int itemId = item.getItemId();
-        if (itemId == R.id.action_manage_feeds) {
-            showManageFeeds();
-            return true;
-        }
-        else
         if (itemId == R.id.action_about) {
             showAboutDialog();
             return true;
@@ -313,20 +308,14 @@ public class ThothMainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
-            if (cursor == null || cursor.getCount() < 2) {
-                if (mArticleListFragment != null)
-                    mArticleListFragment.setNoFeeds(true);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                mActionBar.setHomeButtonEnabled(false);
-                mActionBar.setDisplayHomeAsUpEnabled(false);
+            if (cursor == null || cursor.getCount() < 1) {
+                mNoFeeds = true;
             } else {
-                if (mArticleListFragment != null)
-                    mArticleListFragment.setNoFeeds(false);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                mActionBar.setHomeButtonEnabled(true);
-                mActionBar.setDisplayHomeAsUpEnabled(true);
-                mDrawerAdapter.changeCursor(cursor);
+                mNoFeeds = false;
             }
+            if (mArticleListFragment != null)
+                mArticleListFragment.setNoFeeds(mNoFeeds);
+            mDrawerAdapter.changeCursor(cursor);
         }
         else {
             //loader_id is the group pos of the children cursor we are trying to load
@@ -351,18 +340,6 @@ public class ThothMainActivity extends FragmentActivity
     public void onBackStackChanged() {
         if (mSharing && mFragmentManager.getBackStackEntryCount() == 0)
             finish();
-
-
-        Cursor c = mDrawerAdapter.getCursor();
-        if (c != null && c.getCount() > 1) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            mActionBar.setHomeButtonEnabled(true);
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-        } else {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            mActionBar.setHomeButtonEnabled(false);
-            mActionBar.setDisplayHomeAsUpEnabled(false);
-        }
     }
 
 
@@ -408,16 +385,22 @@ public class ThothMainActivity extends FragmentActivity
             );
         }
 
-
-        protected void bindView(View view, Context context, Cursor cursor, boolean isLastChild) {
+        protected void bindView(View view, Context context, Cursor cursor) {
             TextView tv = (TextView) view.findViewById(android.R.id.text1);
             String title = String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title")));
-            tv.setText(title.isEmpty() ? getString(R.string.unfiled) : title);
+            tv.setText(title);
+
             tv = (TextView) view.findViewById(android.R.id.text2);
-            long unread = cursor.getLong(cursor.getColumnIndexOrThrow("unread"));
-            if (unread > 0) {
-                tv.setVisibility(View.VISIBLE);
-                tv.setText( String.valueOf(unread) );
+            int unread_idx = cursor.getColumnIndex("unread");
+            if (unread_idx != -1) {
+                long unread = cursor.getLong(unread_idx);
+                if (unread > 0) {
+                    tv.setVisibility(View.VISIBLE);
+                    tv.setText( String.valueOf(unread) );
+                }
+                else {
+                    tv.setVisibility(View.INVISIBLE);
+                }
             }
             else {
                 tv.setVisibility(View.INVISIBLE);
@@ -427,7 +410,7 @@ public class ThothMainActivity extends FragmentActivity
 
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-            bindView(view,context,cursor,isLastChild);
+            bindView(view,context,cursor);
             final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -457,14 +440,15 @@ public class ThothMainActivity extends FragmentActivity
             }
         }
         @Override
-        protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
-            bindView(view, context, cursor, isLastChild);
+        protected void bindGroupView(View view, Context context, Cursor cursor, boolean is_expanded) {
+            bindView(view, context, cursor);
             final int groupPosition = cursor.getPosition();
-            boolean is_expanded = mDrawerList.isGroupExpanded(groupPosition);
+            final long _id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
 
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
             iv.setImageResource(is_expanded ? R.drawable.expand : R.drawable.collapse);
-            if (groupPosition == 0) {
+
+            if (_id < 0) {
                 iv.setVisibility(View.INVISIBLE);
             } else {
                 iv.setVisibility(View.VISIBLE);
@@ -475,7 +459,8 @@ public class ThothMainActivity extends FragmentActivity
             left.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (groupPosition == 0) { // All feeds clicked
+                    if (_id == -2) {
+                        //all feeds
                         if (mFeedId != 0) {
                             mFeedId = 0;
                             mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
@@ -485,7 +470,12 @@ public class ThothMainActivity extends FragmentActivity
                             getSupportFragmentManager().popBackStack();
                         }
                     }
-                    else {
+                    else if (_id == -3) {
+                        //manage feeds
+                        showManageFeeds();
+                    }
+                    else if (_id > 0) {
+                        //tag
                         long tag_id = mDrawerAdapter.getGroupId(groupPosition);
                         if (mTagId != tag_id) {
                             mTagId = tag_id;
@@ -496,6 +486,7 @@ public class ThothMainActivity extends FragmentActivity
                             getSupportFragmentManager().popBackStack();
                         }
                     }
+
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -529,6 +520,19 @@ public class ThothMainActivity extends FragmentActivity
             return null;
         }
 
+        @Override
+        public void changeCursor(Cursor cursor) {
+            String[] extras_fields = new String[] {"_id", "title"};
+            MatrixCursor top_extras = new MatrixCursor(extras_fields);
+            MatrixCursor bottom_extras = new MatrixCursor(extras_fields);
+
+            if (!mNoFeeds)
+                top_extras.addRow(new String[] {"-2", getString(R.string.all_feeds)});
+            bottom_extras.addRow(new String[] {"-3", getString(R.string.action_manage_feeds)});
+
+            Cursor newCursor = new MergeCursor(new Cursor[] {top_extras, cursor, bottom_extras});
+            super.changeCursor(newCursor);
+        }
     }
 
     @Override
