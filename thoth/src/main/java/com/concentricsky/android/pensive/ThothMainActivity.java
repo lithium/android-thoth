@@ -6,6 +6,7 @@ import android.app.ActionBar;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.MatrixCursor;
@@ -191,7 +192,13 @@ public class ThothMainActivity extends FragmentActivity
                     break;
             }
             showArticleList(false);
+            
+            SharedPreferences prefs = getSharedPreferences("preferences", 0);
+            if (!prefs.getBoolean("userUnderstandsDrawer", false)) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
         }
+
 
 
     }
@@ -367,6 +374,8 @@ public class ThothMainActivity extends FragmentActivity
         @Override
         public void onDrawerOpened(View drawerView) {
             invalidateOptionsMenu();
+            SharedPreferences prefs = getSharedPreferences("preferences", 0);
+            prefs.edit().putBoolean("userUnderstandsDrawer", true).commit();
         }
     }
 
