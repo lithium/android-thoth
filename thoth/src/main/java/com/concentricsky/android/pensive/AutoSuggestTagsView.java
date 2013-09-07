@@ -41,7 +41,7 @@ public class AutoSuggestTagsView extends AutoCompleteTextView {
                     }
                     text = text.trim();
                 }
-                Cursor cursor = ThothDatabaseHelper.getInstance().getTagCursor(text, true);
+                Cursor cursor = ThothDatabaseHelper.getInstance().getTagCursor(text);
                 return cursor;
             }
         });
