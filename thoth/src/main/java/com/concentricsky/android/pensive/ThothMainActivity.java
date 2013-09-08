@@ -549,7 +549,6 @@ public class ThothMainActivity extends FragmentActivity
     public void pushArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(tag_id, feed_id);
-        frag.scrollToPosition(scroll_position, scroll_offset);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "ArticleList");
         trans.addToBackStack("ArticleList");

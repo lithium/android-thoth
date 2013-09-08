@@ -5,6 +5,7 @@ import android.content.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -48,7 +49,8 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mToggleMenuItem;
     private boolean mPaused = false;
     private SharedPreferences mPreferences;
-    private int mScrollPosition = -1;
+    private int mScrollPosition = 0;
+    private int mScrollOffset = 0;
     private Handler mResumeHandler;
     private MenuItem mMarkAsReadMenuItem;
     private View mEmpty;
@@ -94,6 +96,11 @@ public class ArticleListFragment extends ListFragment
             long tag_id = args.getLong("tag_id", -1);
             if (tag_id != -1)
                 setTag(tag_id);
+        }
+
+        if (savedInstanceState != null) {
+            mScrollPosition = savedInstanceState.getInt("scroll_position",0);
+            mScrollOffset = savedInstanceState.getInt("scroll_offset",0);
         }
     }
 
@@ -144,6 +151,12 @@ public class ArticleListFragment extends ListFragment
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+
+        if (mList != null) {
+            View v = mList.getChildAt(0);
+            outState.putInt("scroll_position", mList.getFirstVisiblePosition());
+            outState.putInt("scroll_offset", (v == null) ? 0 : v.getTop());
+        }
     }
 
 
@@ -164,7 +177,6 @@ public class ArticleListFragment extends ListFragment
         mPaused = true;
         if (mTask != null)
             mTask.cancel(true);
-        mScrollPosition = getScrollPosition();
     }
 
     @Override
@@ -387,20 +399,6 @@ public class ArticleListFragment extends ListFragment
         }
     }
 
-    public void scrollToPosition(int position, int offset) {
-        mScrollPosition = position;
-        if (mList != null && mScrollPosition != -1) {
-            mList.setSelectionFromTop(position, 0);
-        }
-    }
-
-    public int getScrollPosition() {
-        if (mList != null) {
-            return mList.getFirstVisiblePosition();
-        }
-        return -1;
-    }
-
     public void resumeArticleDetail(Handler handler) {
         mResumeHandler = handler;
     }
@@ -501,8 +499,7 @@ public class ArticleListFragment extends ListFragment
             mAdapter.changeCursor(cursor);
             if (mProgress != null)
                 mProgress.setVisibility(View.GONE);
-            if (mScrollPosition != -1)
-                mList.setSelectionFromTop(mScrollPosition, 0);
+            mList.setSelectionFromTop(mScrollPosition, mScrollOffset);
 
             if (mEmpty != null) {
                 mEmpty.setVisibility(!mNoFeeds && (cursor == null || cursor.getCount() < 1) ? View.VISIBLE : View.GONE);
