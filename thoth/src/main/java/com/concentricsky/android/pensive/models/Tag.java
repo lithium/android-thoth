@@ -32,8 +32,6 @@ public class Tag {
     public static void createDatabase(SQLiteDatabase db)
     {
         db.execSQL(TAG_TABLE_CREATE);
-        db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (1,0,?)", new String[] {"All Feeds"});
-        db.execSQL("INSERT INTO "+TAG_TABLE_NAME+ " (_id,ordering,title) VALUES (2,100,?)", new String[] {"Unfiled"});
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {

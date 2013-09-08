@@ -32,7 +32,6 @@ public class FeedHelper {
     public static Feed attemptToParseAtom(Feed feed, String data)
     {
         AtomFeedParser parser = new AtomFeedParser();
-        Log.d("THOTH", data);
         return parser.parse(feed, data);
     }
 

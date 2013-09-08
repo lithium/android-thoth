@@ -25,7 +25,7 @@ public class Article implements Serializable
     public int unread=1;
     public String feed_title;
 
-    public static final int DATABASE_VERSION = 11;
+    public static final int DATABASE_VERSION = 12;
 
     public static final String ARTICLE_TABLE_NAME = "article";
     public static final String ARTICLE_TABLE_CREATE =
@@ -51,6 +51,9 @@ public class Article implements Serializable
     public static void createDatabase(SQLiteDatabase db)
     {
         db.execSQL(ARTICLE_TABLE_CREATE);
+        db.execSQL("CREATE INDEX IF NOT EXISTS timestamp_idx ON "+ARTICLE_TABLE_NAME+" (timestamp);");
+        db.execSQL("CREATE INDEX IF NOT EXISTS unread_idx ON "+ARTICLE_TABLE_NAME+" (unread);");
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_id ON "+ARTICLE_TABLE_NAME+" (feed_id);");
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {

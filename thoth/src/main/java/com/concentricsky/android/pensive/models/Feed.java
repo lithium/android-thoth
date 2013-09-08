@@ -24,7 +24,7 @@ public class Feed {
     public String[] tags;
     public ArrayList<Article> articles;
 
-    public static final int DATABASE_VERSION = 8;
+    public static final int DATABASE_VERSION = 9;
 
     public static final String FEED_TABLE_NAME = "feed";
     public static final String FEED_VIEW_NAME = "feedview";
@@ -61,9 +61,7 @@ public class Feed {
     public static final String FEEDTAG_TABLE_CREATE =
             "CREATE TABLE " + FEEDTAG_TABLE_NAME + " ("+
                     "feed_id INTEGER,"+
-                    "tag_id INTEGER);" +
-                    "CREATE INDEX feedtag_feed_idx ON "+FEEDTAG_TABLE_NAME+" (feed_id);" +
-                    "CREATE INDEX feedtag_tag_idx ON "+FEEDTAG_TABLE_NAME+" (tag_id);";
+                    "tag_id INTEGER);";
     public static final String FEEDTAG_TABLE_DROP = "DROP TABLE IF EXISTS "+FEEDTAG_TABLE_NAME+";";
     public static final String FEEDTAG_TABLE_INSERT = "INSERT INTO " + FEEDTAG_TABLE_NAME + " (feed_id,tag_id) VALUES (?,?);";
 
@@ -74,6 +72,8 @@ public class Feed {
     {
         db.execSQL(FEED_TABLE_CREATE);
         db.execSQL(FEEDTAG_TABLE_CREATE);
+        db.execSQL("CREATE INDEX feedtag_feed_idx ON "+FEEDTAG_TABLE_NAME+" (feed_id);");
+        db.execSQL("CREATE INDEX feedtag_tag_idx ON "+FEEDTAG_TABLE_NAME+" (tag_id);");
     }
     public static void createView(SQLiteDatabase db)
     {
@@ -108,7 +108,17 @@ public class Feed {
 
         SQLiteStatement stmt = db.compileStatement("DELETE FROM "+Feed.FEED_TABLE_NAME+" WHERE _id=?");
         stmt.bindLong(1, this._id);
-        return stmt.executeUpdateDelete() > 0;
+        boolean ret = stmt.executeUpdateDelete() > 0;
+
+        stmt = db.compileStatement("DELETE FROM "+Feed.FEEDTAG_TABLE_NAME+" WHERE feed_id=?");
+        stmt.bindLong(1, this._id);
+        ret = ret && stmt.executeUpdateDelete() > 0;
+
+        stmt = db.compileStatement("DELETE FROM "+Article.ARTICLE_TABLE_NAME+" WHERE feed_id=?");
+        stmt.bindLong(1, this._id);
+        ret = ret && stmt.executeUpdateDelete() > 0;
+
+        return ret;
     }
 
     public boolean save(SQLiteDatabase db)

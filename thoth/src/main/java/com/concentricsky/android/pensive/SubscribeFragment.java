@@ -267,7 +267,6 @@ public class SubscribeFragment extends Fragment
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        Log.d(TAG, "volley error! "+error);
         mError.setText(error.toString());
         mProgress.setVisibility(View.INVISIBLE);
         mError.setVisibility(View.VISIBLE);

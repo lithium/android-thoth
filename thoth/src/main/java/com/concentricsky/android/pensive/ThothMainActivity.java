@@ -2,18 +2,22 @@ package com.concentricsky.android.pensive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
+import android.app.*;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.database.MatrixCursor;
+import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.v4.app.*;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,40 +36,39 @@ import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends FragmentActivity
-                               implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener {
+                               implements LoaderManager.LoaderCallbacks<Cursor>,
+                                          ArticleListFragment.ArticleSelectedListener
+{
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
     private ThothActionBarDrawerToggle mDrawerToggle;
-    private FragmentManager mFragmentManager;
-    private ArticleListFragment mArticleListFragment;
-    private SubscribeFragment mSubscribeFragment;
+    private DrawerItemClickListener mDrawerClickListener;
     private ThothDrawerAdapter mDrawerAdapter;
 
-
+    private FragmentManager mFragmentManager;
+    private LoaderManager mLoaderManager;
     private SparseIntArray mNavLoaderIds;
     private static final int TAG_LOADER_ID=-1;
-    private boolean mSharing = false;
-    private ArticleFragment mArticleFragment;
-    private LoaderManager mLoaderManager;
-    private SQLiteDatabase mWritableDb;
-    private DrawerItemClickListener mDrawerClickListener;
-    private ImportFragment mImportFragment;
 
-    private long mTagId = -1;
-    private long mFeedId = -1;
-    private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
-    private int mArticlePosition= -1;
-    private ManageFragment mManageFragment;
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
-    private int mScrollTo=-1;
 
-    public enum ThothActivityState {
-        THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
-        THOTH_STATE_DETAIL, //ArticleFragment with article id plus ArticleListFragment state
-        THOTH_STATE_DISREGARD,
-    };
+    private boolean mNoFeeds=false;
+
+    @Override
+    public void onArticleSelected(long article_id, long tag_id, long feed_id){
+        Fragment frag = getSupportFragmentManager().findFragmentByTag("ArticleDetail");
+        if (frag != null) { //tablet layout
+            try {
+                ArticleFragment articleFragment = (ArticleFragment)frag;
+                articleFragment.setArticle(article_id, tag_id, feed_id);
+            } catch (ClassCastException e) {}
+        } else {
+            pushArticleDetail(article_id, tag_id, feed_id);
+        }
+
+    }
 
     @Override
     protected void onResume() {
@@ -85,12 +88,12 @@ public class ThothMainActivity extends FragmentActivity
         setContentView(R.layout.activity_main);
 
 
-        setProgressBarIndeterminateVisibility(false);
-
         //set up action bar
         mActionBar = getActionBar();
         mActionBar.setDisplayHomeAsUpEnabled(true);
         mActionBar.setHomeButtonEnabled(true);
+        setProgressBarIndeterminateVisibility(false);
+
 
         //set up navigation drawer
         mDrawerLayout = (DrawerLayout)findViewById(R.id.drawer_layout);
@@ -107,9 +110,6 @@ public class ThothMainActivity extends FragmentActivity
 
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
         mLoaderManager = getSupportLoaderManager();
-//        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
-//            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
-//        }
 
         mRequestQueue = Volley.newRequestQueue(this);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
@@ -129,73 +129,37 @@ public class ThothMainActivity extends FragmentActivity
 
         //set up fragments
         mFragmentManager = getSupportFragmentManager();
-        mFragmentManager.addOnBackStackChangedListener(this);
-        mSubscribeFragment = null; //create on demand
-
-
-        if (savedInstanceState != null) {
-            String state = savedInstanceState.getString("thoth_state", null);
-            mActivityState = state != null ? ThothActivityState.valueOf(state) : ThothActivityState.THOTH_STATE_ALL_FEEDS;
-
-            mFeedId = savedInstanceState.getLong("thoth_feed_id", 0);
-            mTagId = savedInstanceState.getLong("thoth_tag_id", -1);
-            mArticlePosition = savedInstanceState.getInt("thoth_article_position", -1);
-
-            mScrollTo = savedInstanceState.getInt("thoth_scroll_position", -1);
-        }
 
 
         Intent intent = getIntent();
         if (Intent.ACTION_SEND.equals(intent.getAction())) {
             // share intent
-            mSharing = true;
             String url = intent.getStringExtra(Intent.EXTRA_TEXT);
             showSubscribe(url);
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
         }
         else
         if (Intent.ACTION_VIEW.equals(intent.getAction())) {
-            //import google reader takeout zip
-            mSharing = true;
+            //import opml / google-reader-takeout zip
             Uri uri  = getIntent().getData();
             showImport(uri);
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-        }
-        else {
-            switch (mActivityState) {
-                case THOTH_STATE_TAG:
-                    mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
-                    break;
-                case THOTH_STATE_FEED:
-                    mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
-                    break;
-                case THOTH_STATE_ALL_FEEDS:
-                    mFeedId = 0;
-                    mArticleListFragment = ArticleListFragment.newInstance(0, -1);
-                    break;
-                case THOTH_STATE_DETAIL:
-                    if (mTagId != -1) {
-                        mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
-                    }
-                    else {
-                        if (mFeedId == -1)
-                            mFeedId = 0;
-                        mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
-                    }
-                    mArticleListFragment.resumeArticleDetail(new Handler() {
-                        @Override
-                        public void handleMessage(Message msg) {
-                            showArticle(mArticleListFragment.getCursor(), mArticlePosition, true);
-                        }
-                    });
-                    break;
-            }
-            showArticleList(false);
-        }
+        } else {
 
+
+            if (savedInstanceState != null) {
+
+            }
+            else {
+                showAllFeeds();
+            }
+
+            // show the drawer if the user hasn't opened it themselves yet.
+            SharedPreferences prefs = getSharedPreferences("preferences", 0);
+            if (!prefs.getBoolean("userUnderstandsDrawer", false)) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        }
 
     }
-
 
 
 
@@ -220,7 +184,11 @@ public class ThothMainActivity extends FragmentActivity
 
     private ThothFragmentInterface getCurrentFragment()
     {
-        return (ThothFragmentInterface)mFragmentManager.findFragmentByTag("current_fragment");
+        try {
+            ThothFragmentInterface iface = (ThothFragmentInterface)mFragmentManager.findFragmentById(R.id.content_frame);
+            return iface;
+        } catch (ClassCastException e) {  }
+        return null;
     }
 
     @Override
@@ -245,11 +213,6 @@ public class ThothMainActivity extends FragmentActivity
         }
 
         int itemId = item.getItemId();
-        if (itemId == R.id.action_manage_feeds) {
-            showManageFeeds();
-            return true;
-        }
-        else
         if (itemId == R.id.action_about) {
             showAboutDialog();
             return true;
@@ -313,20 +276,14 @@ public class ThothMainActivity extends FragmentActivity
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
         int loader_id = loader.getId();
         if (loader_id == TAG_LOADER_ID) { //tag cursor
-            if (cursor == null || cursor.getCount() < 2) {
-                if (mArticleListFragment != null)
-                    mArticleListFragment.setNoFeeds(true);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-                mActionBar.setHomeButtonEnabled(false);
-                mActionBar.setDisplayHomeAsUpEnabled(false);
+            if (cursor == null || cursor.getCount() < 1) {
+                mNoFeeds = true;
             } else {
-                if (mArticleListFragment != null)
-                    mArticleListFragment.setNoFeeds(false);
-                mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                mActionBar.setHomeButtonEnabled(true);
-                mActionBar.setDisplayHomeAsUpEnabled(true);
-                mDrawerAdapter.changeCursor(cursor);
+                mNoFeeds = false;
             }
+//            if (mArticleListFragment != null)
+//                mArticleListFragment.setNoFeeds(mNoFeeds);
+            mDrawerAdapter.changeCursor(cursor);
         }
         else {
             //loader_id is the group pos of the children cursor we are trying to load
@@ -344,24 +301,6 @@ public class ThothMainActivity extends FragmentActivity
             mDrawerAdapter.changeCursor(null);
         } else {
 //            mDrawerAdapter.setChildrenCursor(loader_id, null);
-        }
-    }
-
-    @Override
-    public void onBackStackChanged() {
-        if (mSharing && mFragmentManager.getBackStackEntryCount() == 0)
-            finish();
-
-
-        Cursor c = mDrawerAdapter.getCursor();
-        if (c != null && c.getCount() > 1) {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            mActionBar.setHomeButtonEnabled(true);
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-        } else {
-            mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            mActionBar.setHomeButtonEnabled(false);
-            mActionBar.setDisplayHomeAsUpEnabled(false);
         }
     }
 
@@ -390,6 +329,8 @@ public class ThothMainActivity extends FragmentActivity
         @Override
         public void onDrawerOpened(View drawerView) {
             invalidateOptionsMenu();
+            SharedPreferences prefs = getSharedPreferences("preferences", 0);
+            prefs.edit().putBoolean("userUnderstandsDrawer", true).commit();
         }
     }
 
@@ -408,16 +349,22 @@ public class ThothMainActivity extends FragmentActivity
             );
         }
 
-
-        protected void bindView(View view, Context context, Cursor cursor, boolean isLastChild) {
+        protected void bindView(View view, Context context, Cursor cursor) {
             TextView tv = (TextView) view.findViewById(android.R.id.text1);
             String title = String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title")));
-            tv.setText(title.isEmpty() ? getString(R.string.unfiled) : title);
+            tv.setText(title);
+
             tv = (TextView) view.findViewById(android.R.id.text2);
-            long unread = cursor.getLong(cursor.getColumnIndexOrThrow("unread"));
-            if (unread > 0) {
-                tv.setVisibility(View.VISIBLE);
-                tv.setText( String.valueOf(unread) );
+            int unread_idx = cursor.getColumnIndex("unread");
+            if (unread_idx != -1) {
+                long unread = cursor.getLong(unread_idx);
+                if (unread > 0) {
+                    tv.setVisibility(View.VISIBLE);
+                    tv.setText( String.valueOf(unread) );
+                }
+                else {
+                    tv.setVisibility(View.INVISIBLE);
+                }
             }
             else {
                 tv.setVisibility(View.INVISIBLE);
@@ -427,18 +374,18 @@ public class ThothMainActivity extends FragmentActivity
 
         @Override
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
-            bindView(view,context,cursor,isLastChild);
+            bindView(view,context,cursor);
             final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
             view.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View view) {
-                    if (feed_id != mFeedId) {
-                        mArticleListFragment = ArticleListFragment.newInstance(feed_id, -1);
-                        mFeedId = feed_id;
-                        mActivityState = ThothActivityState.THOTH_STATE_FEED;
-                        showArticleList(true);
-                    } else if (mActivityState != ThothActivityState.THOTH_STATE_FEED) {
-                        getSupportFragmentManager().popBackStack();
+                    try {
+                        ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                        listener.onNavigationClickFeed(feed_id);
+                    } catch (ClassCastException e) {
+                        mFragmentManager.popBackStack(null,0);
+                        pushArticleList(-1, feed_id, 0, 0);
                     }
                     mDrawerLayout.closeDrawers();
                 }
@@ -457,14 +404,15 @@ public class ThothMainActivity extends FragmentActivity
             }
         }
         @Override
-        protected void bindGroupView(View view, Context context, Cursor cursor, boolean isLastChild) {
-            bindView(view, context, cursor, isLastChild);
+        protected void bindGroupView(View view, Context context, Cursor cursor, boolean is_expanded) {
+            bindView(view, context, cursor);
             final int groupPosition = cursor.getPosition();
-            boolean is_expanded = mDrawerList.isGroupExpanded(groupPosition);
+            final long _id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
 
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setImageResource(is_expanded ? R.drawable.collapse : R.drawable.expand);
-            if (groupPosition == 0) {
+            iv.setImageResource(is_expanded ? R.drawable.expand : R.drawable.collapse);
+
+            if (_id < 0) {
                 iv.setVisibility(View.INVISIBLE);
             } else {
                 iv.setVisibility(View.VISIBLE);
@@ -475,27 +423,35 @@ public class ThothMainActivity extends FragmentActivity
             left.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (groupPosition == 0) { // All feeds clicked
-                        if (mFeedId != 0) {
-                            mFeedId = 0;
-                            mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
-                            showArticleList(true);
-                            mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
-                        } else if (mActivityState != ThothActivityState.THOTH_STATE_ALL_FEEDS) {
-                            getSupportFragmentManager().popBackStack();
+                    if (_id == -2) {
+                        //all feeds
+                        try {
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
+                            listener.onNavigationAllFeeds();
+                        } catch (ClassCastException e) {
+
+                            mFragmentManager.popBackStack(null,0);
+
                         }
                     }
-                    else {
+                    else if (_id == -3) {
+                        //manage feeds
+                        showManageFeeds();
+                    }
+                    else if (_id > 0) {
+                        //tag
                         long tag_id = mDrawerAdapter.getGroupId(groupPosition);
-                        if (mTagId != tag_id) {
-                            mTagId = tag_id;
-                            mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
-                            showArticleList(true);
-                            mActivityState = ThothActivityState.THOTH_STATE_TAG;
-                        } else if (mActivityState != ThothActivityState.THOTH_STATE_TAG) {
-                            getSupportFragmentManager().popBackStack();
+                        try {
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
+                            listener.onNavigationClickTag(tag_id);
+                        } catch (ClassCastException e) {
+
+                            mFragmentManager.popBackStack(null,0);
+                            pushArticleList(tag_id, -1, 0, 0);
+
                         }
                     }
+
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -529,88 +485,50 @@ public class ThothMainActivity extends FragmentActivity
             return null;
         }
 
-    }
+        @Override
+        public void changeCursor(Cursor cursor) {
+            String[] extras_fields = new String[] {"_id", "title"};
+            MatrixCursor top_extras = new MatrixCursor(extras_fields);
+            MatrixCursor bottom_extras = new MatrixCursor(extras_fields);
 
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        outState.putString("thoth_state", mActivityState.name());
-        outState.putLong("thoth_feed_id", mFeedId);
-        outState.putLong("thoth_tag_id", mTagId);
-        outState.putInt("thoth_article_position", mArticlePosition);
-        outState.putInt("thoth_scroll_position", mArticleListFragment.getScrollPosition());
-        super.onSaveInstanceState(outState);
-    }
-/*
-     * Private Methods
-     */
+            if (!mNoFeeds)
+                top_extras.addRow(new String[] {"-2", getString(R.string.all_feeds)});
+            bottom_extras.addRow(new String[] {"-3", getString(R.string.action_manage_feeds)});
 
-    public void showArticleList(boolean add_to_back_stack)
-    {
-        if (mScrollTo != -1) {
-            mArticleListFragment.scrollToPosition(mScrollTo);
-            mScrollTo = -1;
+            Cursor newCursor = new MergeCursor(new Cursor[] {top_extras, cursor, bottom_extras});
+            super.changeCursor(newCursor);
         }
-        FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mArticleListFragment, "current_fragment");
-        if (add_to_back_stack)
-            trans.addToBackStack("ArticleList");
-        trans.commit();
-        invalidateOptionsMenu();
     }
 
     public void showSubscribe(String url)
     {
-        mSubscribeFragment = new SubscribeFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
-        mSubscribeFragment.setUrl(url);
+        SubscribeFragment frag = new SubscribeFragment();
+        frag.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mSubscribeFragment, "current_fragment").addToBackStack("Subscribe");
+        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Subscribe");
         trans.commit();
         invalidateOptionsMenu();
-    }
-
-    public void showArticle(Cursor cursor, int position)
-    {
-        showArticle(cursor,position,false);
-    }
-    public void showArticle(Cursor cursor, int position, boolean allow_state_loss)
-    {
-        if (mArticleFragment == null) {
-            mArticleFragment = new ArticleFragment();
-        }
-        mArticleFragment.setArticle(cursor, position);
-
-        mActivityState = ThothActivityState.THOTH_STATE_DETAIL;
-        mArticlePosition = position;
-
-        FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mArticleFragment, "current_fragment").addToBackStack("Article");
-        if (allow_state_loss)
-            trans.commitAllowingStateLoss();
-        else
-            trans.commit();
-        invalidateOptionsMenu();
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
 
     public void showImport(Uri uri)
     {
-        mImportFragment = new ImportFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
-        mImportFragment.setZipfileUri(uri);
+        ImportFragment frag = new ImportFragment();
+        frag.setZipfileUri(uri);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mImportFragment, "current_fragment").addToBackStack("Import");
+        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Import");
         trans.commit();
         invalidateOptionsMenu();
+        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     public void showManageFeeds()
     {
         mDrawerLayout.closeDrawers();
-        mManageFragment = new ManageFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
+        ManageFragment frag = new ManageFragment();
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, mManageFragment, "current_fragment").addToBackStack("Manage");
+        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Manage");
         trans.commit();
         invalidateOptionsMenu();
     }
@@ -619,4 +537,36 @@ public class ThothMainActivity extends FragmentActivity
         AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
         aboutDialogFragment.show(getSupportFragmentManager(), "About");
     }
+
+    public void showAllFeeds()
+    {
+        HomeFragment frag = HomeFragment.newInstance();
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, frag, "AllFeeds");
+        trans.commit();
+    }
+
+    public void pushArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
+    {
+        ArticleListFragment frag = ArticleListFragment.newInstance(tag_id, feed_id);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, frag, "ArticleList");
+        trans.addToBackStack("ArticleList");
+        trans.commit();
+        invalidateOptionsMenu();
+    }
+
+    public void pushArticleDetail(long article_id, long tag_id, long feed_id)
+    {
+        ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.content_frame, frag, "ArticleDetail");
+        trans.addToBackStack("ArticleDetail");
+        trans.commit();
+        invalidateOptionsMenu();
+
+
+    }
+
+
 }

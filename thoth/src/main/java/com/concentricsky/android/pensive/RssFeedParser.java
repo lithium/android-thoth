@@ -114,7 +114,6 @@ public class RssFeedParser {
                                     article.timestamp = date;
                                 }
                                 else {
-//                                    Log.v("foo", "foo");
                                     //nop
                                 }
                                 //                            article.timestamp = xpp.getText();

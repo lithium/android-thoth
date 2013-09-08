@@ -117,15 +117,14 @@ public class ThothDatabaseHelper
 
 
     public Cursor getTagCursor() {
-        return getTagCursor(null, false);
+        return getTagCursor(null);
     }
-    public Cursor getTagCursor(String like, boolean hide_internal)
+    public Cursor getTagCursor(String like)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE (ordering=0 OR feed_count > 0) "+
-                               (hide_internal ? " AND ordering=99 " : "")+
+        Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE (feed_count > 0) "+
                                (like != null ? " AND title LIKE '%"+like+"%'" : "")+
-                               " ORDER BY ordering,title COLLATE NOCASE ASC", null);
+                               " ORDER BY title COLLATE NOCASE ASC", null);
         if (!c.moveToFirst())
             return null;
         return c;
@@ -175,7 +174,7 @@ public class ThothDatabaseHelper
                     " JOIN "+Feed.FEED_TABLE_NAME+" ON feed_id="+Feed.FEED_TABLE_NAME+"._id "+
                     " WHERE feed_id=?"+
                     (hide_unread ? " AND article.unread=1" : "")+
-                    " ORDER BY timestamp DESC", new String[] {String.valueOf(feed_id)});
+                    " ORDER BY timestamp DESC LIMIT 200", new String[] {String.valueOf(feed_id)});
         }
         if (c == null || !c.moveToFirst())
             return null;
