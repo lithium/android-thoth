@@ -1,10 +1,12 @@
 package com.concentricsky.android.pensive;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
+import android.support.v4.content.Loader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.*;
@@ -14,13 +16,16 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.ShareActionProvider;
+import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.pensive.models.Article;
 
 /**
  * Created by wiggins on 5/23/13.
  */
-public class ArticleFragment extends Fragment implements ThothFragmentInterface, ViewPager.OnPageChangeListener {
-    private static final int CURSOR_LOADER_ID = 1;
+public class ArticleFragment extends Fragment implements ThothFragmentInterface,
+                                                         ViewPager.OnPageChangeListener,
+                                                         ThothNavigationDrawerListener, LoaderManager.LoaderCallbacks<Cursor> {
+    private static final int LOADER_ID_ARTICLE_CURSOR = 2;
 
     private long mFeedId;
     private long mTagId;
@@ -33,6 +38,8 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private ShareActionProvider mShareActionProvider;
     private boolean mInitializedHack=false;
     private WebView mWebView;
+    private LoaderManager mLoaderManager;
+    private boolean mHideRead;
 
 
     public static ArticleFragment newInstance(long article_id, long tag_id, long feed_id)
@@ -56,18 +63,23 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         super.onActivityCreated(savedInstanceState);
         FragmentActivity activity = getActivity();
 
+        mLoaderManager = getLoaderManager();
+        SharedPreferences preferences = activity.getSharedPreferences("preferences", 0);
+        mHideRead = preferences.getBoolean("hideUnread", false);
+
+        long article_id=-1,tag_id=-1,feed_id=-1;
         Bundle args = getArguments();
-        if (args != null) {
-            long article_id = args.getLong("article_id", -1);
-            long feed_id = args.getLong("feed_id", -1);
-            long tag_id = args.getLong("tag_id", -1);
-//            if (feed_id != -1){
-//                setFeed(feed_id);
-//            }
-//            if (tag_id != -1) {
-//                setTag(tag_id);
-//            }
+        if (savedInstanceState != null) {
+            article_id = savedInstanceState.getLong("article_id",-1);
+            tag_id = savedInstanceState.getLong("tag_id",-1);
+            feed_id = savedInstanceState.getLong("feed_id",-1);
         }
+        else if (args != null) {
+            article_id = args.getLong("article_id", -1);
+            feed_id = args.getLong("feed_id", -1);
+            tag_id = args.getLong("tag_id", -1);
+        }
+        setArticle(article_id, tag_id, feed_id);
     }
 
     @Override
@@ -79,12 +91,13 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_article, container, false);
 
+
         mAdapter = new ArticlePagerAdapter();
         mViewPager = (ViewPager)root;
         mViewPager.setAdapter(mAdapter);
         mViewPager.setOnPageChangeListener(this);
 
-        load_cursor();
+        change_cursor();
 
         return root;
     }
@@ -112,6 +125,27 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onNavigationAllFeeds() {
+        getFragmentManager().popBackStack("AllFeeds",0);
+    }
+
+    @Override
+    public void onNavigationClickTag(long tag_id) {
+        FragmentManager fm = getFragmentManager();
+        ArticleListFragment frag = (ArticleListFragment) fm.findFragmentByTag("ArticleList");
+        frag.setTag(tag_id);
+        fm.popBackStack("ArticleList", 0);
+    }
+
+    @Override
+    public void onNavigationClickFeed(long feed_id) {
+        FragmentManager fm = getFragmentManager();
+        ArticleListFragment frag = (ArticleListFragment) fm.findFragmentByTag("ArticleList");
+        frag.setFeed(feed_id);
+        fm.popBackStack("ArticleList", 0);
+    }
+
     private void visit_link(String link)
     {
         Intent i = new Intent(Intent.ACTION_VIEW);
@@ -132,21 +166,33 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onResume() {
         super.onResume();
         getActivity().invalidateOptionsMenu();
-        load_cursor();
+        change_cursor();
     }
 
+
+    public void setArticle(long article_id, long tag_id, long feed_id)
+    {
+        mArticleId = article_id;
+        mTagId = tag_id;
+        mFeedId = feed_id;
+
+        mLoaderManager.restartLoader(LOADER_ID_ARTICLE_CURSOR, null, this);
+    }
 
     public void setArticle(Cursor cursor, int position) {
         mCursor = cursor;
         mPosition = position;
     }
 
-    private void load_cursor()
+    private void change_cursor()
     {
         if (mCursor == null)
             return;
         mAdapter.changeCursor(mCursor);
-        mViewPager.setCurrentItem(mPosition, true);
+
+        int pos = mAdapter.getPositionFromId(mArticleId);
+        mViewPager.setCurrentItem(pos, true);
+
         if (!mInitializedHack && mPosition == 0) {
             // HACK: this is needed to fix THOT-37. onPageSelected isnt called for the first page the first time.
             // see: http://stackoverflow.com/questions/16074058/onpageselected-doesnt-work-for-first-page
@@ -171,6 +217,7 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                 activity.reloadTags();
             }
 
+            mArticleId = a._id;
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);
             intent.setType("text/plain");
@@ -191,6 +238,29 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         super.onPause();
         if (mWebView != null)
             mWebView.loadUrl("file:///android_asset/stop_playing_video");
+    }
+
+    @Override
+    public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
+        return new SimpleCursorLoader(getActivity()) {
+            @Override
+            public Cursor loadInBackground() {
+                if (mTagId != -1)
+                    return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideRead);
+                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideRead);
+            }
+        };
+    }
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
+        mCursor = cursor;
+        change_cursor();
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> cursorLoader) {
+
     }
 
     private class ArticlePagerAdapter extends PagerAdapter
@@ -318,5 +388,24 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             return article;
         }
 
+        public int getPositionFromId(long id) {
+            int pos;
+            int len = getCount();
+            for (pos=0; pos < len; pos++) {
+                Article a = getArticle(pos);
+                if (a._id == id)
+                    return pos;
+            }
+            return 0;
+        }
+
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("feed_id", mFeedId);
+        outState.putLong("tag_id", mTagId);
+        outState.putLong("article_id", mArticleId);
     }
 }

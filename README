@@ -132,6 +132,8 @@ ArticleListFragment
     - back pops backstack
     - action bar
         - Add: push SubscribeFragment to backstack
+    - interface
+        - onArticleSelected(article_id,tag_id,feed_id)
     - click article: push ArticleFeed to backstack
     - navigation drawer:
         - all feeds: pop backstack.

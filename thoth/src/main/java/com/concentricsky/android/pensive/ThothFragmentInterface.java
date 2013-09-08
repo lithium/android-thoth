@@ -11,4 +11,7 @@ public interface ThothFragmentInterface {
 //    public Fragment getFragment();
     public void onPrepareOptionsMenu(Menu menu, boolean drawer_open);
     public boolean onOptionsItemSelected(MenuItem item);
+
+
+
 }

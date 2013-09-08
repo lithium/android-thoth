@@ -2,7 +2,7 @@ package com.concentricsky.android.pensive;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
-import android.app.ActionBar;
+import android.app.*;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -14,6 +14,10 @@ import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -32,7 +36,7 @@ import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends FragmentActivity
-                               implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener {
+                               implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener, ArticleListFragment.ArticleSelectedListener {
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
@@ -55,6 +59,20 @@ public class ThothMainActivity extends FragmentActivity
     private int mArticlePosition= -1;
     private int mScrollTo=-1;
     private boolean mNoFeeds=false;
+
+    @Override
+    public void onArticleSelected(long article_id, long tag_id, long feed_id){
+        Fragment frag = getSupportFragmentManager().findFragmentByTag("ArticleDetail");
+        if (frag != null) { //tablet layout
+            try {
+                ArticleFragment articleFragment = (ArticleFragment)frag;
+                articleFragment.setArticle(article_id, tag_id, feed_id);
+            } catch (ClassCastException e) {}
+        } else {
+            pushArticleDetail(article_id, tag_id, feed_id);
+        }
+
+    }
 
     public enum ThothActivityState {
         THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
@@ -393,21 +411,27 @@ public class ThothMainActivity extends FragmentActivity
             bindView(view,context,cursor);
             final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
             view.setOnClickListener(new View.OnClickListener() {
+
                 @Override
                 public void onClick(View view) {
-                    if (feed_id != mFeedId) {
-
-                        mFeedId = feed_id;
-                        mActivityState = ThothActivityState.THOTH_STATE_FEED;
-//                        mArticleListFragment = ArticleListFragment.newInstance(feed_id, -1);
-//                        pushArticleList(true);
-
-                        pushArticleList(-1, feed_id, 0, 0);
-
-
-                    } else if (mActivityState != ThothActivityState.THOTH_STATE_FEED) {
-                        getSupportFragmentManager().popBackStack();
+                    try {
+                        ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                        listener.onNavigationClickFeed(feed_id);
+                    } catch (ClassCastException e) {
                     }
+//                    if (feed_id != mFeedId) {
+//
+//                        mFeedId = feed_id;
+//                        mActivityState = ThothActivityState.THOTH_STATE_FEED;
+////                        mArticleListFragment = ArticleListFragment.newInstance(feed_id, -1);
+////                        pushArticleList(true);
+//
+//                        pushArticleList(-1, feed_id, 0, 0);
+//
+//
+//                    } else if (mActivityState != ThothActivityState.THOTH_STATE_FEED) {
+//                        getSupportFragmentManager().popBackStack();
+//                    }
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -446,13 +470,10 @@ public class ThothMainActivity extends FragmentActivity
                 public void onClick(View view) {
                     if (_id == -2) {
                         //all feeds
-                        if (mFeedId != 0) {
-//                            mFeedId = 0;
-//                            mArticleListFragment = ArticleListFragment.newInstance(mFeedId, -1);
-//                            pushArticleList(true);
-//                            mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
-                        } else if (mActivityState != ThothActivityState.THOTH_STATE_ALL_FEEDS) {
-                            getSupportFragmentManager().popBackStack();
+                        try {
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                            listener.onNavigationAllFeeds();
+                        } catch (ClassCastException e) {
                         }
                     }
                     else if (_id == -3) {
@@ -462,14 +483,10 @@ public class ThothMainActivity extends FragmentActivity
                     else if (_id > 0) {
                         //tag
                         long tag_id = mDrawerAdapter.getGroupId(groupPosition);
-                        if (mTagId != tag_id) {
-//                            mTagId = tag_id;
-//                            mArticleListFragment = ArticleListFragment.newInstance(-1, mTagId);
-//                            pushArticleList(true);
-//                            mActivityState = ThothActivityState.THOTH_STATE_TAG;
-                        } else if (mActivityState != ThothActivityState.THOTH_STATE_TAG) {
-                            getSupportFragmentManager().popBackStack();
-                        }
+                        try {
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                            listener.onNavigationClickTag(tag_id);
+                        } catch (ClassCastException e) { }
                     }
 
                     mDrawerLayout.closeDrawers();
@@ -611,8 +628,10 @@ public class ThothMainActivity extends FragmentActivity
     public void showAllFeeds()
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(-1, 0);
+        frag.setArticleSelectedListener(this);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "current_fragment");
+        trans.addToBackStack("AllFeeds");
         trans.commit();
     }
 
@@ -620,6 +639,7 @@ public class ThothMainActivity extends FragmentActivity
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(tag_id, feed_id);
         frag.scrollToPosition(scroll_position, scroll_offset);
+        frag.setArticleSelectedListener(this);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "current_fragment");
         trans.addToBackStack("ArticleList");
