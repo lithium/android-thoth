@@ -496,10 +496,15 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
-            mAdapter.changeCursor(cursor);
+            if (mAdapter != null)
+                mAdapter.changeCursor(cursor);
+
             if (mProgress != null)
                 mProgress.setVisibility(View.GONE);
-            mList.setSelectionFromTop(mScrollPosition, mScrollOffset);
+            
+            if (mList != null) {
+                mList.setSelectionFromTop(mScrollPosition, mScrollOffset);
+            }
 
             if (mEmpty != null) {
                 mEmpty.setVisibility(!mNoFeeds && (cursor == null || cursor.getCount() < 1) ? View.VISIBLE : View.GONE);
@@ -516,7 +521,8 @@ public class ArticleListFragment extends ListFragment
 
         @Override
         public void onLoaderReset(Loader<Cursor> cursorLoader) {
-            mAdapter.changeCursor(null);
+            if (mAdapter != null)
+                mAdapter.changeCursor(null);
         }
     }
 
