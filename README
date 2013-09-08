@@ -98,7 +98,9 @@ h3. Action Bar
 h3. App Navigation
     referencing: http://developer.android.com/design/patterns/navigation.html
 
-
+                                      All Feeds
+                                         |
+                                         +
       +--------------------------> ArticleListView
       |                                  |       
       |                                  |      
@@ -111,6 +113,67 @@ h3. App Navigation
       |       |                          |                         |
       +-------+--------------------------+-------------------------+
 
+
+
+
+h3. Fragment Navigation
+
+HomeFragment
+    - subclass of ArticleListFragment, shows all feeds.
+    - back exits app
+    - action bar
+        - Add: push SubscribeFragment to backstack
+    - navigation drawer
+        - all feeds: do nothing.
+        - tag/feed: push ArticleListFragment to backstack.
+        - manage: push ManageFragment to backstack.
+
+ArticleListFragment
+    - back pops backstack
+    - action bar
+        - Add: push SubscribeFragment to backstack
+    - click article: push ArticleFeed to backstack
+    - navigation drawer:
+        - all feeds: pop backstack.
+        - tag/feed: switch current cursor.
+
+ArticleFeed
+    - back pops backstack
+    - action bar
+        - open in browser
+        - share to ...
+    - navigation drawer:
+        - all feeds: pop backstack twice [feed,list] to return to HomeFragment.
+        - tag/feed: switch current cursor.
+
+
+
+
+h3. Intents / SavedInstanceState
+
+
+- first time / no known state
+    - add HomeFragment to backstack
+
+- resuming from ArticleListFragment:
+        - saved state includes: tag_id, feed_id, scroll_position, scroll_offset
+    - add HomeFragment to backstack
+    - add ArticleListFragment to backstack with (tag_id,feed_id)
+    - scroll to last known position
+
+- resuming from ArticleFragment
+        - saved state includes: article_id, tag_id, feed_id
+    - add HomeFragment to backstack
+    - add ArticleFragment to backstack with (article_id)
+    - back button takes you immediately to Home
+
+- Intent:ACTION_SEND (share intent)
+    - add SubscribeFragment to backstack
+    - when done, replace self with ArticleListFragment:(feed_id=)
+
+- Intent:ACTION_VIEW (opml import)
+    - add ImportFragment to backstack
+    - when done, replace self with HomeFragment
 
 
 Components
@@ -159,22 +222,6 @@ h3. NagShop
         - $1.00    "Thanks."
         - $3.00    "This is pretty good."
         - $5.00    "Awesome app!"
-
-
-
-Wishes
-------
-
-h3. Better image viewing than reader.
-
-h3. FeedCachingService
-    - IntentService that deals with fetching and caching description tags and images to disk.
-
-h3. PollingAlarm
-    - of type RTC so as to not wake device.
-
-
-
 
 
 
