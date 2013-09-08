@@ -24,7 +24,8 @@ import com.concentricsky.android.pensive.models.Article;
  */
 public class ArticleFragment extends Fragment implements ThothFragmentInterface,
                                                          ViewPager.OnPageChangeListener,
-                                                         ThothNavigationDrawerListener, LoaderManager.LoaderCallbacks<Cursor> {
+                                                         LoaderManager.LoaderCallbacks<Cursor>
+{
     private static final int LOADER_ID_ARTICLE_CURSOR = 2;
 
     private long mFeedId;
@@ -117,27 +118,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onNavigationAllFeeds() {
-        getFragmentManager().popBackStack("AllFeeds",0);
-    }
-
-    @Override
-    public void onNavigationClickTag(long tag_id) {
-        FragmentManager fm = getFragmentManager();
-        ArticleListFragment frag = (ArticleListFragment) fm.findFragmentByTag("ArticleList");
-        frag.setTag(tag_id);
-        fm.popBackStack("ArticleList", 0);
-    }
-
-    @Override
-    public void onNavigationClickFeed(long feed_id) {
-        FragmentManager fm = getFragmentManager();
-        ArticleListFragment frag = (ArticleListFragment) fm.findFragmentByTag("ArticleList");
-        frag.setFeed(feed_id);
-        fm.popBackStack("ArticleList", 0);
     }
 
     private void visit_link(String link)

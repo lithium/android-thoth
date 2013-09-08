@@ -383,7 +383,10 @@ public class ThothMainActivity extends FragmentActivity
                     try {
                         ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
                         listener.onNavigationClickFeed(feed_id);
-                    } catch (ClassCastException e) { }
+                    } catch (ClassCastException e) {
+                        mFragmentManager.popBackStack(null,0);
+                        pushArticleList(-1, feed_id, 0, 0);
+                    }
                     mDrawerLayout.closeDrawers();
                 }
             });
@@ -425,7 +428,11 @@ public class ThothMainActivity extends FragmentActivity
                         try {
                             ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
                             listener.onNavigationAllFeeds();
-                        } catch (ClassCastException e) { }
+                        } catch (ClassCastException e) {
+
+                            mFragmentManager.popBackStack(null,0);
+
+                        }
                     }
                     else if (_id == -3) {
                         //manage feeds
@@ -437,7 +444,12 @@ public class ThothMainActivity extends FragmentActivity
                         try {
                             ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
                             listener.onNavigationClickTag(tag_id);
-                        } catch (ClassCastException e) { }
+                        } catch (ClassCastException e) {
+
+                            mFragmentManager.popBackStack(null,0);
+                            pushArticleList(tag_id, -1, 0, 0);
+
+                        }
                     }
 
                     mDrawerLayout.closeDrawers();
