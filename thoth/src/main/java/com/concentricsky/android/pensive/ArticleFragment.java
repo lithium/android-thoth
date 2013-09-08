@@ -75,6 +75,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             long tag_id = args.getLong("tag_id", -1);
             setArticle(article_id, tag_id, feed_id);
         }
+
+        if (savedInstanceState != null) {
+            mArticleId = savedInstanceState.getLong("article_id");
+        }
     }
 
     @Override
@@ -192,9 +196,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             }
 
             mArticleId = a._id;
-
-            Bundle args = getArguments();
-            args.putLong("article_id", mArticleId);
 
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);
@@ -379,4 +380,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putLong("article_id", mArticleId);
+    }
 }

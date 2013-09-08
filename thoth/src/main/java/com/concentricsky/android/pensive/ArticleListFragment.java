@@ -501,7 +501,7 @@ public class ArticleListFragment extends ListFragment
 
             if (mProgress != null)
                 mProgress.setVisibility(View.GONE);
-            
+
             if (mList != null) {
                 mList.setSelectionFromTop(mScrollPosition, mScrollOffset);
             }
