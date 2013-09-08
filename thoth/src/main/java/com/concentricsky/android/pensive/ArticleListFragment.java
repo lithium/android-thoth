@@ -81,6 +81,11 @@ public class ArticleListFragment extends ListFragment
         mPreferences = activity.getSharedPreferences("preferences", 0);
         mHideRead = mPreferences.getBoolean("hideUnread", false);
 
+        try {
+            ArticleSelectedListener iface = (ArticleSelectedListener)activity;
+            setArticleSelectedListener(iface);
+        } catch (ClassCastException e) { }
+
         Bundle args = getArguments();
         if (args != null) {
             long feed_id = args.getLong("feed_id", -1);
@@ -583,9 +588,6 @@ public class ArticleListFragment extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-//        ThothMainActivity activity = (ThothMainActivity) getActivity();
-//        Cursor cursor = mAdapter.getCursor();
-//        activity.showArticle(cursor, position);
         if (mArticleSelectedListener != null)
             mArticleSelectedListener.onArticleSelected(id, mTagId, mFeedId);
     }

@@ -67,19 +67,13 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         SharedPreferences preferences = activity.getSharedPreferences("preferences", 0);
         mHideRead = preferences.getBoolean("hideUnread", false);
 
-        long article_id=-1,tag_id=-1,feed_id=-1;
         Bundle args = getArguments();
-        if (savedInstanceState != null) {
-            article_id = savedInstanceState.getLong("article_id",-1);
-            tag_id = savedInstanceState.getLong("tag_id",-1);
-            feed_id = savedInstanceState.getLong("feed_id",-1);
+        if (args != null) {
+            long article_id = args.getLong("article_id", -1);
+            long feed_id = args.getLong("feed_id", -1);
+            long tag_id = args.getLong("tag_id", -1);
+            setArticle(article_id, tag_id, feed_id);
         }
-        else if (args != null) {
-            article_id = args.getLong("article_id", -1);
-            feed_id = args.getLong("feed_id", -1);
-            tag_id = args.getLong("tag_id", -1);
-        }
-        setArticle(article_id, tag_id, feed_id);
     }
 
     @Override
@@ -218,6 +212,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
             }
 
             mArticleId = a._id;
+
+            Bundle args = getArguments();
+            args.putLong("article_id", mArticleId);
+
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);
             intent.setType("text/plain");
@@ -401,11 +399,4 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putLong("feed_id", mFeedId);
-        outState.putLong("tag_id", mTagId);
-        outState.putLong("article_id", mArticleId);
-    }
 }
