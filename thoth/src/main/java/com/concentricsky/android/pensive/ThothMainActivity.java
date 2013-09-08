@@ -36,7 +36,9 @@ import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends FragmentActivity
-                               implements LoaderManager.LoaderCallbacks<Cursor>,FragmentManager.OnBackStackChangedListener, ArticleListFragment.ArticleSelectedListener {
+                               implements LoaderManager.LoaderCallbacks<Cursor>,
+                                          ArticleListFragment.ArticleSelectedListener
+{
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
     private ExpandableListView mDrawerList;
@@ -52,12 +54,12 @@ public class ThothMainActivity extends FragmentActivity
     private RequestQueue mRequestQueue;
     private ImageLoader mImageLoader;
 
-    private boolean mSharing = false;
-    private long mTagId = -1;
-    private long mFeedId = -1;
-    private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
-    private int mArticlePosition= -1;
-    private int mScrollTo=-1;
+//    private boolean mSharing = false;
+//    private long mTagId = -1;
+//    private long mFeedId = -1;
+//    private ThothActivityState mActivityState = ThothActivityState.THOTH_STATE_ALL_FEEDS;
+//    private int mArticlePosition= -1;
+//    private int mScrollTo=-1;
     private boolean mNoFeeds=false;
 
     @Override
@@ -74,11 +76,11 @@ public class ThothMainActivity extends FragmentActivity
 
     }
 
-    public enum ThothActivityState {
-        THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
-        THOTH_STATE_DETAIL, //ArticleFragment with article id plus ArticleListFragment state
-        THOTH_STATE_DISREGARD,
-    };
+//    public enum ThothActivityState {
+//        THOTH_STATE_ALL_FEEDS, THOTH_STATE_FEED, THOTH_STATE_TAG, //ArticleListFragment with some type of cursor
+//        THOTH_STATE_DETAIL, //ArticleFragment with article id plus ArticleListFragment state
+//        THOTH_STATE_DISREGARD,
+//    };
 
 
     @Override
@@ -140,7 +142,6 @@ public class ThothMainActivity extends FragmentActivity
 
         //set up fragments
         mFragmentManager = getSupportFragmentManager();
-        mFragmentManager.addOnBackStackChangedListener(this);
 
 
 //        if (savedInstanceState != null) {
@@ -170,19 +171,19 @@ public class ThothMainActivity extends FragmentActivity
 
             showAllFeeds();
 
-            if (savedInstanceState != null) {
-                long article_id = savedInstanceState.getLong("article_id",-1);
-                long tag_id = savedInstanceState.getLong("tag_id",-1);
-                long feed_id = savedInstanceState.getLong("feed_id",-1);
-
-                if (article_id > 0) {
-                    pushArticleDetail(article_id, tag_id, feed_id);
-                } else if (tag_id > 0 && feed_id > 0) {
-                    int scroll_position = savedInstanceState.getInt("scroll_position",0);
-                    int scroll_offset = savedInstanceState.getInt("scroll_offset",0);
-                    pushArticleList(tag_id, feed_id, scroll_position, scroll_offset);
-                }
-            }
+//            if (savedInstanceState != null) {
+//                long article_id = savedInstanceState.getLong("article_id",-1);
+//                long tag_id = savedInstanceState.getLong("tag_id",-1);
+//                long feed_id = savedInstanceState.getLong("feed_id",-1);
+//
+//                if (article_id > 0) {
+//                    pushArticleDetail(article_id, tag_id, feed_id);
+//                } else if (tag_id > 0 && feed_id > 0) {
+//                    int scroll_position = savedInstanceState.getInt("scroll_position",0);
+//                    int scroll_offset = savedInstanceState.getInt("scroll_offset",0);
+//                    pushArticleList(tag_id, feed_id, scroll_position, scroll_offset);
+//                }
+//            }
 
             // show the drawer if the user hasn't opened it themselves yet.
             SharedPreferences prefs = getSharedPreferences("preferences", 0);
@@ -332,12 +333,6 @@ public class ThothMainActivity extends FragmentActivity
         }
     }
 
-    @Override
-    public void onBackStackChanged() {
-        if (mSharing && mFragmentManager.getBackStackEntryCount() == 0)
-            finish();
-    }
-
 
 
     /*
@@ -418,6 +413,8 @@ public class ThothMainActivity extends FragmentActivity
                         ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
                         listener.onNavigationClickFeed(feed_id);
                     } catch (ClassCastException e) {
+                        //on home view
+                        pushArticleList(-1, feed_id,0,0);
                     }
 //                    if (feed_id != mFeedId) {
 //
@@ -471,10 +468,9 @@ public class ThothMainActivity extends FragmentActivity
                     if (_id == -2) {
                         //all feeds
                         try {
-                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
                             listener.onNavigationAllFeeds();
-                        } catch (ClassCastException e) {
-                        }
+                        } catch (ClassCastException e) { }
                     }
                     else if (_id == -3) {
                         //manage feeds
@@ -484,7 +480,7 @@ public class ThothMainActivity extends FragmentActivity
                         //tag
                         long tag_id = mDrawerAdapter.getGroupId(groupPosition);
                         try {
-                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
+                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
                             listener.onNavigationClickTag(tag_id);
                         } catch (ClassCastException e) { }
                     }
@@ -587,7 +583,6 @@ public class ThothMainActivity extends FragmentActivity
     public void showSubscribe(String url)
     {
         SubscribeFragment frag = new SubscribeFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         frag.setUrl(url);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Subscribe");
@@ -600,7 +595,6 @@ public class ThothMainActivity extends FragmentActivity
     public void showImport(Uri uri)
     {
         ImportFragment frag = new ImportFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         frag.setZipfileUri(uri);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Import");
@@ -613,7 +607,6 @@ public class ThothMainActivity extends FragmentActivity
     {
         mDrawerLayout.closeDrawers();
         ManageFragment frag = new ManageFragment();
-        mActivityState = ThothActivityState.THOTH_STATE_DISREGARD;
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Manage");
         trans.commit();
@@ -627,11 +620,10 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showAllFeeds()
     {
-        ArticleListFragment frag = ArticleListFragment.newInstance(-1, 0);
+        HomeFragment frag = HomeFragment.newInstance();
         frag.setArticleSelectedListener(this);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, frag, "current_fragment");
-        trans.addToBackStack("AllFeeds");
+        trans.replace(R.id.content_frame, frag, "AllFeeds");
         trans.commit();
     }
 
@@ -641,27 +633,17 @@ public class ThothMainActivity extends FragmentActivity
         frag.scrollToPosition(scroll_position, scroll_offset);
         frag.setArticleSelectedListener(this);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, frag, "current_fragment");
+        trans.replace(R.id.content_frame, frag, "ArticleList");
         trans.addToBackStack("ArticleList");
         trans.commit();
         invalidateOptionsMenu();
     }
 
-
-//    public void pushArticleDetail(long article_id, Cursor cursor)
-//    {
-//        ArticleFragment frag = ArticleFragment.newInstance(article_id,cursor);
-//        article_detail(frag);
-//    }
     public void pushArticleDetail(long article_id, long tag_id, long feed_id)
     {
         ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
-        article_detail(frag);
-    }
-    private void article_detail(ArticleFragment frag)
-    {
         FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.content_frame, frag, "current_fragment");
+        trans.replace(R.id.content_frame, frag, "ArticleDetail");
         trans.addToBackStack("ArticleDetail");
         trans.commit();
         invalidateOptionsMenu();
