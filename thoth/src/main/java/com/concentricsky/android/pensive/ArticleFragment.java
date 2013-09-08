@@ -35,6 +35,19 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private WebView mWebView;
 
 
+    public static ArticleFragment newInstance(long article_id, long tag_id, long feed_id)
+    {
+        ArticleFragment fragment = new ArticleFragment();
+
+        Bundle args = new Bundle();
+        args.putLong("article_id", article_id);
+        args.putLong("tag_id", tag_id);
+        args.putLong("feed_id", feed_id);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+
     public ArticleFragment()
     {}
 
@@ -42,6 +55,19 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         FragmentActivity activity = getActivity();
+
+        Bundle args = getArguments();
+        if (args != null) {
+            long article_id = args.getLong("article_id", -1);
+            long feed_id = args.getLong("feed_id", -1);
+            long tag_id = args.getLong("tag_id", -1);
+//            if (feed_id != -1){
+//                setFeed(feed_id);
+//            }
+//            if (tag_id != -1) {
+//                setTag(tag_id);
+//            }
+        }
     }
 
     @Override

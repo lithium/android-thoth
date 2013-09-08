@@ -56,7 +56,7 @@ public class ArticleListFragment extends ListFragment
     public ArticleListFragment() {
     }
 
-    public static ArticleListFragment newInstance(long feed_id, long tag_id) {
+    public static ArticleListFragment newInstance(long tag_id, long feed_id) {
         ArticleListFragment fragment = new ArticleListFragment();
 
         Bundle args = new Bundle();
@@ -366,7 +366,7 @@ public class ArticleListFragment extends ListFragment
         }
     }
 
-    public void scrollToPosition(int position) {
+    public void scrollToPosition(int position, int offset) {
         mScrollPosition = position;
         if (mList != null && mScrollPosition != -1) {
             mList.setSelectionFromTop(position, 0);
@@ -567,9 +567,20 @@ public class ArticleListFragment extends ListFragment
 
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
-        ThothMainActivity activity = (ThothMainActivity) getActivity();
-        Cursor cursor = mAdapter.getCursor();
-        activity.showArticle(cursor, position);
+//        ThothMainActivity activity = (ThothMainActivity) getActivity();
+//        Cursor cursor = mAdapter.getCursor();
+//        activity.showArticle(cursor, position);
+        if (mArticleSelectedListener != null)
+            mArticleSelectedListener.onArticleSelected(position);
     }
 
+
+    public interface ArticleSelectedListener {
+        void onArticleSelected(int position);
+    };
+
+    private ArticleSelectedListener mArticleSelectedListener;
+    public void setArticleSelectedListener(ArticleSelectedListener listener) {
+        mArticleSelectedListener = listener;
+    }
 }
