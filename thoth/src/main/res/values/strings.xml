@@ -51,5 +51,6 @@
     <string name="import_status_error">Error parsing feed.</string>
     <string name="sync_account_type">pensive.concentricsky.com</string>
     <string name="sync_provider_authority">com.concentricsky.android.pensive.provider</string>
+    <string name="subscribe_parse_error">Could not find any rss or atom feeds.</string>
 
 </resources>

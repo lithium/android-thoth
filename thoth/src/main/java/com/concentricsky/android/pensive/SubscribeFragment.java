@@ -267,7 +267,17 @@ public class SubscribeFragment extends Fragment
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        mError.setText(error.toString());
+        String errmsg = error.toString();
+        errmsg = errmsg.replace("java.net.UnknownHostException: ","");
+        errmsg = errmsg.replace("com.android.volley.NoConnectionError: ","");
+        errmsg = errmsg.replace("java.net.UnknownHostException: ","");
+        errmsg = errmsg.replace("com.android.volley.ParseError","").trim();
+        if (errmsg.isEmpty()) {
+            mError.setText(R.string.subscribe_parse_error);
+        }
+        else {
+            mError.setText(errmsg);
+        }
         mProgress.setVisibility(View.INVISIBLE);
         mError.setVisibility(View.VISIBLE);
     }
