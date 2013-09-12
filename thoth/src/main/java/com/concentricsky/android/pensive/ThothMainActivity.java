@@ -213,8 +213,12 @@ public class ThothMainActivity extends FragmentActivity
         }
 
         int itemId = item.getItemId();
-        if (itemId == R.id.action_about) {
+        switch (itemId) {
+        case R.id.action_about:
             showAboutDialog();
+            return true;
+        case R.id.action_subscribe:
+            showSubscribe(null);
             return true;
         }
 

@@ -44,7 +44,13 @@ public class ManageFragment extends ListFragment
         int i;
         for (i=0; i < menu.size(); i++) {
             MenuItem item = menu.getItem(i);
-            item.setVisible(false);
+            int id = item.getItemId();
+            if (id == R.id.action_subscribe || id == R.id.action_about) {
+                item.setVisible(true);
+            }
+            else {
+                item.setVisible(false);
+            }
         }
 
     }
