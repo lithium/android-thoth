@@ -1,5 +1,6 @@
 package com.concentricsky.android.pensive;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -40,7 +41,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private boolean mInitializedHack=false;
     private WebView mWebView;
     private LoaderManager mLoaderManager;
-    private boolean mHideRead;
 
 
     public static ArticleFragment newInstance(long article_id, long tag_id, long feed_id)
@@ -65,8 +65,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         FragmentActivity activity = getActivity();
 
         mLoaderManager = getLoaderManager();
-        SharedPreferences preferences = activity.getSharedPreferences("preferences", 0);
-        mHideRead = preferences.getBoolean("hideUnread", false);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -224,9 +222,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         return new SimpleCursorLoader(getActivity()) {
             @Override
             public Cursor loadInBackground() {
+                boolean hide_read = getContext().getSharedPreferences("preferences", 0).getBoolean("hideUnread", false);
                 if (mTagId != -1)
-                    return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideRead);
-                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideRead);
+                    return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, hide_read);
+                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, hide_read);
             }
         };
     }
