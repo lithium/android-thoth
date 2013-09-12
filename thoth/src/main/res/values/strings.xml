@@ -6,7 +6,7 @@
     </string>
     <string name="drawer_open" >Open navigation drawer</string>
     <string name="drawer_close" >Close navigation drawer</string>
-    <string name="subscribe_link_prompt">Enter URL:</string>
+    <string name="subscribe_link_prompt">Enter the URL of a RSS or Atom feed, or enter the URL of a website to scrape it for any possible feeds.</string>
     <string name="subscribe">Subscribe</string>
     <string name="search">Search</string>
     <string name="tags">Tags</string>
