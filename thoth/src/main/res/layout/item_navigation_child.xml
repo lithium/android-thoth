@@ -13,15 +13,30 @@
                   android:paddingLeft="8dp"
                   android:orientation="horizontal"
                 >
-        <com.android.volley.toolbox.NetworkImageView
-                   android:id="@android:id/icon1"
+
+        <FrameLayout
+                android:id="@android:id/icon1"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="12dp"
+                >
+
+                <com.android.volley.toolbox.NetworkImageView
+                   android:id="@+id/favicon"
                    android:layout_width="16dp"
                    android:layout_height="16dp"
-                   android:layout_alignParentLeft="true"
-                   android:layout_centerVertical="true"
-                   android:layout_marginRight="12dp"
                    android:src="@drawable/rss_default"
                 />
+
+                <ImageView
+                    android:id="@+id/missing_favicon"
+                    android:layout_width="16dp"
+                    android:layout_height="16dp"
+                    android:src="@drawable/rss_default"
+                    />
+        </FrameLayout>
 
         <TextView xmlns:android="http://schemas.android.com/apk/res/android"
                   android:id="@android:id/text2"

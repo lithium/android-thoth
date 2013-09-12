@@ -401,15 +401,20 @@ public class ThothMainActivity extends FragmentActivity
             });
             view.setBackgroundResource(R.color.navigation_child_background);
 
-            NetworkImageView icon = (NetworkImageView) view.findViewById(android.R.id.icon1);
-            icon.setDefaultImageResId(R.drawable.rss_default);
-            icon.setErrorImageResId(R.drawable.rss_default);
             String link = cursor.getString(cursor.getColumnIndexOrThrow("link"));
+            View default_favicon = (ImageView)view.findViewById(R.id.missing_favicon);
+            NetworkImageView icon = (NetworkImageView) view.findViewById(R.id.favicon);
             if (!TextUtils.isEmpty(link)) {
+                icon.setDefaultImageResId(R.drawable.rss_default);
+                icon.setErrorImageResId(R.drawable.rss_default);
                 icon.setImageUrl(link+"/favicon.ico", mImageLoader);
+                icon.setVisibility(View.VISIBLE);
+                default_favicon.setVisibility(View.GONE);
             }
             else {
                 icon.setImageUrl(null, mImageLoader);
+                icon.setVisibility(View.GONE);
+                default_favicon.setVisibility(View.VISIBLE);
             }
         }
         @Override
