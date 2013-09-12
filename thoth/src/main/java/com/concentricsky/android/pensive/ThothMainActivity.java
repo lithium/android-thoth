@@ -376,10 +376,15 @@ public class ThothMainActivity extends FragmentActivity
         protected void bindChildView(View view, Context context, Cursor cursor, boolean isLastChild) {
             bindView(view,context,cursor);
             final long feed_id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
+            final String title = String.valueOf(cursor.getString(cursor.getColumnIndexOrThrow("title")));
+
             view.setOnClickListener(new View.OnClickListener() {
 
                 @Override
                 public void onClick(View view) {
+
+                    getActionBar().setTitle( title );
+
                     try {
                         ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
                         listener.onNavigationClickFeed(feed_id);
@@ -441,6 +446,13 @@ public class ThothMainActivity extends FragmentActivity
                     else if (_id > 0) {
                         //tag
                         long tag_id = mDrawerAdapter.getGroupId(groupPosition);
+
+                        Cursor c = getCursor();
+                        c.moveToPosition(groupPosition);
+                        String title = String.valueOf(c.getString(c.getColumnIndexOrThrow("title")));
+                        getActionBar().setTitle( title );
+
+
                         try {
                             ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
                             listener.onNavigationClickTag(tag_id);
@@ -544,6 +556,7 @@ public class ThothMainActivity extends FragmentActivity
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.content_frame, frag, "AllFeeds");
         trans.commit();
+        mActionBar.setTitle(R.string.all_feeds);
     }
 
     public void pushArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
