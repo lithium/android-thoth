@@ -23,7 +23,8 @@ import java.util.Iterator;
  * Created by wiggins on 7/7/13.
  */
 public class ManageFragment extends ListFragment
-                            implements   ThothFragmentInterface, LoaderManager.LoaderCallbacks<Cursor> {
+                            implements   LoaderManager.LoaderCallbacks<Cursor>
+{
     private static final int LOADER_FEEDS = 1;
     private LoaderManager mLoaderManager;
     private CursorAdapter mAdapter;
@@ -36,22 +37,6 @@ public class ManageFragment extends ListFragment
                 new String[] {"title", "tags"},
                 new int[] {android.R.id.text1, android.R.id.text2},
                 0);
-
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        int i;
-        for (i=0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            int id = item.getItemId();
-            if (id == R.id.action_subscribe || id == R.id.action_about) {
-                item.setVisible(true);
-            }
-            else {
-                item.setVisible(false);
-            }
-        }
 
     }
 

@@ -23,7 +23,6 @@ import com.concentricsky.android.pensive.models.Tag;
  * Created by wiggins on 5/17/13.
  */
 public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface
 {
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
@@ -53,6 +52,7 @@ public class ArticleListFragment extends ListFragment
     private AsyncTask<Void, Integer, Void> mTask;
 
     public ArticleListFragment() {
+        setHasOptionsMenu(true);
     }
 
     public static ArticleListFragment newInstance(long tag_id, long feed_id) {
@@ -228,8 +228,11 @@ public class ArticleListFragment extends ListFragment
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean drawer_open = false;
+
         menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
+
         mRefreshMenuItem = menu.findItem(R.id.action_refresh);
         mRefreshMenuItem.setVisible(mRefreshing || mNoFeeds ? false : !drawer_open);
 
@@ -245,10 +248,6 @@ public class ArticleListFragment extends ListFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
        switch (item.getItemId()) {
-           case R.id.action_subscribe:
-               ThothMainActivity act = (ThothMainActivity)getActivity();
-               act.showSubscribe(null);
-               return true;
            case R.id.action_refresh:
                refresh_feeds();
                return true;

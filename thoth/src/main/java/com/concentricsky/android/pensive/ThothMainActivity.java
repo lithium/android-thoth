@@ -151,41 +151,11 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.thoth_main, menu);
-        menu.findItem(R.id.action_refresh).setVisible(false);
-        menu.findItem(R.id.action_subscribe).setVisible(false);
-        menu.findItem(R.id.action_share).setVisible(false);
-        menu.findItem(R.id.action_visitpage).setVisible(false);
-        menu.findItem(R.id.action_toggle_unread).setVisible(false);
-        menu.findItem(R.id.action_mark_as_read).setVisible(false);
         return true;
     }
 
 
-//    private ThothFragmentInterface getCurrentFragment()
-//    {
-//        try {
-//            ThothFragmentInterface iface = (ThothFragmentInterface)mFragmentManager.findFragmentById(R.id.content_frame);
-//            return iface;
-//        } catch (ClassCastException e) {  }
-//        return null;
-//    }
-
-//    @Override
-//    public boolean onPrepareOptionsMenu(Menu menu) {
-//        boolean is_open = mDrawerLayout.isDrawerOpen(mDrawerList);
-//
-//        try {
-//            ThothFragmentInterface frag = getCurrentFragment();
-//            if (frag != null) {
-//                frag.onPrepareOptionsMenu(menu, is_open);
-//            }
-//        } catch (java.lang.ClassCastException e) {
-//        }
-//
-//        return super.onPrepareOptionsMenu(menu);
-//    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -202,11 +172,6 @@ public class ThothMainActivity extends FragmentActivity
             showSubscribe(null);
             return true;
         }
-
-//        ThothFragmentInterface frag = getCurrentFragment();
-//        if (frag != null && frag.onOptionsItemSelected(item)) {
-//            return true;
-//        }
 
         return super.onOptionsItemSelected(item);
     }
@@ -295,35 +260,35 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showSubscribe(String url)
     {
-//        SubscribeFragment frag = new SubscribeFragment();
-//        frag.setUrl(url);
-//        FragmentTransaction trans = mFragmentManager.beginTransaction();
-//        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Subscribe");
-//        trans.commit();
-//        invalidateOptionsMenu();
+        SubscribeFragment frag = new SubscribeFragment();
+        frag.setUrl(url);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.list_frame, frag, "current_fragment").addToBackStack("Subscribe");
+        trans.commit();
+        invalidateOptionsMenu();
 //        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
 
     public void showImport(Uri uri)
     {
-//        ImportFragment frag = new ImportFragment();
-//        frag.setZipfileUri(uri);
-//        FragmentTransaction trans = mFragmentManager.beginTransaction();
-//        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Import");
-//        trans.commit();
-//        invalidateOptionsMenu();
+        ImportFragment frag = new ImportFragment();
+        frag.setZipfileUri(uri);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.list_frame, frag, "current_fragment").addToBackStack("Import");
+        trans.commit();
+        invalidateOptionsMenu();
 //        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     public void showManageFeeds()
     {
-//        mDrawerLayout.closeDrawers();
-//        ManageFragment frag = new ManageFragment();
-//        FragmentTransaction trans = mFragmentManager.beginTransaction();
-//        trans.replace(R.id.content_frame, frag, "current_fragment").addToBackStack("Manage");
-//        trans.commit();
-//        invalidateOptionsMenu();
+        ManageFragment frag = new ManageFragment();
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.list_frame, frag, "ManageFeeds");
+        trans.addToBackStack("Manage");
+        trans.commit();
+        invalidateOptionsMenu();
     }
 
     private void showAboutDialog() {
@@ -333,7 +298,7 @@ public class ThothMainActivity extends FragmentActivity
 
     public void showAllFeeds()
     {
-        HomeFragment frag = HomeFragment.newInstance();
+        ArticleListFragment frag = ArticleListFragment.newInstance(-1,0); // All Feeds
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.navigation_frame, mNavigationFragment);
         trans.replace(R.id.list_frame, frag, "AllFeeds");

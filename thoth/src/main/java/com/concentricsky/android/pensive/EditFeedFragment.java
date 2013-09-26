@@ -16,7 +16,6 @@ import com.concentricsky.android.pensive.models.Feed;
  * Created by wiggins on 7/7/13.
  */
 public class EditFeedFragment extends Fragment
-                                implements ThothFragmentInterface
 {
     private static final int LOADER_TAGS = 1;
     private final Feed mFeed;
@@ -152,10 +151,6 @@ public class EditFeedFragment extends Fragment
         inflater.inflate(R.menu.fragment_editfeed, menu);
         mDeleteItem = menu.findItem(R.id.action_delete);
         mSaveItem = menu.findItem(R.id.action_save);
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
     }
 
     @Override
