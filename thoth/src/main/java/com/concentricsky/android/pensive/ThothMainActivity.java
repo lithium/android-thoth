@@ -89,11 +89,12 @@ public class ThothMainActivity extends FragmentActivity
             mIsTabletLayout = false;
 
             //set up action bar home drawer toggle
-            mActionBar.setDisplayHomeAsUpEnabled(true);
-            mActionBar.setHomeButtonEnabled(true);
-            mDrawerToggle = new ThothActionBarDrawerToggle();
+            mDrawerToggle = new ThothActionBarDrawerToggle(this);
             mDrawerLayout.setDrawerListener(mDrawerToggle);
             mDrawerLayout.setDrawerShadow(R.drawable.drawer_shadow, GravityCompat.START);
+
+            mActionBar.setDisplayHomeAsUpEnabled(true);
+            mActionBar.setHomeButtonEnabled(true);
         }
 
 
@@ -198,29 +199,29 @@ public class ThothMainActivity extends FragmentActivity
 //        return super.onPrepareOptionsMenu(menu);
 //    }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//        if (mDrawerToggle.onOptionsItemSelected(item)) {
-//            return true;
-//        }
-//
-//        int itemId = item.getItemId();
-//        switch (itemId) {
-//        case R.id.action_about:
-//            showAboutDialog();
-//            return true;
-//        case R.id.action_subscribe:
-//            showSubscribe(null);
-//            return true;
-//        }
-//
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (mDrawerToggle != null && mDrawerToggle.onOptionsItemSelected(item)) {
+            return true;
+        }
+
+        int itemId = item.getItemId();
+        switch (itemId) {
+        case R.id.action_about:
+            showAboutDialog();
+            return true;
+        case R.id.action_subscribe:
+            showSubscribe(null);
+            return true;
+        }
+
 //        ThothFragmentInterface frag = getCurrentFragment();
 //        if (frag != null && frag.onOptionsItemSelected(item)) {
 //            return true;
 //        }
-//
-//        return super.onOptionsItemSelected(item);
-//    }
+
+        return super.onOptionsItemSelected(item);
+    }
 
 
 
@@ -229,8 +230,8 @@ public class ThothMainActivity extends FragmentActivity
      */
 
     private class ThothActionBarDrawerToggle extends ActionBarDrawerToggle {
-        public ThothActionBarDrawerToggle() {
-            super(ThothMainActivity.this, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
+        public ThothActionBarDrawerToggle(Activity activity) {
+            super(activity, mDrawerLayout, R.drawable.ic_drawer, R.string.drawer_open, R.string.drawer_close);
         }
         @Override
         public void onDrawerClosed(View drawerView) {
