@@ -21,20 +21,4 @@ public class HomeFragment extends ArticleListFragment
         return fragment;
     }
 
-    @Override
-    public void onNavigationAllFeeds() {
-
-    }
-
-    @Override
-    public void onNavigationClickTag(long tag_id) {
-        ThothMainActivity activity = (ThothMainActivity)getActivity();
-        activity.pushArticleList(tag_id, -1, 0, 0);
-    }
-
-    @Override
-    public void onNavigationClickFeed(long feed_id) {
-        ThothMainActivity activity = (ThothMainActivity)getActivity();
-        activity.pushArticleList(-1, feed_id, 0, 0);
-    }
 }

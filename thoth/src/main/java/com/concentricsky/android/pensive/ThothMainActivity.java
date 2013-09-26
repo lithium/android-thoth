@@ -4,37 +4,25 @@ import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.app.*;
 import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.database.MergeCursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.*;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.text.TextUtils;
-import android.util.SparseIntArray;
 import android.view.*;
 import android.widget.*;
-import com.android.volley.RequestQueue;
-import com.android.volley.toolbox.ImageLoader;
-import com.android.volley.toolbox.NetworkImageView;
-import com.android.volley.toolbox.Volley;
-import com.codeslap.gist.SimpleCursorLoader;
 
 
 public class ThothMainActivity extends FragmentActivity
                                implements  ArticleListFragment.ArticleSelectedListener,
-                                           FragmentManager.OnBackStackChangedListener
+                                           FragmentManager.OnBackStackChangedListener,
+                                           NavigationFragment.NavigationListener
 {
     private ActionBar mActionBar;
     private DrawerLayout mDrawerLayout;
@@ -221,6 +209,47 @@ public class ThothMainActivity extends FragmentActivity
 //        }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onFeedsDiscovered(boolean feeds_are_present) {
+
+    }
+
+    @Override
+    public void onTagClicked(long tag_id) {
+        pushArticleList(tag_id, -1, 0, 0);
+
+        //TODO: pass title in
+        //                        Cursor c = getCursor();
+        //                        c.moveToPosition(groupPosition);
+        //                        String title = String.valueOf(c.getString(c.getColumnIndexOrThrow("title")));
+        //                        getActionBar().setTitle( title );
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+    }
+
+    @Override
+    public void onFeedClicked(long feed_id) {
+        //TODO: pass title in
+//                    getActionBar().setTitle( title );
+        pushArticleList(-1, feed_id, 0, 0);
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+    }
+
+    @Override
+    public void onAllFeedsClicked() {
+        mFragmentManager.popBackStack();
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+    }
+
+    @Override
+    public void onManageFeedsClicked() {
+        showManageFeeds();
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
     }
 
 

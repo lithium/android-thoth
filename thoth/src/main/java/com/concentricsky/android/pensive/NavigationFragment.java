@@ -1,12 +1,10 @@
 package com.concentricsky.android.pensive;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.database.MergeCursor;
 import android.os.Bundle;
-import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
@@ -29,7 +27,7 @@ import com.codeslap.gist.SimpleCursorLoader;
 public class NavigationFragment extends Fragment
 
 {
-    private NavigationDrawerListener mNavigationDrawerListener;
+    private NavigationListener mNavigationListener;
     private ExpandableListView mDrawerList;
 
     private LoaderManager mLoaderManager;
@@ -43,10 +41,8 @@ public class NavigationFragment extends Fragment
     private boolean mFeedsPresent;
 
 
-    public interface NavigationDrawerListener
+    public interface NavigationListener
     {
-        public void onNavigationItemClicked(ListView l, int position, long id);
-
         public void onFeedsDiscovered(boolean feeds_are_present);
 
         public void onTagClicked(long tag_id);
@@ -54,7 +50,7 @@ public class NavigationFragment extends Fragment
         public void onAllFeedsClicked();
         public void onManageFeedsClicked();
     };
-    public void setNavigationListener(NavigationDrawerListener listener) { mNavigationDrawerListener = listener; }
+    public void setNavigationListener(NavigationListener listener) { mNavigationListener = listener; }
 
 
     @Override
@@ -79,9 +75,9 @@ public class NavigationFragment extends Fragment
         FragmentActivity activity = getActivity();
 
         try {
-            setNavigationListener((NavigationDrawerListener)activity);
+            setNavigationListener((NavigationListener)activity);
         } catch (ClassCastException e) {
-            mNavigationDrawerListener = null;
+            mNavigationListener = null;
         }
 
         mDrawerAdapter = new ThothDrawerAdapter(activity);
@@ -130,13 +126,13 @@ public class NavigationFragment extends Fragment
         public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
             int loader_id = loader.getId();
             if (loader_id == TAG_LOADER_ID) { //tag cursor
-                if (mNavigationDrawerListener != null) {
+                if (mNavigationListener != null) {
                     if (cursor == null || cursor.getCount() < 1) {
                         mFeedsPresent = false;
                     } else {
                         mFeedsPresent = true;
                     }
-                    mNavigationDrawerListener.onFeedsDiscovered(mFeedsPresent);
+                    mNavigationListener.onFeedsDiscovered(mFeedsPresent);
                 }
                 mDrawerAdapter.changeCursor(cursor);
             }
@@ -208,20 +204,9 @@ public class NavigationFragment extends Fragment
                 @Override
                 public void onClick(View view) {
 
-                    if (mNavigationDrawerListener != null) {
-                        mNavigationDrawerListener.onFeedClicked(feed_id);
+                    if (mNavigationListener != null) {
+                        mNavigationListener.onFeedClicked(feed_id);
                     }
-
-                    //TODO: move to mainactivity
-//                    getActionBar().setTitle( title );
-//                    try {
-//                        ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)getCurrentFragment();
-//                        listener.onNavigationClickFeed(feed_id);
-//                    } catch (ClassCastException e) {
-//                        mFragmentManager.popBackStack(null,0);
-//                        pushArticleList(-1, feed_id, 0, 0);
-//                    }
-//                    mDrawerLayout.closeDrawers();
 
                 }
             });
@@ -264,58 +249,24 @@ public class NavigationFragment extends Fragment
                 @Override
                 public void onClick(View view) {
 
-                    if (mNavigationDrawerListener != null) {
+                    if (mNavigationListener != null) {
 
                         if (_id == -2) {
                             //all feeds
-                            mNavigationDrawerListener.onAllFeedsClicked();
-
-// todo: move to main activity
-//                            try {
-//                                ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
-//                                listener.onNavigationAllFeeds();
-//                            } catch (ClassCastException e) {
-//
-//                                mFragmentManager.popBackStack(null,0);
-//
-//                            }
+                            mNavigationListener.onAllFeedsClicked();
                         }
                         else if (_id == -3) {
                             //manage feeds
-                            mNavigationDrawerListener.onManageFeedsClicked();
-
-
-// todo: move to main activity
-    //                        showManageFeeds();
+                            mNavigationListener.onManageFeedsClicked();
                         }
                         else if (_id > 0) {
                             //tag
                             long tag_id = mDrawerAdapter.getGroupId(groupPosition);
-                            mNavigationDrawerListener.onTagClicked(tag_id);
-
-
-// todo: move to main activity
-
-    //                        Cursor c = getCursor();
-    //                        c.moveToPosition(groupPosition);
-    //                        String title = String.valueOf(c.getString(c.getColumnIndexOrThrow("title")));
-    //                        getActionBar().setTitle( title );
-    //
-    //
-    //                        try {
-    //                            ThothNavigationDrawerListener listener = (ThothNavigationDrawerListener)mFragmentManager.findFragmentById(R.id.content_frame);
-    //                            listener.onNavigationClickTag(tag_id);
-    //                        } catch (ClassCastException e) {
-    //
-    //                            mFragmentManager.popBackStack(null,0);
-    //                            pushArticleList(tag_id, -1, 0, 0);
-    //
-    //                        }
+                            mNavigationListener.onTagClicked(tag_id);
                         }
                     }
 
-// todo: move to main activity
-//                    mDrawerLayout.closeDrawers();
+
                 }
             });
             right.setOnClickListener(new View.OnClickListener() {

@@ -23,8 +23,7 @@ import com.concentricsky.android.pensive.models.Tag;
  * Created by wiggins on 5/17/13.
  */
 public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface,
-                                            ThothNavigationDrawerListener
+                                 implements ThothFragmentInterface
 {
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
@@ -261,21 +260,6 @@ public class ArticleListFragment extends ListFragment
                return true;
        }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onNavigationAllFeeds() {
-        getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onNavigationClickTag(long tag_id) {
-        setTag(tag_id);
-    }
-
-    @Override
-    public void onNavigationClickFeed(long feed_id) {
-        setFeed(feed_id);
     }
 
     private void markAllAsRead() {
