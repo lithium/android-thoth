@@ -13,10 +13,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.pensive.models.Article;
 import com.concentricsky.android.pensive.models.Feed;
@@ -204,6 +201,12 @@ public class ArticleListFragment extends ListFragment
         mFeedId = feed_id;
         load_feed();
     }
+    public void setTagFeed(long tag_id, long feed_id)
+    {
+        mTagId = tag_id;
+        mFeedId = feed_id;
+        load_feed();
+    }
     private void load_feed()
     {
         if (mLoaderManager == null) {
@@ -350,6 +353,13 @@ public class ArticleListFragment extends ListFragment
         intent.putExtra("feed_id", mFeedId);
         intent.putExtra("tag_id", mTagId);
         activity.startService(intent);
+    }
+
+    public void setLayoutWidth(int width) {
+        if (mList != null) {
+            mList.setLayoutParams(new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.MATCH_PARENT));
+        }
+
     }
 
     public class SyncResponseReceiver extends BroadcastReceiver {

@@ -8,11 +8,21 @@
     >
 
     <FrameLayout
-        android:id="@+id/content_frame"
+        android:id="@+id/list_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />
 
+
+    <FrameLayout
+        android:id="@+id/navigation_frame"
+        android:layout_width="300dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="#eee"
+        />
+
+    <!-- todo: move to to navigation fragment
     <ExpandableListView
         android:id="@+id/navigation_list"
         android:layout_width="300dp"
@@ -22,6 +32,7 @@
         android:background="#eee"
         android:groupIndicator="@null"
         />
+        -->
 
 
 
