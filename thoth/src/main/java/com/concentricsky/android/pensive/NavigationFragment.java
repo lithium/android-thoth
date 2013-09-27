@@ -235,7 +235,7 @@ public class NavigationFragment extends Fragment
             final long _id = cursor.getLong(cursor.getColumnIndexOrThrow("_id"));
 
             ImageView iv = (ImageView)view.findViewById(R.id.group_indicator);
-            iv.setImageResource(is_expanded ? R.drawable.expand : R.drawable.collapse);
+            iv.setImageResource(is_expanded ? R.drawable.collapse : R.drawable.expand);
 
             if (_id < 0) {
                 iv.setVisibility(View.INVISIBLE);
