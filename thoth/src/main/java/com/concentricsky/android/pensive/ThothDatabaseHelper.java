@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
  */
 public class ThothDatabaseHelper
 {
+    private static final boolean DEBUG_REBUILD_VIEWS = false;
     private static ThothDatabaseHelper instance = null;
     private ThothOpenHelper mOpenHelper;
 
@@ -47,6 +48,7 @@ public class ThothDatabaseHelper
 
     public void init(Context context) {
        mOpenHelper = new ThothOpenHelper(context);
+
     }
 
 
@@ -121,6 +123,12 @@ public class ThothDatabaseHelper
     }
     public Cursor getTagCursor(String like)
     {
+        if (DEBUG_REBUILD_VIEWS) {
+            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            Feed.createView(db);
+            Tag.createView(db);
+        }
+
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE (feed_count > 0) "+
                                (like != null ? " AND title LIKE '%"+like+"%'" : "")+
