@@ -17,6 +17,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.view.*;
 import android.widget.*;
+import com.concentricsky.android.pensive.models.Feed;
 
 
 public class ThothMainActivity extends FragmentActivity
@@ -291,6 +292,16 @@ public class ThothMainActivity extends FragmentActivity
         invalidateOptionsMenu();
     }
 
+    public void showEditFeed(Feed feed)
+    {
+        EditFeedFragment frag = new EditFeedFragment(feed);
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.list_frame, frag, "EditFeed");
+        trans.addToBackStack("EditFeed");
+        trans.commit();
+        invalidateOptionsMenu();
+    }
+
     private void showAboutDialog() {
         AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
         aboutDialogFragment.show(getSupportFragmentManager(), "About");
@@ -305,6 +316,7 @@ public class ThothMainActivity extends FragmentActivity
         trans.commit();
         mActionBar.setTitle(R.string.all_feeds);
     }
+
 
     public void pushArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
     {

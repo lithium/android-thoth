@@ -201,9 +201,7 @@ public class ManageFragment extends ListFragment
     }
 
     private void edit_feed_at(int position) {
-        //todo: move to main activity
-//        FragmentTransaction trans = getFragmentManager().beginTransaction();
-//        trans.replace(R.id.content_frame, new EditFeedFragment(get_feed_at(position)), "current_fragment").addToBackStack("EditFeed");
-//        trans.commit();
+        ThothMainActivity activity = (ThothMainActivity)getActivity();
+        activity.showEditFeed(get_feed_at(position));
     }
 }
