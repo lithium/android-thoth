@@ -4,26 +4,33 @@
           android:orderInCategory="10"
           android:icon="@drawable/navigation_refresh"
           android:title="Refresh"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="ifRoom"
+          android:visible="false"
+            />
 
     <item android:id="@+id/action_subscribe"
           android:orderInCategory="20"
           android:icon="@drawable/content_new"
           android:title="Subscribe"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="ifRoom"
+          android:visible="false"
+            />
 
     <item android:id="@+id/action_visitpage"
-          android:orderInCategory="10"
+          android:orderInCategory="30"
           android:icon="@drawable/location_web_site"
           android:title="Visit Page"
-          android:showAsAction="ifRoom" />
+          android:showAsAction="ifRoom"
+          android:visible="false"
+            />
 
     <item android:id="@+id/action_share"
-          android:orderInCategory="20"
+          android:orderInCategory="40"
           android:icon="@drawable/social_share"
           android:title="Share"
           android:showAsAction="ifRoom"
           android:actionProviderClass="android.widget.ShareActionProvider"
+          android:visible="false"
             />
 
 
@@ -39,11 +46,13 @@
           android:title="@string/action_hide_read"
           android:orderInCategory="100"
           android:showAsAction="never"
+          android:visible="false"
           />
     <item android:id="@+id/action_mark_as_read"
           android:title="@string/action_mark_as_read"
           android:orderInCategory="100"
           android:showAsAction="never"
+          android:visible="false"
             />
     <item android:id="@+id/action_about"
           android:title="@string/action_about"

@@ -1,5 +1,6 @@
 package com.concentricsky.android.pensive;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.database.Cursor;
@@ -22,8 +23,7 @@ import com.concentricsky.android.pensive.models.Article;
 /**
  * Created by wiggins on 5/23/13.
  */
-public class ArticleFragment extends Fragment implements ThothFragmentInterface,
-                                                         ViewPager.OnPageChangeListener,
+public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeListener,
                                                          LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final int LOADER_ID_ARTICLE_CURSOR = 2;
@@ -40,7 +40,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
     private boolean mInitializedHack=false;
     private WebView mWebView;
     private LoaderManager mLoaderManager;
-    private boolean mHideRead;
 
 
     public static ArticleFragment newInstance(long article_id, long tag_id, long feed_id)
@@ -57,7 +56,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
 
     public ArticleFragment()
-    {}
+    {
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -65,8 +66,6 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         FragmentActivity activity = getActivity();
 
         mLoaderManager = getLoaderManager();
-        SharedPreferences preferences = activity.getSharedPreferences("preferences", 0);
-        mHideRead = preferences.getBoolean("hideUnread", false);
 
         Bundle args = getArguments();
         if (args != null) {
@@ -133,7 +132,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean drawer_open = false;
+
         MenuItem share =  menu.findItem(R.id.action_share);
         share.setVisible(!drawer_open);
         mShareActionProvider = (ShareActionProvider)share.getActionProvider();
@@ -224,9 +225,10 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
         return new SimpleCursorLoader(getActivity()) {
             @Override
             public Cursor loadInBackground() {
+                boolean hide_read = getContext().getSharedPreferences("preferences", 0).getBoolean("hideUnread", false);
                 if (mTagId != -1)
-                    return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, mHideRead);
-                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, mHideRead);
+                    return ThothDatabaseHelper.getInstance().getArticleCursorByTag(mTagId, hide_read);
+                return ThothDatabaseHelper.getInstance().getArticleCursor(mFeedId, hide_read);
             }
         };
     }

@@ -38,7 +38,12 @@ public class Feed {
                     "ttl INTEGER,"+
                     "timestamp INTEGER);";
     public static final String FEED_VIEW_CREATE = "CREATE VIEW IF NOT EXISTS "+FEED_VIEW_NAME+" AS "+
-            "SELECT feed.*,(select count(*) from article where unread=1 and feed_id=feed._id) as unread FROM "+FEED_TABLE_NAME+"; ";
+            " SELECT feed.*,"+
+            " feedtag.tag_id as tag_id,"+
+            " (select count(*) from article where unread=1 and feed_id=feed._id) as unread"+
+            " FROM "+FEED_TABLE_NAME+
+            " JOIN feedtag ON feed._id=feedtag.feed_id"+
+            "; ";
     public static final String FEED_TABLE_DROP = "DROP TABLE IF EXISTS "+FEED_TABLE_NAME+"; DROP VIEW IF EXISTS "+FEED_VIEW_NAME+";";
     public static final String FEED_TABLE_INSERT = "INSERT INTO " + FEED_TABLE_NAME + " (" +
             "url,"+
@@ -77,6 +82,7 @@ public class Feed {
     }
     public static void createView(SQLiteDatabase db)
     {
+        db.execSQL("DROP VIEW IF EXISTS "+FEED_VIEW_NAME);
         db.execSQL(FEED_VIEW_CREATE);
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)

@@ -37,10 +37,6 @@ public class AtomFeedParser {
             String lastText = null;
 
             AtomXmlState state = AtomXmlState.NONE;
-//            SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz");
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-//            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-//            sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
             SimpleDateFormat[] date_formats = {
                 new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ss'Z'"),
                 new SimpleDateFormat("yyy-MM-dd'T'HH:mm:ssZ"),
@@ -73,6 +69,15 @@ public class AtomFeedParser {
                                 }
                                 state = AtomXmlState.IN_ENTRY;
                                 article = new Article();
+                            }
+                        }
+                        else
+                        if (state == AtomXmlState.IN_ENTRY) {
+                            if (tag_name.equals("link")) {
+                                String rel = xpp.getAttributeValue(null, "rel");
+                                if (rel != null && rel.equals("alternate")) {
+                                    article.link = xpp.getAttributeValue(null, "href");
+                                }
                             }
                         }
                         break;
@@ -111,12 +116,6 @@ public class AtomFeedParser {
                             else if (tag_name.equals("title")) {
                                 article.title = lastText;
                             }
-                            else if (tag_name.equals("link")) {
-                                String rel = xpp.getAttributeValue(null, "rel");
-                                if (rel != null && rel.equals("alternate")) {
-                                    article.link = xpp.getAttributeValue(null, "href");
-                                }
-                            }
                             else if (tag_name.equals("summary")) {
                                 if (article.description == null) { // prefer content:encoded if present already
                                     article.description = lastText;
@@ -128,10 +127,6 @@ public class AtomFeedParser {
                             else if (tag_name.equals("id")) {
                                 article.guid = lastText;
                             }
-//                            else if (tag_name.equals("published")) {
-//                                if (article.timestamp == null)
-//                                    article.timestamp = sdf.parse(lastText, new ParsePosition(0));
-//                            }
                             else if (tag_name.equals("updated")) {
                                 for (SimpleDateFormat sdf : date_formats) {
                                     Date date = sdf.parse(lastText, new ParsePosition(0));

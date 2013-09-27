@@ -21,7 +21,9 @@ public class Tag {
                     "title TEXT,"+
                     "ordering INTEGER default 99);";
     public static final String TAG_VIEW_CREATE =  "CREATE VIEW IF NOT EXISTS "+TAG_VIEW_NAME+" AS "+
-            "SELECT tag.*,(select count(*) from feedtag where tag_id=tag._id) as feed_count, (select count(*) from article where article.unread=1 and feed_id in (select feed_id from feedtag where tag_id=tag._id)) as unread"+
+            " SELECT tag.*,"+
+            " (SELECT count(*) FROM feedtag WHERE tag_id=tag._id) as feed_count,"+
+            " (SELECT SUM(unread) FROM "+Feed.FEED_VIEW_NAME+" WHERE tag_id=tag._id) as unread"+
             " FROM "+TAG_TABLE_NAME+";";
     public static final String TAG_TABLE_INSERT = "INSERT INTO " +TAG_TABLE_NAME + " (title) VALUES (?);";
     public static final String TAG_TABLE_DROP = "DROP TABLE IF EXISTS "+TAG_TABLE_NAME+";";
@@ -41,6 +43,7 @@ public class Tag {
     }
     public static void createView(SQLiteDatabase db)
     {
+        db.execSQL("DROP VIEW IF EXISTS "+TAG_VIEW_NAME);
         db.execSQL(TAG_VIEW_CREATE);
     }
 

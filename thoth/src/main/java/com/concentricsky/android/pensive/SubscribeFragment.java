@@ -22,8 +22,7 @@ import java.util.HashSet;
  * Created by wiggins on 5/17/13.
  */
 public class SubscribeFragment extends Fragment
-                               implements   ThothFragmentInterface,
-                                            Response.Listener<Feed>,
+                               implements   Response.Listener<Feed>,
                                             Response.ErrorListener
 
 {
@@ -213,16 +212,6 @@ public class SubscribeFragment extends Fragment
         mInputManager.hideSoftInputFromWindow(mLinkText.getWindowToken(), 0);
     }
 
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        int i;
-        for (i=0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            item.setVisible(false);
-        }
-    }
-
     public boolean onOptionsItemSelected(MenuItem item) {
         return false;
     }
@@ -267,7 +256,17 @@ public class SubscribeFragment extends Fragment
 
     @Override
     public void onErrorResponse(VolleyError error) {
-        mError.setText(error.toString());
+        String errmsg = error.toString();
+        errmsg = errmsg.replace("java.net.UnknownHostException: ","");
+        errmsg = errmsg.replace("com.android.volley.NoConnectionError: ","");
+        errmsg = errmsg.replace("java.net.UnknownHostException: ","");
+        errmsg = errmsg.replace("com.android.volley.ParseError","").trim();
+        if (errmsg.isEmpty()) {
+            mError.setText(R.string.subscribe_parse_error);
+        }
+        else {
+            mError.setText(errmsg);
+        }
         mProgress.setVisibility(View.INVISIBLE);
         mError.setVisibility(View.VISIBLE);
     }
