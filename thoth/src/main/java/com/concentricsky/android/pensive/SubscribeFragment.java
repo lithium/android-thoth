@@ -22,8 +22,7 @@ import java.util.HashSet;
  * Created by wiggins on 5/17/13.
  */
 public class SubscribeFragment extends Fragment
-                               implements   ThothFragmentInterface,
-                                            Response.Listener<Feed>,
+                               implements   Response.Listener<Feed>,
                                             Response.ErrorListener
 
 {
@@ -211,16 +210,6 @@ public class SubscribeFragment extends Fragment
     private void search_url() {
         setUrl(mLinkText.getText().toString());
         mInputManager.hideSoftInputFromWindow(mLinkText.getWindowToken(), 0);
-    }
-
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        int i;
-        for (i=0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            item.setVisible(false);
-        }
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {

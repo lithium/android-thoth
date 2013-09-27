@@ -23,8 +23,7 @@ import com.concentricsky.android.pensive.models.Article;
 /**
  * Created by wiggins on 5/23/13.
  */
-public class ArticleFragment extends Fragment implements ThothFragmentInterface,
-                                                         ViewPager.OnPageChangeListener,
+public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeListener,
                                                          LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final int LOADER_ID_ARTICLE_CURSOR = 2;
@@ -57,7 +56,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
 
     public ArticleFragment()
-    {}
+    {
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -131,7 +132,9 @@ public class ArticleFragment extends Fragment implements ThothFragmentInterface,
 
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean drawer_open = false;
+
         MenuItem share =  menu.findItem(R.id.action_share);
         share.setVisible(!drawer_open);
         mShareActionProvider = (ShareActionProvider)share.getActionProvider();

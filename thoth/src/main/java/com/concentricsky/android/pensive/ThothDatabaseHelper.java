@@ -21,6 +21,7 @@ import java.util.zip.ZipInputStream;
  */
 public class ThothDatabaseHelper
 {
+    private static final boolean DEBUG_REBUILD_VIEWS = false;
     private static ThothDatabaseHelper instance = null;
     private ThothOpenHelper mOpenHelper;
 
@@ -47,6 +48,7 @@ public class ThothDatabaseHelper
 
     public void init(Context context) {
        mOpenHelper = new ThothOpenHelper(context);
+
     }
 
 
@@ -73,8 +75,8 @@ public class ThothDatabaseHelper
             Feed.createDatabase(sqLiteDatabase);
             Article.createDatabase(sqLiteDatabase);
 
-            Tag.createView(sqLiteDatabase);
             Feed.createView(sqLiteDatabase);
+            Tag.createView(sqLiteDatabase);
 
 
         }
@@ -121,6 +123,12 @@ public class ThothDatabaseHelper
     }
     public Cursor getTagCursor(String like)
     {
+        if (DEBUG_REBUILD_VIEWS) {
+            SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+            Feed.createView(db);
+            Tag.createView(db);
+        }
+
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
         Cursor c = db.rawQuery("SELECT * FROM " + Tag.TAG_VIEW_NAME + " WHERE (feed_count > 0) "+
                                (like != null ? " AND title LIKE '%"+like+"%'" : "")+
@@ -154,7 +162,7 @@ public class ThothDatabaseHelper
     public Cursor getFeedCursor(long tag_id)
     {
         SQLiteDatabase db = mOpenHelper.getReadableDatabase();
-        Cursor c = db.rawQuery("SELECT "+Feed.FEED_VIEW_NAME+".* FROM "+Feed.FEED_VIEW_NAME+" JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE tag_id=? ORDER BY title COLLATE NOCASE ASC", new String[] {String.valueOf(tag_id)});
+        Cursor c = db.rawQuery("SELECT "+Feed.FEED_VIEW_NAME+".* FROM "+Feed.FEED_VIEW_NAME+" JOIN "+Feed.FEEDTAG_TABLE_NAME+" ON feed_id=_id WHERE feedtag.tag_id=? ORDER BY title COLLATE NOCASE ASC", new String[] {String.valueOf(tag_id)});
         if (!c.moveToFirst())
             return null;
         return c;

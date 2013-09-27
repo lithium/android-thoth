@@ -22,11 +22,16 @@ import java.util.Iterator;
 /**
  * Created by wiggins on 7/7/13.
  */
-public class ManageFragment extends ListFragment
-                            implements   ThothFragmentInterface, LoaderManager.LoaderCallbacks<Cursor> {
+public class ManageFragment extends ResizableListFragment
+                            implements   LoaderManager.LoaderCallbacks<Cursor>
+{
     private static final int LOADER_FEEDS = 1;
     private LoaderManager mLoaderManager;
     private CursorAdapter mAdapter;
+
+    public ManageFragment() {
+        setHasOptionsMenu(true);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,19 +45,15 @@ public class ManageFragment extends ListFragment
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-        int i;
-        for (i=0; i < menu.size(); i++) {
-            MenuItem item = menu.getItem(i);
-            int id = item.getItemId();
-            if (id == R.id.action_subscribe || id == R.id.action_about) {
-                item.setVisible(true);
-            }
-            else {
-                item.setVisible(false);
-            }
-        }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_manage, container, false);
 
+        return root;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_subscribe).setVisible(true);
     }
 
     @Override
@@ -91,7 +92,7 @@ public class ManageFragment extends ListFragment
             }
             else {
                 if (mActivePositions.contains(i))
-                    mActivePositions.remove(i);
+                    mActivePositions.remove((Integer)i);
             }
 
             if (mActivePositions.size() > 1) {
@@ -158,6 +159,7 @@ public class ManageFragment extends ListFragment
                     mProgress.hide();
                     mProgress = null;
                     mLoaderManager.restartLoader(LOADER_FEEDS, null, ManageFragment.this);
+                    reloadTags();
                 }
 
                 @Override
@@ -178,6 +180,9 @@ public class ManageFragment extends ListFragment
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    private void reloadTags() {
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
     }
@@ -216,8 +221,7 @@ public class ManageFragment extends ListFragment
     }
 
     private void edit_feed_at(int position) {
-        FragmentTransaction trans = getFragmentManager().beginTransaction();
-        trans.replace(R.id.content_frame, new EditFeedFragment(get_feed_at(position)), "current_fragment").addToBackStack("EditFeed");
-        trans.commit();
+        ThothMainActivity activity = (ThothMainActivity)getActivity();
+        activity.showEditFeed(get_feed_at(position));
     }
 }

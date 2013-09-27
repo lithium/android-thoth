@@ -31,7 +31,6 @@ import java.util.ArrayList;
  * Created by wiggins on 6/6/13.
  */
 public class ImportFragment extends ListFragment
-                            implements   ThothFragmentInterface
 {
     private Uri mUri;
     private RequestQueue mRequestQueue;
@@ -196,11 +195,6 @@ public class ImportFragment extends ListFragment
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
         getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
-
     }
 
 

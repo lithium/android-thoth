@@ -54,6 +54,7 @@ public class Article implements Serializable
         db.execSQL("CREATE INDEX IF NOT EXISTS timestamp_idx ON "+ARTICLE_TABLE_NAME+" (timestamp);");
         db.execSQL("CREATE INDEX IF NOT EXISTS unread_idx ON "+ARTICLE_TABLE_NAME+" (unread);");
         db.execSQL("CREATE INDEX IF NOT EXISTS feed_id ON "+ARTICLE_TABLE_NAME+" (feed_id);");
+        db.execSQL("CREATE INDEX IF NOT EXISTS feed_id ON "+ARTICLE_TABLE_NAME+" (unread,feed_id);");
     }
     public static void upgradeDatabase(SQLiteDatabase db, int i, int i2)
     {

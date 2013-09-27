@@ -13,10 +13,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.view.*;
-import android.widget.CursorAdapter;
-import android.widget.ListView;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import com.codeslap.gist.SimpleCursorLoader;
 import com.concentricsky.android.pensive.models.Article;
 import com.concentricsky.android.pensive.models.Feed;
@@ -25,9 +22,7 @@ import com.concentricsky.android.pensive.models.Tag;
 /**
  * Created by wiggins on 5/17/13.
  */
-public class ArticleListFragment extends ListFragment
-                                 implements ThothFragmentInterface,
-                                            ThothNavigationDrawerListener
+public class ArticleListFragment extends ResizableListFragment
 {
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
@@ -55,8 +50,10 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mMarkAsReadMenuItem;
     private View mEmpty;
     private AsyncTask<Void, Integer, Void> mTask;
+    private SyncResponseReceiver mSyncResponseReceiver;
 
     public ArticleListFragment() {
+        setHasOptionsMenu(true);
     }
 
     public static ArticleListFragment newInstance(long tag_id, long feed_id) {
@@ -135,13 +132,15 @@ public class ArticleListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
         load_feed();
 
-        SyncResponseReceiver receiver = new SyncResponseReceiver();
+        mSyncResponseReceiver = new SyncResponseReceiver();
         IntentFilter filter = new IntentFilter(RefreshFeedIntentService.ALL_FEEDS_SYNCED);
         filter.addAction(RefreshFeedIntentService.FEED_SYNCED);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
+        getActivity().registerReceiver(mSyncResponseReceiver, filter);
 
     }
+
+
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
@@ -177,6 +176,17 @@ public class ArticleListFragment extends ListFragment
         mPaused = true;
         if (mTask != null)
             mTask.cancel(true);
+
+
+        if (mList != null) {
+            View v = mList.getChildAt(0);
+            mScrollPosition = mList.getFirstVisiblePosition();
+            mScrollOffset = (v == null) ? 0 : v.getTop();
+        }
+
+
+        Activity activity = getActivity();
+        activity.unregisterReceiver(mSyncResponseReceiver);
     }
 
     @Override
@@ -204,6 +214,12 @@ public class ArticleListFragment extends ListFragment
         mFeedId = feed_id;
         load_feed();
     }
+    public void setTagFeed(long tag_id, long feed_id)
+    {
+        mTagId = tag_id;
+        mFeedId = feed_id;
+        load_feed();
+    }
     private void load_feed()
     {
         if (mLoaderManager == null) {
@@ -226,8 +242,11 @@ public class ArticleListFragment extends ListFragment
     }
 
     @Override
-    public void onPrepareOptionsMenu(Menu menu, boolean drawer_open) {
+    public void onPrepareOptionsMenu(Menu menu) {
+        boolean drawer_open = false;
+
         menu.findItem(R.id.action_subscribe).setVisible(!drawer_open);
+
         mRefreshMenuItem = menu.findItem(R.id.action_refresh);
         mRefreshMenuItem.setVisible(mRefreshing || mNoFeeds ? false : !drawer_open);
 
@@ -243,10 +262,6 @@ public class ArticleListFragment extends ListFragment
     public boolean onOptionsItemSelected(MenuItem item)
     {
        switch (item.getItemId()) {
-           case R.id.action_subscribe:
-               ThothMainActivity act = (ThothMainActivity)getActivity();
-               act.showSubscribe(null);
-               return true;
            case R.id.action_refresh:
                refresh_feeds();
                return true;
@@ -258,21 +273,6 @@ public class ArticleListFragment extends ListFragment
                return true;
        }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void onNavigationAllFeeds() {
-        getFragmentManager().popBackStack();
-    }
-
-    @Override
-    public void onNavigationClickTag(long tag_id) {
-        setTag(tag_id);
-    }
-
-    @Override
-    public void onNavigationClickFeed(long feed_id) {
-        setFeed(feed_id);
     }
 
     private void markAllAsRead() {
@@ -351,6 +351,8 @@ public class ArticleListFragment extends ListFragment
         intent.putExtra("tag_id", mTagId);
         activity.startService(intent);
     }
+
+
 
     public class SyncResponseReceiver extends BroadcastReceiver {
 
