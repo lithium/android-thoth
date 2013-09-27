@@ -1,5 +1,6 @@
 package com.concentricsky.android.pensive;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -119,7 +120,9 @@ public class EditFeedFragment extends Fragment
 
             @Override
             protected void onPostExecute(Void aVoid) {
-                getActivity().setProgressBarIndeterminateVisibility(false);
+                Activity a = getActivity();
+                if (a != null)
+                    a.setProgressBarIndeterminateVisibility(false);
                 getFragmentManager().popBackStack();
             }
         };
