@@ -76,7 +76,7 @@ public class ManageFragment extends ListFragment
             }
             else {
                 if (mActivePositions.contains(i))
-                    mActivePositions.remove(i);
+                    mActivePositions.remove((Integer)i);
             }
 
             if (mActivePositions.size() > 1) {
