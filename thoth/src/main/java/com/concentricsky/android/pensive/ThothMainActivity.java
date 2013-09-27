@@ -43,18 +43,9 @@ public class ThothMainActivity extends FragmentActivity
                 articleFragment.setArticle(article_id, tag_id, feed_id);
             } catch (ClassCastException e) {}
         } else {
-            pushArticleDetail(article_id, tag_id, feed_id);
+            showArticleDetail(article_id, tag_id, feed_id);
         }
 
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        //todo: does navigation fragment need this?
-//        if (mLoaderManager.getLoader(TAG_LOADER_ID) == null) {
-//            mLoaderManager.initLoader(TAG_LOADER_ID, null, this); //navigation drawer: start tag loader
-//        }
     }
 
     @Override
@@ -184,7 +175,7 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onTagClicked(long tag_id) {
-        pushArticleList(tag_id, -1, 0, 0);
+        showArticleList(tag_id, -1, 0, 0);
 
         //TODO: pass title in
         //                        Cursor c = getCursor();
@@ -199,7 +190,7 @@ public class ThothMainActivity extends FragmentActivity
     public void onFeedClicked(long feed_id) {
         //TODO: pass title in
 //                    getActionBar().setTitle( title );
-        pushArticleList(-1, feed_id, 0, 0);
+        showArticleList(-1, feed_id, 0, 0);
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
     }
@@ -266,8 +257,6 @@ public class ThothMainActivity extends FragmentActivity
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.list_frame, frag, "current_fragment").addToBackStack("Subscribe");
         trans.commit();
-        invalidateOptionsMenu();
-//        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
 
@@ -278,8 +267,6 @@ public class ThothMainActivity extends FragmentActivity
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.list_frame, frag, "current_fragment").addToBackStack("Import");
         trans.commit();
-        invalidateOptionsMenu();
-//        mDrawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
     }
 
     public void showManageFeeds()
@@ -289,7 +276,6 @@ public class ThothMainActivity extends FragmentActivity
         trans.replace(R.id.list_frame, frag, "ManageFeeds");
         trans.addToBackStack("Manage");
         trans.commit();
-        invalidateOptionsMenu();
     }
 
     public void showEditFeed(Feed feed)
@@ -299,7 +285,6 @@ public class ThothMainActivity extends FragmentActivity
         trans.replace(R.id.list_frame, frag, "EditFeed");
         trans.addToBackStack("EditFeed");
         trans.commit();
-        invalidateOptionsMenu();
     }
 
     private void showAboutDialog() {
@@ -318,7 +303,7 @@ public class ThothMainActivity extends FragmentActivity
     }
 
 
-    public void pushArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
+    public void showArticleList(long tag_id, long feed_id, int scroll_position, int scroll_offset)
     {
         // only ever put one ArticleList on the stack
         ArticleListFragment frag = (ArticleListFragment)mFragmentManager.findFragmentByTag("ArticleList");
@@ -332,10 +317,9 @@ public class ThothMainActivity extends FragmentActivity
             frag.setTagFeed(tag_id, feed_id);
         }
 
-        invalidateOptionsMenu();
     }
 
-    public void pushArticleDetail(long article_id, long tag_id, long feed_id)
+    public void showArticleDetail(long article_id, long tag_id, long feed_id)
     {
         ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
@@ -351,7 +335,6 @@ public class ThothMainActivity extends FragmentActivity
         trans.addToBackStack("ArticleDetail");
         trans.commit();
 
-        invalidateOptionsMenu();
     }
 
     @Override
