@@ -268,15 +268,6 @@ public class ThothMainActivity extends FragmentActivity
         trans.commit();
     }
 
-    public void showEditFeed(Feed feed)
-    {
-        EditFeedFragment frag = new EditFeedFragment(feed);
-        FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.list_frame, frag, "EditFeed");
-        trans.addToBackStack("EditFeed");
-        trans.commit();
-    }
-
     private void showAboutDialog() {
         AboutDialogFragment aboutDialogFragment = new AboutDialogFragment();
         aboutDialogFragment.show(getSupportFragmentManager(), "About");
@@ -312,19 +303,7 @@ public class ThothMainActivity extends FragmentActivity
     public void showArticleDetail(long article_id, long tag_id, long feed_id)
     {
         ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
-        FragmentTransaction trans = mFragmentManager.beginTransaction();
-
-        if (mIsTabletLayout) {
-            ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
-            listFragment.setLayoutWidth(400);
-            trans.replace(R.id.detail_frame, frag, "ArticleDetail");
-            trans.hide(mNavigationFragment);
-        } else {
-            trans.replace(R.id.list_frame, frag, "ArticleDetail");
-        }
-        trans.addToBackStack("ArticleDetail");
-        trans.commit();
-
+        show_detail_frame(frag, "ArticleDetail");
     }
 
     public void showManageFeeds()
@@ -340,11 +319,39 @@ public class ThothMainActivity extends FragmentActivity
         trans.commit();
     }
 
+    public void showEditFeed(Feed feed)
+    {
+        EditFeedFragment frag = (EditFeedFragment)mFragmentManager.findFragmentByTag("EditFeed");
+        if (frag == null) {
+            frag = new EditFeedFragment(feed);
+            show_detail_frame(frag, "EditFeed");
+        } else {
+            //todo: implement for tablet
+//            frag.setFeed(feed);
+        }
+    }
+
+
+    private void show_detail_frame(Fragment frag, String tag)
+    {
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        if (mIsTabletLayout) {
+            ResizableListFragment listFragment = (ResizableListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+            listFragment.setLayoutWidth(400);
+            trans.replace(R.id.detail_frame, frag, tag);
+            trans.hide(mNavigationFragment);
+        } else {
+            trans.replace(R.id.list_frame, frag, tag);
+        }
+        trans.addToBackStack(tag);
+        trans.commit();
+    }
+
     @Override
     public void onBackStackChanged() {
         if (mIsTabletLayout) {
             try {
-                ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+                ResizableListFragment listFragment = (ResizableListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
                 Fragment detailFragment = mFragmentManager.findFragmentById(R.id.detail_frame);
                 if (detailFragment == null && listFragment != null) {
                     listFragment.setLayoutWidth(LinearLayout.LayoutParams.MATCH_PARENT);

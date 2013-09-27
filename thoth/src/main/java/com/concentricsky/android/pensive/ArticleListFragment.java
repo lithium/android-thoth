@@ -22,7 +22,7 @@ import com.concentricsky.android.pensive.models.Tag;
 /**
  * Created by wiggins on 5/17/13.
  */
-public class ArticleListFragment extends ListFragment
+public class ArticleListFragment extends ResizableListFragment
 {
     private static final String TAG = "ArticleListFragment";
     private LoaderManager mLoaderManager;
@@ -185,7 +185,8 @@ public class ArticleListFragment extends ListFragment
         }
 
 
-        getActivity().unregisterReceiver(mSyncResponseReceiver);
+        Activity activity = getActivity();
+        activity.unregisterReceiver(mSyncResponseReceiver);
     }
 
     @Override
@@ -351,12 +352,7 @@ public class ArticleListFragment extends ListFragment
         activity.startService(intent);
     }
 
-    public void setLayoutWidth(int width) {
-        if (mList != null) {
-            mList.setLayoutParams(new LinearLayout.LayoutParams(width, LinearLayout.LayoutParams.MATCH_PARENT));
-        }
 
-    }
 
     public class SyncResponseReceiver extends BroadcastReceiver {
 

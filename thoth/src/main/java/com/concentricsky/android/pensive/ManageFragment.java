@@ -22,7 +22,7 @@ import java.util.Iterator;
 /**
  * Created by wiggins on 7/7/13.
  */
-public class ManageFragment extends ListFragment
+public class ManageFragment extends ResizableListFragment
                             implements   LoaderManager.LoaderCallbacks<Cursor>
 {
     private static final int LOADER_FEEDS = 1;
