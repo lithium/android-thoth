@@ -177,6 +177,14 @@ public class ArticleListFragment extends ListFragment
         if (mTask != null)
             mTask.cancel(true);
 
+
+        if (mList != null) {
+            View v = mList.getChildAt(0);
+            mScrollPosition = mList.getFirstVisiblePosition();
+            mScrollOffset = (v == null) ? 0 : v.getTop();
+        }
+
+
         getActivity().unregisterReceiver(mSyncResponseReceiver);
     }
 
