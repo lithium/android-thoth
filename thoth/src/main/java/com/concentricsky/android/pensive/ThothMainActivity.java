@@ -198,7 +198,7 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onAllFeedsClicked() {
-        mFragmentManager.popBackStack();
+        mFragmentManager.popBackStack(null,FragmentManager.POP_BACK_STACK_INCLUSIVE);
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
     }
