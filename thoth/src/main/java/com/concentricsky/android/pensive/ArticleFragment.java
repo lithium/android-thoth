@@ -169,8 +169,8 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
             return;
         mAdapter.changeCursor(mCursor);
 
-        int pos = mAdapter.getPositionFromId(mArticleId);
-        mViewPager.setCurrentItem(pos, true);
+        mPosition = mAdapter.getPositionFromId(mArticleId);
+        mViewPager.setCurrentItem(mPosition, true);
 
         if (!mInitializedHack && mPosition == 0) {
             // HACK: this is needed to fix THOT-37. onPageSelected isnt called for the first page the first time.
