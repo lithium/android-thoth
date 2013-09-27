@@ -174,6 +174,7 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onTagClicked(long tag_id) {
+        close_detail_if_present();
         showArticleList(tag_id, -1, 0, 0);
 
         //TODO: pass title in
@@ -189,6 +190,7 @@ public class ThothMainActivity extends FragmentActivity
     public void onFeedClicked(long feed_id) {
         //TODO: pass title in
 //                    getActionBar().setTitle( title );
+        close_detail_if_present();
         showArticleList(-1, feed_id, 0, 0);
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
@@ -206,6 +208,12 @@ public class ThothMainActivity extends FragmentActivity
         showManageFeeds();
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
+    }
+    private void close_detail_if_present()
+    {
+        Fragment frag = mFragmentManager.findFragmentByTag("ArticleDetail");
+        if (frag != null)
+            mFragmentManager.popBackStack();
     }
 
 
