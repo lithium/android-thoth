@@ -40,6 +40,12 @@ public class NavigationFragment extends Fragment
     private NavigationLoaderCallbacks mLoaderCallbacks;
     private boolean mFeedsPresent;
 
+    public void reload() {
+        if (mLoaderCallbacks != null && mLoaderManager != null) {
+            mLoaderManager.restartLoader(TAG_LOADER_ID, null, mLoaderCallbacks); //navigation drawer: start tag loader
+        }
+    }
+
 
     public interface NavigationListener
     {

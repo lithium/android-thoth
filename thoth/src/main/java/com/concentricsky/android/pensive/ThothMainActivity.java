@@ -136,8 +136,7 @@ public class ThothMainActivity extends FragmentActivity
 
 
     public void reloadTags() {
-        //todo: move to navigation fragment
-//        mLoaderManager.restartLoader(TAG_LOADER_ID, null, this);
+        mNavigationFragment.reload();
     }
 
 
@@ -269,15 +268,6 @@ public class ThothMainActivity extends FragmentActivity
         trans.commit();
     }
 
-    public void showManageFeeds()
-    {
-        ManageFragment frag = new ManageFragment();
-        FragmentTransaction trans = mFragmentManager.beginTransaction();
-        trans.replace(R.id.list_frame, frag, "ManageFeeds");
-        trans.addToBackStack("Manage");
-        trans.commit();
-    }
-
     public void showEditFeed(Feed feed)
     {
         EditFeedFragment frag = new EditFeedFragment(feed);
@@ -337,13 +327,30 @@ public class ThothMainActivity extends FragmentActivity
 
     }
 
+    public void showManageFeeds()
+    {
+        ManageFragment frag = (ManageFragment)mFragmentManager.findFragmentByTag("ManageFeeds");
+        if (frag != null)
+            return;
+        frag = new ManageFragment();
+
+        FragmentTransaction trans = mFragmentManager.beginTransaction();
+        trans.replace(R.id.list_frame, frag, "ManageFeeds");
+        trans.addToBackStack("ManageFeeds");
+        trans.commit();
+    }
+
     @Override
     public void onBackStackChanged() {
         if (mIsTabletLayout) {
-            ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
-            Fragment detailFragment = mFragmentManager.findFragmentById(R.id.detail_frame);
-            if (detailFragment == null && listFragment != null) {
-                listFragment.setLayoutWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+            try {
+                ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+                Fragment detailFragment = mFragmentManager.findFragmentById(R.id.detail_frame);
+                if (detailFragment == null && listFragment != null) {
+                    listFragment.setLayoutWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+                }
+            } catch (ClassCastException e) {
+
             }
         }
 

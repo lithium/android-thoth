@@ -29,6 +29,10 @@ public class ManageFragment extends ListFragment
     private LoaderManager mLoaderManager;
     private CursorAdapter mAdapter;
 
+    public ManageFragment() {
+        setHasOptionsMenu(true);
+    }
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +42,18 @@ public class ManageFragment extends ListFragment
                 new int[] {android.R.id.text1, android.R.id.text2},
                 0);
 
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View root = inflater.inflate(R.layout.fragment_manage, container, false);
+
+        return root;
+    }
+
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        menu.findItem(R.id.action_subscribe).setVisible(true);
     }
 
     @Override
@@ -143,6 +159,7 @@ public class ManageFragment extends ListFragment
                     mProgress.hide();
                     mProgress = null;
                     mLoaderManager.restartLoader(LOADER_FEEDS, null, ManageFragment.this);
+                    reloadTags();
                 }
 
                 @Override
@@ -163,6 +180,9 @@ public class ManageFragment extends ListFragment
     @Override
     public void onPause() {
         super.onPause();
+    }
+
+    private void reloadTags() {
         ThothMainActivity activity = (ThothMainActivity)getActivity();
         activity.reloadTags();
     }
