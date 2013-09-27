@@ -50,6 +50,7 @@ public class ArticleListFragment extends ListFragment
     private MenuItem mMarkAsReadMenuItem;
     private View mEmpty;
     private AsyncTask<Void, Integer, Void> mTask;
+    private SyncResponseReceiver mSyncResponseReceiver;
 
     public ArticleListFragment() {
         setHasOptionsMenu(true);
@@ -131,13 +132,15 @@ public class ArticleListFragment extends ListFragment
         super.onActivityCreated(savedInstanceState);
         load_feed();
 
-        SyncResponseReceiver receiver = new SyncResponseReceiver();
+        mSyncResponseReceiver = new SyncResponseReceiver();
         IntentFilter filter = new IntentFilter(RefreshFeedIntentService.ALL_FEEDS_SYNCED);
         filter.addAction(RefreshFeedIntentService.FEED_SYNCED);
         filter.addCategory(Intent.CATEGORY_DEFAULT);
-        getActivity().registerReceiver(receiver, filter);
+        getActivity().registerReceiver(mSyncResponseReceiver, filter);
 
     }
+
+
 
     @Override
     public void onViewStateRestored(Bundle savedInstanceState) {
@@ -173,6 +176,8 @@ public class ArticleListFragment extends ListFragment
         mPaused = true;
         if (mTask != null)
             mTask.cancel(true);
+
+        getActivity().unregisterReceiver(mSyncResponseReceiver);
     }
 
     @Override
