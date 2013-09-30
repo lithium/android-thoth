@@ -92,7 +92,7 @@ public class NavigationFragment extends Fragment
         mNavLoaderIds = new SparseIntArray();         //navigation drawer: map loader ids -> tag ids
         mLoaderManager = getLoaderManager();
         mLoaderCallbacks = new NavigationLoaderCallbacks();
-        mLoaderManager.initLoader(TAG_LOADER_ID, null, mLoaderCallbacks); //navigation drawer: start tag loader
+        mLoaderManager.restartLoader(TAG_LOADER_ID, null, mLoaderCallbacks); //navigation drawer: start tag loader
 
         mRequestQueue = Volley.newRequestQueue(activity);
         mImageLoader = new ImageLoader(mRequestQueue, new BitmapLruCache());
