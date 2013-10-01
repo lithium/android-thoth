@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
 import com.codeslap.gist.SimpleCursorLoader;
@@ -52,9 +53,11 @@ public class ArticleListFragment extends ResizableListFragment
     private AsyncTask<Void, Integer, Void> mTask;
     private SyncResponseReceiver mSyncResponseReceiver;
     private boolean mShowHighlighted=false;
+    private SparseArray<Boolean> mHighlightedCache;
 
     public ArticleListFragment() {
         setHasOptionsMenu(true);
+        mHighlightedCache = new SparseArray<Boolean>();
     }
 
     public static ArticleListFragment newInstance(long tag_id, long feed_id) {
@@ -356,6 +359,8 @@ public class ArticleListFragment extends ResizableListFragment
     public void setHighlightedArticle(int position, long id) {
         mList.setItemChecked(position, true);
         mList.smoothScrollToPosition(position);
+
+        mHighlightedCache.append(position, true);
     }
     public void setShowHighlighted(boolean show_highlighted) {
         mShowHighlighted = show_highlighted;
@@ -584,15 +589,19 @@ public class ArticleListFragment extends ResizableListFragment
             boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
 
-
-            boolean checked = getListView().isItemChecked(cursor.getPosition());
+            int pos = cursor.getPosition();
+            boolean checked = getListView().isItemChecked(pos);
             if (mShowHighlighted && checked)
                 view.setBackgroundResource(R.color.selected_background);
-            else
-                view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+            else {
+                boolean local_unread = (mHighlightedCache.get(pos) == null);
+                view.setBackgroundResource(unread && local_unread ? R.color.unread_background : R.color.read_background);
+            }
 
 
         }
+
+
 
         @Override
         public void changeCursor(Cursor cursor) {
