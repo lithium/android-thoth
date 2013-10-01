@@ -2,6 +2,7 @@
 <resources>
     <color name="unread_background">#ffffff</color>
     <color name="read_background">#cccccc</color>
+    <color name="selected_background">#ffcccc</color>
     <color name="border">#efefef</color>
     <color name="navigation_expanded_background">#ffffff</color>
     <color name="navigation_collapsed_background">#ffffff</color>

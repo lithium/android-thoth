@@ -576,7 +576,14 @@ public class ArticleListFragment extends ResizableListFragment
             boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
 
-            view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+
+            boolean checked = getListView().isItemChecked(cursor.getPosition());
+            if (checked)
+                view.setBackgroundResource(R.color.selected_background);
+            else
+                view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+
+
         }
 
         @Override
@@ -595,6 +602,7 @@ public class ArticleListFragment extends ResizableListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         if (mArticleSelectedListener != null)
             mArticleSelectedListener.onArticleSelected(id, mTagId, mFeedId);
+        l.setItemChecked(position, true);
     }
 
 
