@@ -40,7 +40,11 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
     private boolean mInitializedHack=false;
     private WebView mWebView;
     private LoaderManager mLoaderManager;
+    private ArticleSwipedListener mArticleSwipedListener;
 
+    public interface ArticleSwipedListener {
+        void onArticleSwiped(int position, long id);
+    };
 
     public static ArticleFragment newInstance(long article_id, long tag_id, long feed_id)
     {
@@ -73,6 +77,12 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
             long feed_id = args.getLong("feed_id", -1);
             long tag_id = args.getLong("tag_id", -1);
             setArticle(article_id, tag_id, feed_id);
+        }
+
+        try {
+            mArticleSwipedListener = (ArticleSwipedListener)activity;
+        } catch (ClassCastException e) {
+
         }
 
         if (savedInstanceState != null) {
@@ -175,8 +185,8 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
         if (!mInitializedHack && mPosition == 0) {
             // HACK: this is needed to fix THOT-37. onPageSelected isnt called for the first page the first time.
             // see: http://stackoverflow.com/questions/16074058/onpageselected-doesnt-work-for-first-page
-            mInitializedHack = true;
             onPageSelected(0);
+            mInitializedHack = true;
         }
 
     }
@@ -197,6 +207,8 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
             }
 
             mArticleId = a._id;
+            if (mArticleSwipedListener != null)
+                mArticleSwipedListener.onArticleSwiped(i, mArticleId);
 
             Intent intent = new Intent(Intent.ACTION_SEND);
             intent.putExtra(Intent.EXTRA_TEXT, a.link);

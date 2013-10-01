@@ -22,6 +22,7 @@ import com.concentricsky.android.pensive.models.Feed;
 
 public class ThothMainActivity extends FragmentActivity
                                implements  ArticleListFragment.ArticleSelectedListener,
+                                           ArticleFragment.ArticleSwipedListener,
                                            FragmentManager.OnBackStackChangedListener,
                                            NavigationFragment.NavigationListener
 {
@@ -44,6 +45,16 @@ public class ThothMainActivity extends FragmentActivity
             } catch (ClassCastException e) {}
         } else {
             showArticleDetail(article_id, tag_id, feed_id);
+        }
+    }
+
+    @Override
+    public void onArticleSwiped(int position, long id) {
+        try {
+            ArticleListFragment frag = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+            frag.setHighlightedArticle(position, id);
+        } catch (ClassCastException e) {
+
         }
 
     }
@@ -284,6 +295,8 @@ public class ThothMainActivity extends FragmentActivity
     public void showAllFeeds()
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(-1,0); // All Feeds
+        if (mIsTabletLayout)
+            frag.setShowHighlighted(true);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.navigation_frame, mNavigationFragment);
         trans.replace(R.id.list_frame, frag, "AllFeeds");
@@ -299,6 +312,8 @@ public class ThothMainActivity extends FragmentActivity
         if (frag == null) {
             FragmentTransaction trans = mFragmentManager.beginTransaction();
             frag = ArticleListFragment.newInstance(tag_id, feed_id);
+            if (mIsTabletLayout)
+                frag.setShowHighlighted(true);
             trans.replace(R.id.list_frame, frag, "ArticleList");
             trans.addToBackStack("ArticleList");
             trans.commit();

@@ -51,6 +51,7 @@ public class ArticleListFragment extends ResizableListFragment
     private View mEmpty;
     private AsyncTask<Void, Integer, Void> mTask;
     private SyncResponseReceiver mSyncResponseReceiver;
+    private boolean mShowHighlighted=false;
 
     public ArticleListFragment() {
         setHasOptionsMenu(true);
@@ -352,6 +353,12 @@ public class ArticleListFragment extends ResizableListFragment
         activity.startService(intent);
     }
 
+    public void setHighlightedArticle(int position, long id) {
+        mList.setItemChecked(position, true);
+    }
+    public void setShowHighlighted(boolean show_highlighted) {
+        mShowHighlighted = show_highlighted;
+    }
 
 
     public class SyncResponseReceiver extends BroadcastReceiver {
@@ -578,7 +585,7 @@ public class ArticleListFragment extends ResizableListFragment
 
 
             boolean checked = getListView().isItemChecked(cursor.getPosition());
-            if (checked)
+            if (mShowHighlighted && checked)
                 view.setBackgroundResource(R.color.selected_background);
             else
                 view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
@@ -602,7 +609,7 @@ public class ArticleListFragment extends ResizableListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         if (mArticleSelectedListener != null)
             mArticleSelectedListener.onArticleSelected(id, mTagId, mFeedId);
-        l.setItemChecked(position, true);
+        setHighlightedArticle(position, id);
     }
 
 
