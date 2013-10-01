@@ -355,6 +355,7 @@ public class ArticleListFragment extends ResizableListFragment
 
     public void setHighlightedArticle(int position, long id) {
         mList.setItemChecked(position, true);
+        mList.smoothScrollToPosition(position);
     }
     public void setShowHighlighted(boolean show_highlighted) {
         mShowHighlighted = show_highlighted;
