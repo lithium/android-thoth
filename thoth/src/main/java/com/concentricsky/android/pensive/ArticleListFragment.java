@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
+import android.util.SparseArray;
 import android.view.*;
 import android.widget.*;
 import com.codeslap.gist.SimpleCursorLoader;
@@ -51,9 +52,12 @@ public class ArticleListFragment extends ResizableListFragment
     private View mEmpty;
     private AsyncTask<Void, Integer, Void> mTask;
     private SyncResponseReceiver mSyncResponseReceiver;
+    private boolean mShowHighlighted=false;
+    private SparseArray<Boolean> mHighlightedCache;
 
     public ArticleListFragment() {
         setHasOptionsMenu(true);
+        mHighlightedCache = new SparseArray<Boolean>();
     }
 
     public static ArticleListFragment newInstance(long tag_id, long feed_id) {
@@ -352,6 +356,15 @@ public class ArticleListFragment extends ResizableListFragment
         activity.startService(intent);
     }
 
+    public void setHighlightedArticle(int position, long id) {
+        mList.setItemChecked(position, true);
+        mList.smoothScrollToPosition(position);
+
+        mHighlightedCache.append(position, true);
+    }
+    public void setShowHighlighted(boolean show_highlighted) {
+        mShowHighlighted = show_highlighted;
+    }
 
 
     public class SyncResponseReceiver extends BroadcastReceiver {
@@ -543,7 +556,7 @@ public class ArticleListFragment extends ResizableListFragment
             TextView title;
             TextView feed;
             TextView date;
-
+            ImageView highlight;
         };
 
         public ArticleListAdapter(Context context, Cursor cursor) {
@@ -558,6 +571,7 @@ public class ArticleListFragment extends ResizableListFragment
             holder.title = (TextView)root.findViewById(R.id.title);
             holder.feed = (TextView)root.findViewById(R.id.feed_title);
             holder.date = (TextView)root.findViewById(R.id.timestamp);
+            holder.highlight = (ImageView)root.findViewById(R.id.highlight);
             root.setTag(holder);
             return root;
         }
@@ -573,11 +587,20 @@ public class ArticleListFragment extends ResizableListFragment
             if (mTimestampIdx != -1)
                 holder.date.setText(DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)));
 
-            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
-            holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
+            int pos = cursor.getPosition();
+            boolean checked = getListView().isItemChecked(pos);
+            boolean db_unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
+            boolean local_unread = (mHighlightedCache.get(pos) == null);
+            boolean unread = db_unread && local_unread;
 
+            holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
             view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+            holder.highlight.setVisibility(mShowHighlighted && checked ? View.VISIBLE : View.GONE);
+
+
         }
+
+
 
         @Override
         public void changeCursor(Cursor cursor) {
@@ -595,6 +618,7 @@ public class ArticleListFragment extends ResizableListFragment
     public void onListItemClick(ListView l, View v, int position, long id) {
         if (mArticleSelectedListener != null)
             mArticleSelectedListener.onArticleSelected(id, mTagId, mFeedId);
+        setHighlightedArticle(position, id);
     }
 
 

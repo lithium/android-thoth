@@ -7,7 +7,6 @@
                 android:paddingLeft="18dp"
                 android:paddingTop="10dp"
                 android:paddingBottom="10dp"
-                android:paddingRight="18dp"
         >
 
     <TextView android:id="@+id/title"
@@ -15,7 +14,9 @@
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:layout_marginBottom="3dp"
-              android:text="article title"/>
+              android:layout_marginRight="18dp"
+              android:text="article title"
+            />
 
     <TextView android:id="@+id/feed_title"
               android:textAppearance="?android:attr/textAppearanceSmall"
@@ -23,7 +24,8 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_below="@+id/title"
-              android:text="feed title"/>
+              android:text="feed title"
+            />
 
     <TextView android:id="@+id/seperator"
               android:textAppearance="?android:attr/textAppearanceSmall"
@@ -41,6 +43,17 @@
               android:layout_height="wrap_content"
               android:layout_below="@+id/title"
               android:layout_toRightOf="@+id/seperator"
-              android:text="date"/>
+              android:text="date"
+              android:layout_marginRight="18dp"
+            />
+
+
+    <ImageView android:id="@+id/highlight"
+               android:layout_height="match_parent"
+               android:layout_width="wrap_content"
+               android:layout_alignParentRight="true"
+               android:src="@drawable/arrow_highlight"
+               android:visibility="gone"
+               />
 
 </RelativeLayout>
