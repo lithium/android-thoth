@@ -556,7 +556,7 @@ public class ArticleListFragment extends ResizableListFragment
             TextView title;
             TextView feed;
             TextView date;
-
+            ImageView highlight;
         };
 
         public ArticleListAdapter(Context context, Cursor cursor) {
@@ -571,6 +571,7 @@ public class ArticleListFragment extends ResizableListFragment
             holder.title = (TextView)root.findViewById(R.id.title);
             holder.feed = (TextView)root.findViewById(R.id.feed_title);
             holder.date = (TextView)root.findViewById(R.id.timestamp);
+            holder.highlight = (ImageView)root.findViewById(R.id.highlight);
             root.setTag(holder);
             return root;
         }
@@ -586,17 +587,15 @@ public class ArticleListFragment extends ResizableListFragment
             if (mTimestampIdx != -1)
                 holder.date.setText(DateUtils.fuzzyTimestamp(context, cursor.getLong(mTimestampIdx)));
 
-            boolean unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
-            holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
-
             int pos = cursor.getPosition();
             boolean checked = getListView().isItemChecked(pos);
-            if (mShowHighlighted && checked)
-                view.setBackgroundResource(R.color.selected_background);
-            else {
-                boolean local_unread = (mHighlightedCache.get(pos) == null);
-                view.setBackgroundResource(unread && local_unread ? R.color.unread_background : R.color.read_background);
-            }
+            boolean db_unread = cursor.getInt(mUnreadIdx) == 1 ? true : false;
+            boolean local_unread = (mHighlightedCache.get(pos) == null);
+            boolean unread = db_unread && local_unread;
+
+            holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
+            view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+            holder.highlight.setVisibility(mShowHighlighted && checked ? View.VISIBLE : View.GONE);
 
 
         }
