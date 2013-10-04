@@ -189,8 +189,12 @@ public class ArticleListFragment extends ResizableListFragment
         }
 
 
-        Activity activity = getActivity();
-        activity.unregisterReceiver(mSyncResponseReceiver);
+        try {
+            Activity activity = getActivity();
+            activity.unregisterReceiver(mSyncResponseReceiver);
+        } catch (IllegalArgumentException e) {
+            // catch Receiver not registered
+        }
     }
 
     @Override
