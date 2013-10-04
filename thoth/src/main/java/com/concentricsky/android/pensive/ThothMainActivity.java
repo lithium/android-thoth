@@ -34,6 +34,7 @@ public class ThothMainActivity extends FragmentActivity
 
     private boolean mIsTabletLayout=false;
     private NavigationFragment mNavigationFragment;
+    private int mCurrentOrientation=-1;
 
     @Override
     public void onArticleSelected(long article_id, long tag_id, long feed_id){
@@ -110,6 +111,8 @@ public class ThothMainActivity extends FragmentActivity
         contentResolver.setSyncAutomatically(newAccount, authority, true);
 
 
+
+        mCurrentOrientation = getResources().getConfiguration().orientation;
 
 
         Intent intent = getIntent();
@@ -260,6 +263,7 @@ public class ThothMainActivity extends FragmentActivity
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        mCurrentOrientation = newConfig.orientation;
         if (mDrawerToggle != null)
             mDrawerToggle.onConfigurationChanged(newConfig);
     }
@@ -360,9 +364,15 @@ public class ThothMainActivity extends FragmentActivity
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         if (mIsTabletLayout) {
             ResizableListFragment listFragment = (ResizableListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
-            listFragment.setLayoutWidth(400);
-            trans.replace(R.id.detail_frame, frag, tag);
-            trans.hide(mNavigationFragment);
+            if (mCurrentOrientation == Configuration.ORIENTATION_PORTRAIT) {
+                trans.replace(R.id.detail_frame, frag, tag);
+                trans.hide(mNavigationFragment);
+                trans.hide(listFragment);
+            } else {
+                listFragment.setLayoutWidth(400);
+                trans.replace(R.id.detail_frame, frag, tag);
+                trans.hide(mNavigationFragment);
+            }
         } else {
             trans.replace(R.id.list_frame, frag, tag);
         }
