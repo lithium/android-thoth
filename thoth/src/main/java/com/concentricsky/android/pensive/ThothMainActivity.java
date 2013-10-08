@@ -230,6 +230,14 @@ public class ThothMainActivity extends FragmentActivity
             mFragmentManager.popBackStack();
     }
 
+    public void setDisplayHomeAsUpEnabled(boolean enabled) {
+        if (mIsTabletLayout) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null)
+                actionBar.setDisplayHomeAsUpEnabled(enabled);
+        }
+    }
+
 
 
     /*
