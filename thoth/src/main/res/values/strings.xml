@@ -11,17 +11,17 @@
     <string name="search">Search</string>
     <string name="tags">Tags</string>
 
-    <string name="time_ago_seconds">Seconds Ago</string>
-    <string name="time_ago_minute">A Minute Ago</string>
-    <string name="time_ago_minutes">%d Minutes Ago</string>
-    <string name="time_ago_hour">An Hour Ago</string>
-    <string name="time_ago_hours">%d Hours Ago</string>
-    <string name="time_ago_day">A Day Ago</string>
-    <string name="time_ago_days">%d Days Ago</string>
-    <string name="time_ago_years">%d Years Ago</string>
-    <string name="time_ago_year">A Year Ago</string>
-    <string name="time_ago_months">%d Months Ago</string>
-    <string name="time_ago_month">A Month Ago</string>
+    <string name="time_ago_seconds">Seconds ago</string>
+    <string name="time_ago_minute">A minute ago</string>
+    <string name="time_ago_minutes">%d minutes ago</string>
+    <string name="time_ago_hour">An hour ago</string>
+    <string name="time_ago_hours">%d hours ago</string>
+    <string name="time_ago_day">A day ago</string>
+    <string name="time_ago_days">%d days ago</string>
+    <string name="time_ago_years">%d years ago</string>
+    <string name="time_ago_year">A year ago</string>
+    <string name="time_ago_months">%d months ago</string>
+    <string name="time_ago_month">A month ago</string>
     <string name="share_with_label">Add to Pensive</string>
     <string name="unfiled">Unfiled</string>
 
