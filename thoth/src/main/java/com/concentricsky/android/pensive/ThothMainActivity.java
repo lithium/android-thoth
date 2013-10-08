@@ -307,8 +307,9 @@ public class ThothMainActivity extends FragmentActivity
     public void showAllFeeds()
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(-1,0); // All Feeds
-        if (mIsTabletLayout)
+        if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
             frag.setShowHighlighted(true);
+        }
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.navigation_frame, mNavigationFragment);
         trans.replace(R.id.list_frame, frag, "AllFeeds");
@@ -324,8 +325,9 @@ public class ThothMainActivity extends FragmentActivity
         if (frag == null) {
             FragmentTransaction trans = mFragmentManager.beginTransaction();
             frag = ArticleListFragment.newInstance(tag_id, feed_id);
-            if (mIsTabletLayout)
+            if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
                 frag.setShowHighlighted(true);
+            }
             trans.replace(R.id.list_frame, frag, "ArticleList");
             trans.addToBackStack("ArticleList");
             trans.commit();
