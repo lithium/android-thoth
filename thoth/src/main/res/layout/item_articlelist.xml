@@ -18,42 +18,33 @@
               android:text="article title"
             />
 
+    <TextView android:id="@+id/feed_title"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:textColor="?android:attr/textColorHint"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/title"
+              android:text="feed title"
+            />
 
+    <TextView android:id="@+id/seperator"
+              android:textAppearance="?android:attr/textAppearanceSmall"
+              android:textColor="?android:attr/textColorHint"
+              android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:layout_below="@+id/title"
+              android:layout_toRightOf="@+id/feed_title"
+              android:text=" / "/>
 
     <TextView android:id="@+id/timestamp"
               android:textAppearance="?android:attr/textAppearanceSmall"
               android:textColor="?android:attr/textColorHint"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
-              android:text="5 minutes ago"
+              android:layout_below="@+id/title"
+              android:layout_toRightOf="@+id/seperator"
+              android:text="date"
               android:layout_marginRight="18dp"
-
-              android:layout_below="@+id/title"
-              android:layout_alignParentRight="true"
-            />
-    <TextView android:id="@+id/seperator"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="?android:attr/textColorHint"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:text="  "
-
-              android:layout_below="@+id/title"
-              android:layout_toLeftOf="@id/timestamp"
-            />
-
-    <TextView android:id="@+id/feed_title"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="?android:attr/textColorHint"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:singleLine="true"
-              android:ellipsize="end"
-              android:text="really long feed name that causes ugly wrapping"
-
-              android:layout_below="@+id/title"
-              android:layout_toLeftOf="@id/seperator"
-              android:layout_alignParentLeft="true"
             />
 
 
