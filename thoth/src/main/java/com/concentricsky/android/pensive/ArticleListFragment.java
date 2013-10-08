@@ -209,6 +209,8 @@ public class ArticleListFragment extends ResizableListFragment
     public void setTag(long tag_id) {
         mTagId = tag_id;
         mFeedId = -1;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
 
@@ -220,12 +222,16 @@ public class ArticleListFragment extends ResizableListFragment
 
         mTagId = -1;
         mFeedId = feed_id;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
     public void setTagFeed(long tag_id, long feed_id)
     {
         mTagId = tag_id;
         mFeedId = feed_id;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
     private void load_feed()
