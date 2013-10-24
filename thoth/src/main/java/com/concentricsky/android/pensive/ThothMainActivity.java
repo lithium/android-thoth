@@ -307,9 +307,6 @@ public class ThothMainActivity extends FragmentActivity
     public void showAllFeeds()
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(-1,0); // All Feeds
-        if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
-            frag.setShowHighlighted(true);
-        }
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.navigation_frame, mNavigationFragment);
         trans.replace(R.id.list_frame, frag, "AllFeeds");
@@ -325,9 +322,6 @@ public class ThothMainActivity extends FragmentActivity
         if (frag == null) {
             FragmentTransaction trans = mFragmentManager.beginTransaction();
             frag = ArticleListFragment.newInstance(tag_id, feed_id);
-            if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
-                frag.setShowHighlighted(true);
-            }
             trans.replace(R.id.list_frame, frag, "ArticleList");
             trans.addToBackStack("ArticleList");
             trans.commit();
@@ -341,6 +335,11 @@ public class ThothMainActivity extends FragmentActivity
     {
         ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
         show_detail_frame(frag, "ArticleDetail");
+        if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
+            ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+            if (listFragment != null)
+                listFragment.setShowHighlighted(true);
+        }
     }
 
     public void showManageFeeds()
@@ -394,16 +393,21 @@ public class ThothMainActivity extends FragmentActivity
     public void onBackStackChanged() {
         if (mIsTabletLayout) {
             try {
-                ResizableListFragment listFragment = (ResizableListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+                ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
                 Fragment detailFragment = mFragmentManager.findFragmentById(R.id.detail_frame);
                 if (detailFragment == null && listFragment != null) {
                     listFragment.setLayoutWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+                }
+
+                if (detailFragment != null && listFragment != null) {
+                    listFragment.setShowHighlighted(true);
+                } else {
+                    listFragment.setShowHighlighted(false);
                 }
             } catch (ClassCastException e) {
 
             }
         }
-
     }
 
 }
