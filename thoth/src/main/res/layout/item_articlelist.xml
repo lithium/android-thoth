@@ -4,55 +4,72 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?android:attr/listPreferredItemHeight"
-                android:paddingLeft="18dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
         >
+
 
     <TextView android:id="@+id/title"
               android:textAppearance="?android:attr/textAppearanceListItem"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginBottom="3dp"
+              android:layout_marginBottom="6dp"
               android:layout_marginRight="18dp"
+              android:layout_marginLeft="12dp"
+              android:layout_marginTop="12dp"
               android:text="article title"
             />
 
-    <TextView android:id="@+id/feed_title"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="?android:attr/textColorHint"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@+id/title"
-              android:text="feed title"
-            />
+    <TableLayout android:id="@+id/feed_row"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:paddingBottom="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/title"
+        android:shrinkColumns="0"
+        android:stretchColumns="2"
+        >
+        <TableRow>
 
-    <TextView android:id="@+id/seperator"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="?android:attr/textColorHint"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@+id/title"
-              android:layout_toRightOf="@+id/feed_title"
-              android:text=" / "/>
 
-    <TextView android:id="@+id/timestamp"
-              android:textAppearance="?android:attr/textAppearanceSmall"
-              android:textColor="?android:attr/textColorHint"
-              android:layout_width="wrap_content"
-              android:layout_height="wrap_content"
-              android:layout_below="@+id/title"
-              android:layout_toRightOf="@+id/seperator"
-              android:text="date"
-              android:layout_marginRight="18dp"
-            />
+        <TextView android:id="@+id/feed_title"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textColor="?android:attr/textColorHint"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:singleLine="true"
+                  android:ellipsize="end"
+                  android:text="really long feed title that causes obnoxious wrapping"
+                />
+
+        <TextView android:id="@+id/seperator"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textColor="?android:attr/textColorHint"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@+id/title"
+                  android:layout_toRightOf="@+id/feed_title"
+                  android:text=" / "/>
+
+        <TextView android:id="@+id/timestamp"
+                  android:textAppearance="?android:attr/textAppearanceSmall"
+                  android:textColor="?android:attr/textColorHint"
+                  android:layout_width="wrap_content"
+                  android:layout_height="wrap_content"
+                  android:layout_below="@+id/title"
+                  android:layout_toRightOf="@+id/seperator"
+                  android:text="15 seconds ago"
+                  android:layout_marginRight="18dp"
+                />
+        </TableRow>
+    </TableLayout>
 
 
     <ImageView android:id="@+id/highlight"
-               android:layout_height="match_parent"
+               android:layout_height="wrap_content"
                android:layout_width="wrap_content"
                android:layout_alignParentRight="true"
-               android:src="@drawable/arrow_highlight"
+               android:layout_centerVertical="true"
+               android:src="@drawable/active"
                android:visibility="gone"
                />
 

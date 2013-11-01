@@ -5,12 +5,6 @@
               android:layout_width="match_parent"
               android:layout_height="match_parent">
 
-   <!--<TextView android:id="@+id/articlelist_feed_title"-->
-              <!--android:layout_width="match_parent"-->
-              <!--android:layout_height="wrap_content"-->
-              <!--android:textSize="20dp"-->
-              <!--android:text="All Feeds"/>-->
-
     <ProgressBar android:id="@id/android:progress"
                  style="?android:attr/progressBarStyleHorizontal"
                  android:layout_marginBottom="-6dp"
@@ -23,11 +17,6 @@
                  android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
             />
 
-    <ListView android:id="@id/android:list"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:choiceMode="singleChoice"
-              />
 
     <TextView android:id="@+id/empty"
               android:layout_width="match_parent"
@@ -38,14 +27,37 @@
               android:text="@string/all_read"
             />
 
-    <TextView android:id="@+id/no_feeds"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:text="@string/empty_feeds_message"
-              android:gravity="center"
-              android:layout_marginLeft="20dp"
-              android:layout_marginRight="20dp"
-              android:visibility="gone"
-            />
+    <LinearLayout android:id="@+id/no_feeds"
+                  android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:layout_marginLeft="20dp"
+                  android:layout_marginRight="20dp"
+                  android:orientation="vertical"
+                  android:visibility="gone"
+                  android:gravity="center|center_vertical"
+                  >
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/empty_feeds_title"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:textSize="24dp"
+                android:layout_marginBottom="6dp"
+                />
+        <TextView
+                  android:layout_width="match_parent"
+                  android:layout_height="wrap_content"
+                  android:text="@string/empty_feeds_message"
+                  android:gravity="center"
+                  android:textSize="18dp"
+                  android:textStyle="normal"
+                />
+    </LinearLayout>
 
+    <ListView android:id="@id/android:list"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:choiceMode="singleChoice"
+            />
 </LinearLayout>

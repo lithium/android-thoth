@@ -183,6 +183,12 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onFeedsDiscovered(boolean feeds_are_present) {
+        try {
+            ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+            listFragment.setNoFeeds(!feeds_are_present);
+        } catch (ClassCastException e) {
+            //
+        }
 
     }
 
@@ -223,11 +229,27 @@ public class ThothMainActivity extends FragmentActivity
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
     }
+
+    @Override
+    public void onSubscribeClicked() {
+        showSubscribe(null);
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+    }
+
     private void close_detail_if_present()
     {
         Fragment frag = mFragmentManager.findFragmentByTag("ArticleDetail");
         if (frag != null)
             mFragmentManager.popBackStack();
+    }
+
+    public void setDisplayHomeAsUpEnabled(boolean enabled) {
+        if (mIsTabletLayout) {
+            ActionBar actionBar = getActionBar();
+            if (actionBar != null)
+                actionBar.setDisplayHomeAsUpEnabled(enabled);
+        }
     }
 
 
@@ -299,8 +321,6 @@ public class ThothMainActivity extends FragmentActivity
     public void showAllFeeds()
     {
         ArticleListFragment frag = ArticleListFragment.newInstance(-1,0); // All Feeds
-        if (mIsTabletLayout)
-            frag.setShowHighlighted(true);
         FragmentTransaction trans = mFragmentManager.beginTransaction();
         trans.replace(R.id.navigation_frame, mNavigationFragment);
         trans.replace(R.id.list_frame, frag, "AllFeeds");
@@ -316,8 +336,6 @@ public class ThothMainActivity extends FragmentActivity
         if (frag == null) {
             FragmentTransaction trans = mFragmentManager.beginTransaction();
             frag = ArticleListFragment.newInstance(tag_id, feed_id);
-            if (mIsTabletLayout)
-                frag.setShowHighlighted(true);
             trans.replace(R.id.list_frame, frag, "ArticleList");
             trans.addToBackStack("ArticleList");
             trans.commit();
@@ -331,6 +349,11 @@ public class ThothMainActivity extends FragmentActivity
     {
         ArticleFragment frag = ArticleFragment.newInstance(article_id, tag_id, feed_id);
         show_detail_frame(frag, "ArticleDetail");
+        if (mIsTabletLayout && mCurrentOrientation != Configuration.ORIENTATION_PORTRAIT) {
+            ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+            if (listFragment != null)
+                listFragment.setShowHighlighted(true);
+        }
     }
 
     public void showManageFeeds()
@@ -384,16 +407,21 @@ public class ThothMainActivity extends FragmentActivity
     public void onBackStackChanged() {
         if (mIsTabletLayout) {
             try {
-                ResizableListFragment listFragment = (ResizableListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+                ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
                 Fragment detailFragment = mFragmentManager.findFragmentById(R.id.detail_frame);
                 if (detailFragment == null && listFragment != null) {
                     listFragment.setLayoutWidth(LinearLayout.LayoutParams.MATCH_PARENT);
+                }
+
+                if (detailFragment != null && listFragment != null) {
+                    listFragment.setShowHighlighted(true);
+                } else {
+                    listFragment.setShowHighlighted(false);
                 }
             } catch (ClassCastException e) {
 
             }
         }
-
     }
 
 }

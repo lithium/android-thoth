@@ -5,11 +5,9 @@ import android.content.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.SparseArray;
@@ -37,7 +35,7 @@ public class ArticleListFragment extends ResizableListFragment
     private static final int TAG_LOADER_ID=-4;
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
-    private TextView mNoFeedsText;
+    private View mNoFeedsView;
     private ProgressBar mProgress;
     private boolean mNoFeeds=false;
     private ListView mList;
@@ -108,8 +106,8 @@ public class ArticleListFragment extends ResizableListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
-        mNoFeedsText = (TextView) root.findViewById(R.id.no_feeds);
-        mNoFeedsText.setOnClickListener(new View.OnClickListener() {
+        mNoFeedsView = root.findViewById(R.id.no_feeds);
+        mNoFeedsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ThothMainActivity activity = (ThothMainActivity) getActivity();
@@ -209,6 +207,8 @@ public class ArticleListFragment extends ResizableListFragment
     public void setTag(long tag_id) {
         mTagId = tag_id;
         mFeedId = -1;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
 
@@ -220,12 +220,16 @@ public class ArticleListFragment extends ResizableListFragment
 
         mTagId = -1;
         mFeedId = feed_id;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
     public void setTagFeed(long tag_id, long feed_id)
     {
         mTagId = tag_id;
         mFeedId = feed_id;
+        mScrollPosition = 0;
+        mScrollOffset = 0;
         load_feed();
     }
     private void load_feed()
@@ -403,8 +407,8 @@ public class ArticleListFragment extends ResizableListFragment
 
     public void setNoFeeds(boolean has_none) {
         mNoFeeds = has_none;
-        if (mNoFeedsText != null) {
-            mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
+        if (mNoFeedsView != null) {
+            mNoFeedsView.setVisibility(has_none ? View.VISIBLE : View.GONE);
         }
 
         if (mMarkAsReadMenuItem != null)
@@ -598,10 +602,8 @@ public class ArticleListFragment extends ResizableListFragment
             boolean unread = db_unread && local_unread;
 
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
-            view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+            view.setBackgroundResource(unread ? R.drawable.rightborder_unread : R.drawable.rightborder_read);
             holder.highlight.setVisibility(mShowHighlighted && checked ? View.VISIBLE : View.GONE);
-
-
         }
 
 

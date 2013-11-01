@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" >Pensive</string>
+    <string name="app_name">Pensive</string>
     <string name="action_settings" >Settings
     </string>
     <string name="drawer_open" >Open navigation drawer</string>
@@ -11,17 +11,17 @@
     <string name="search">Search</string>
     <string name="tags">Tags</string>
 
-    <string name="time_ago_seconds">Seconds Ago</string>
-    <string name="time_ago_minute">A Minute Ago</string>
-    <string name="time_ago_minutes">%d Minutes Ago</string>
-    <string name="time_ago_hour">An Hour Ago</string>
-    <string name="time_ago_hours">%d Hours Ago</string>
-    <string name="time_ago_day">A Day Ago</string>
-    <string name="time_ago_days">%d Days Ago</string>
-    <string name="time_ago_years">%d Years Ago</string>
-    <string name="time_ago_year">A Year Ago</string>
-    <string name="time_ago_months">%d Months Ago</string>
-    <string name="time_ago_month">A Month Ago</string>
+    <string name="time_ago_seconds">Seconds ago</string>
+    <string name="time_ago_minute">A minute ago</string>
+    <string name="time_ago_minutes">%d minutes ago</string>
+    <string name="time_ago_hour">An hour ago</string>
+    <string name="time_ago_hours">%d hours ago</string>
+    <string name="time_ago_day">A day ago</string>
+    <string name="time_ago_days">%d days ago</string>
+    <string name="time_ago_years">%d years ago</string>
+    <string name="time_ago_year">A year ago</string>
+    <string name="time_ago_months">%d months ago</string>
+    <string name="time_ago_month">A month ago</string>
     <string name="share_with_label">Add to Pensive</string>
     <string name="unfiled">Unfiled</string>
 
@@ -29,9 +29,11 @@
     <string name="action_hide_read">Show only unread</string>
     <string name="action_mark_as_read">Mark all as read</string>
     <string name="all_feeds">All Feeds</string>
-    <string name="empty_feeds_message">No feeds yet.\n\nIn a browser share to Pensive to search for feeds, or add a feed by tapping + at the top.</string>
+    <string name="empty_feeds_title">No feeds yet.</string>
+    <string name="empty_feeds_message">In a browser use Share... and choose Add to Pensive to search for feeds on the current page.\nOr add a feed by name by tapping + at the top.</string>
     <string name="all_read">All articles read.</string>
     <string name="action_manage_feeds">Manage Feeds</string>
+    <string name="add_new_feed">Add New Feed</string>
     <string name="title">Title</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>

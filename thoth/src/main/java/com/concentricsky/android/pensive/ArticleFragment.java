@@ -1,5 +1,6 @@
 package com.concentricsky.android.pensive;
 
+import android.app.ActionBar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -88,11 +89,16 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
         if (savedInstanceState != null) {
             mArticleId = savedInstanceState.getLong("article_id");
         }
+
+            setDisplayHomeAsUpEnabled(true);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
+    private void setDisplayHomeAsUpEnabled(boolean enabled)
+    {
+        try {
+            ThothMainActivity activity = (ThothMainActivity)getActivity();
+            activity.setDisplayHomeAsUpEnabled(enabled);
+        } catch (ClassCastException e) {  }
     }
 
     @Override
@@ -128,6 +134,9 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
                 }
                 return true;
             }
+            case android.R.id.home:
+                getFragmentManager().popBackStack();
+                return true;
         }
 
         return super.onOptionsItemSelected(item);
@@ -189,6 +198,7 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
             mInitializedHack = true;
         }
 
+
     }
 
     @Override
@@ -230,6 +240,8 @@ public class ArticleFragment extends Fragment implements ViewPager.OnPageChangeL
         super.onPause();
         if (mWebView != null)
             mWebView.loadUrl("file:///android_asset/stop_playing_video");
+
+        setDisplayHomeAsUpEnabled(false);
     }
 
     @Override
