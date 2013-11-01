@@ -17,11 +17,6 @@
                  android:indeterminateDrawable="@drawable/progress_indeterminate_horizontal_holo"
             />
 
-    <ListView android:id="@id/android:list"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:choiceMode="singleChoice"
-              />
 
     <TextView android:id="@+id/empty"
               android:layout_width="match_parent"
@@ -60,4 +55,9 @@
                 />
     </LinearLayout>
 
+    <ListView android:id="@id/android:list"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:choiceMode="singleChoice"
+            />
 </LinearLayout>
