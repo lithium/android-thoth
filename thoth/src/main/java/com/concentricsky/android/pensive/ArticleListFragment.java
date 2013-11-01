@@ -5,11 +5,9 @@ import android.content.*;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Handler;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.support.v4.app.ListFragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.util.SparseArray;
@@ -604,10 +602,8 @@ public class ArticleListFragment extends ResizableListFragment
             boolean unread = db_unread && local_unread;
 
             holder.title.setTextAppearance(context, unread ? R.style.TextAppearance_article_unread : R.style.TextAppearance_article_read);
-            view.setBackgroundResource(unread ? R.color.unread_background : R.color.read_background);
+            view.setBackgroundResource(unread ? R.drawable.rightborder_unread : R.drawable.rightborder_read);
             holder.highlight.setVisibility(mShowHighlighted && checked ? View.VISIBLE : View.GONE);
-
-
         }
 
 
