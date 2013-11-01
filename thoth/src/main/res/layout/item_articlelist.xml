@@ -4,24 +4,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:minHeight="?android:attr/listPreferredItemHeight"
-                android:paddingLeft="18dp"
-                android:paddingTop="10dp"
-                android:paddingBottom="10dp"
         >
+
 
     <TextView android:id="@+id/title"
               android:textAppearance="?android:attr/textAppearanceListItem"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
-              android:layout_marginBottom="3dp"
+              android:layout_marginBottom="6dp"
               android:layout_marginRight="18dp"
+              android:layout_marginLeft="12dp"
+              android:layout_marginTop="12dp"
               android:text="article title"
             />
 
-    <TableLayout
+    <TableLayout android:id="@+id/feed_row"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/title"
+        android:layout_marginLeft="12dp"
+        android:paddingBottom="2dp"
+        android:layout_alignParentBottom="true"
+        android:layout_below="@id/title"
         android:shrinkColumns="0"
         android:stretchColumns="2"
         >
