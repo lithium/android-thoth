@@ -33,6 +33,7 @@
     <string name="empty_feeds_message">In a browser use Share... and choose Add to Pensive to search for feeds on the current page.\nOr add a feed by name by tapping + at the top.</string>
     <string name="all_read">All articles read.</string>
     <string name="action_manage_feeds">Manage Feeds</string>
+    <string name="add_new_feed">Add New Feed</string>
     <string name="title">Title</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -45,7 +46,6 @@
     <string name="about_contact">Suggestions? <a href="mailto:hello@concentricsky.com">Send us an email</a>.</string>
     <string name="saving_feeds">Saving feeds...</string>
     <string name="add_to_thoth">Add to Pensive</string>
-    <string name="add_new_feed">Add new feed</string>
     <string name="import_status_duplicate">Duplicate.</string>
     <string name="import_status_searching">Searching...</string>
     <string name="import_status_added">Added.</string>
