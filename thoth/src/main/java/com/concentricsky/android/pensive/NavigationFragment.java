@@ -55,6 +55,7 @@ public class NavigationFragment extends Fragment
         public void onFeedClicked(long feed_id);
         public void onAllFeedsClicked();
         public void onManageFeedsClicked();
+        public void onSubscribeClicked();
     };
     public void setNavigationListener(NavigationListener listener) { mNavigationListener = listener; }
 
@@ -265,6 +266,10 @@ public class NavigationFragment extends Fragment
                             //manage feeds
                             mNavigationListener.onManageFeedsClicked();
                         }
+                        else if (_id == -4) {
+                            //subscribe
+                            mNavigationListener.onSubscribeClicked();
+                        }
                         else if (_id > 0) {
                             //tag
                             long tag_id = mDrawerAdapter.getGroupId(groupPosition);
@@ -311,9 +316,11 @@ public class NavigationFragment extends Fragment
             MatrixCursor top_extras = new MatrixCursor(extras_fields);
             MatrixCursor bottom_extras = new MatrixCursor(extras_fields);
 
-            if (mFeedsPresent)
+            if (mFeedsPresent) {
                 top_extras.addRow(new String[] {"-2", getString(R.string.all_feeds)});
-            bottom_extras.addRow(new String[] {"-3", getString(R.string.action_manage_feeds)});
+                bottom_extras.addRow(new String[] {"-3", getString(R.string.action_manage_feeds)});
+            }
+            bottom_extras.addRow(new String[] {"-4", getString(R.string.add_new_feed)});
 
             Cursor newCursor = new MergeCursor(new Cursor[] {top_extras, cursor, bottom_extras});
             super.changeCursor(newCursor);

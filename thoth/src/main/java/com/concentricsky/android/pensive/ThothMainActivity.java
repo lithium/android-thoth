@@ -223,6 +223,14 @@ public class ThothMainActivity extends FragmentActivity
         if (mDrawerLayout != null)
             mDrawerLayout.closeDrawers();
     }
+
+    @Override
+    public void onSubscribeClicked() {
+        showSubscribe(null);
+        if (mDrawerLayout != null)
+            mDrawerLayout.closeDrawers();
+    }
+
     private void close_detail_if_present()
     {
         Fragment frag = mFragmentManager.findFragmentByTag("ArticleDetail");
