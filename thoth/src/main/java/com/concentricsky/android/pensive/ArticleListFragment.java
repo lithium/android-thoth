@@ -35,7 +35,7 @@ public class ArticleListFragment extends ResizableListFragment
     private static final int TAG_LOADER_ID=-4;
     private MenuItem mRefreshMenuItem;
     private boolean mRefreshing=false;
-    private TextView mNoFeedsText;
+    private View mNoFeedsView;
     private ProgressBar mProgress;
     private boolean mNoFeeds=false;
     private ListView mList;
@@ -106,8 +106,8 @@ public class ArticleListFragment extends ResizableListFragment
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_articlelist, container, false);
-        mNoFeedsText = (TextView) root.findViewById(R.id.no_feeds);
-        mNoFeedsText.setOnClickListener(new View.OnClickListener() {
+        mNoFeedsView = root.findViewById(R.id.no_feeds);
+        mNoFeedsView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 ThothMainActivity activity = (ThothMainActivity) getActivity();
@@ -407,8 +407,8 @@ public class ArticleListFragment extends ResizableListFragment
 
     public void setNoFeeds(boolean has_none) {
         mNoFeeds = has_none;
-        if (mNoFeedsText != null) {
-            mNoFeedsText.setVisibility(has_none ? View.VISIBLE : View.GONE);
+        if (mNoFeedsView != null) {
+            mNoFeedsView.setVisibility(has_none ? View.VISIBLE : View.GONE);
         }
 
         if (mMarkAsReadMenuItem != null)

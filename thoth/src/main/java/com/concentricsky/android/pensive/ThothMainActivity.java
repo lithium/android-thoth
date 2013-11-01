@@ -183,6 +183,9 @@ public class ThothMainActivity extends FragmentActivity
 
     @Override
     public void onFeedsDiscovered(boolean feeds_are_present) {
+        ArticleListFragment listFragment = (ArticleListFragment)mFragmentManager.findFragmentById(R.id.list_frame);
+
+        listFragment.setNoFeeds(!feeds_are_present);
 
     }
 

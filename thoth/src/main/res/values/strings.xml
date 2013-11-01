@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name" >Pensive</string>
+    <string name="app_name">Pensive</string>
     <string name="action_settings" >Settings
     </string>
     <string name="drawer_open" >Open navigation drawer</string>
@@ -29,7 +29,8 @@
     <string name="action_hide_read">Show only unread</string>
     <string name="action_mark_as_read">Mark all as read</string>
     <string name="all_feeds">All Feeds</string>
-    <string name="empty_feeds_message">No feeds yet.\n\nIn a browser share to Pensive to search for feeds, or add a feed by tapping + at the top.</string>
+    <string name="empty_feeds_title">No feeds yet.</string>
+    <string name="empty_feeds_message">In a browser use Share... and choose Add to Pensive to search for feeds on the current page.\nOr add a feed by name by tapping + at the top.</string>
     <string name="all_read">All articles read.</string>
     <string name="action_manage_feeds">Manage Feeds</string>
     <string name="title">Title</string>
@@ -44,6 +45,7 @@
     <string name="about_contact">Suggestions? <a href="mailto:hello@concentricsky.com">Send us an email</a>.</string>
     <string name="saving_feeds">Saving feeds...</string>
     <string name="add_to_thoth">Add to Pensive</string>
+    <string name="add_new_feed">Add new feed</string>
     <string name="import_status_duplicate">Duplicate.</string>
     <string name="import_status_searching">Searching...</string>
     <string name="import_status_added">Added.</string>
